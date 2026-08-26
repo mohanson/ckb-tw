@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CKB Testnet Wallet</title>
+  <style>
+    :root { --ink:#13222d; --muted:#5e7280; --paper:#f3f8f6; --panel:#ffffff; --line:#d6e1dd; --mint:#0a806d; --mint-dark:#056355; --coral:#d7634f; --soft-mint:#e0f2eb; }
+    * { box-sizing:border-box; }
+    body { width:390px; min-height:500px; margin:0; background:linear-gradient(145deg,#eef8f4 0%,#f9fbf9 48%,#f8f1ec 100%); color:var(--ink); font:14px/1.45 "Avenir Next","Noto Sans SC",sans-serif; }
+    main { padding:22px; }
+    header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:22px; }
+    h1 { margin:0; font-size:20px; letter-spacing:0; }
+    h2 { margin:0 0 14px; font-size:16px; }
+    .network { color:var(--mint-dark); background:var(--soft-mint); border:1px solid #bae2d5; border-radius:4px; padding:3px 7px; font-size:11px; font-weight:700; }
+    .card { background:rgba(255,255,255,.92); border:1px solid var(--line); border-radius:8px; padding:16px; box-shadow:0 8px 24px rgba(33,61,52,.06); }
+    .card + .card { margin-top:12px; }
+    .hint { margin:0 0 15px; color:var(--muted); font-size:12px; }
+    label { display:block; margin:12px 0 5px; font-weight:650; font-size:12px; }
+    input, textarea, select { width:100%; border:1px solid #bfceca; border-radius:4px; background:#fff; color:var(--ink); padding:10px; font:12px/1.35 ui-monospace,"Cascadia Code",monospace; outline:none; }
+    input:focus, textarea:focus, select:focus { border-color:var(--mint); box-shadow:0 0 0 3px rgba(10,128,109,.13); }
+    textarea { resize:vertical; min-height:72px; }
+    button { border:0; border-radius:4px; padding:10px 12px; background:var(--mint); color:#fff; cursor:pointer; font:600 13px "Avenir Next","Noto Sans SC",sans-serif; }
+    button:hover { background:var(--mint-dark); }
+    button.secondary { background:#e7eeeb; color:#23413b; }
+    button.secondary:hover { background:#d5e2dc; }
+    button.danger { background:#fff0ed; color:#a33c2c; }
+    button:disabled { cursor:wait; opacity:.62; }
+    .actions { display:flex; gap:8px; margin-top:14px; }
+    .actions > button { flex:1; }
+    .address { overflow-wrap:anywhere; margin:6px 0 0; font:12px/1.45 ui-monospace,"Cascadia Code",monospace; color:#23413b; }
+    .balance { margin:4px 0 0; color:var(--mint-dark); font:700 27px/1.1 "Avenir Next","Noto Sans SC",sans-serif; letter-spacing:0; }
+    .balance small { color:var(--muted); font-size:13px; font-weight:600; }
+    .row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .row button { padding:6px 9px; font-size:11px; white-space:nowrap; }
+    .status { min-height:19px; margin:12px 1px 0; color:var(--muted); font-size:12px; }
+    .status.error { color:#a33c2c; }
+    .status.success { color:var(--mint-dark); }
+    .tx-link { color:var(--mint-dark); font-weight:700; text-decoration:none; }
+    .transaction-hash { display:block; overflow-wrap:anywhere; margin-top:3px; font:11px/1.4 ui-monospace,"Cascadia Code",monospace; color:var(--ink); }
+    .warning { margin:10px 0 0; color:#8b4c00; font-size:12px; }
+    .account-type { color:var(--mint-dark); background:var(--soft-mint); border:1px solid #bae2d5; border-radius:4px; padding:2px 6px; font:11px ui-monospace,"Cascadia Code",monospace; }
+    .signing-progress { width:100%; height:5px; margin-top:8px; accent-color:var(--mint); }
+    [hidden] { display:none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <header><h1>CKB Wallet</h1><span class="network">AGGRON4 TESTNET</span></header>
+    <section id="setup-view" class="card">
+      <h2>创建或导入账户</h2>
+      <p class="hint">私钥只会以加密形式保存在此浏览器。请单独备份私钥，丢失密码无法恢复。</p>
+      <label for="setup-account-type">账户类型</label>
+      <select id="setup-account-type">
+        <option value="secp256k1">secp256k1</option>
+        <option value="shrincs">shrincs（实验性）</option>
+      </select>
+      <div id="import-fields" hidden>
+        <label id="private-key-label" for="private-key">私钥（32 字节十六进制）</label>
+        <textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
+      </div>
+      <label for="new-password">保护密码</label>
+      <input id="new-password" type="password" autocomplete="new-password" placeholder="至少 8 位">
+      <div class="actions"><button id="generate-button" type="button">随机生成账户</button><button id="show-import-button" class="secondary" type="button">导入已有账户</button></div>
+      <div id="import-actions" class="actions" hidden><button id="save-wallet-button" type="button">导入并保存</button></div>
+      <p id="setup-status" class="status" role="status"></p>
+      <progress id="generation-progress" class="signing-progress" aria-label="生成账户进度" hidden></progress>
+    </section>
+    <section id="unlock-view" class="card" hidden>
+      <h2>解锁钱包</h2><p class="hint">私钥已加密保存在此浏览器。</p>
+      <label for="unlock-password">密码</label>
+      <input id="unlock-password" type="password" autocomplete="current-password" placeholder="输入保护密码">
+      <div class="actions"><button id="unlock-button" type="button">解锁</button><button id="reset-button" class="danger" type="button">清除钱包</button></div>
+      <p id="unlock-status" class="status" role="status"></p>
+    </section>
+    <section id="wallet-view" hidden>
+      <div class="card">
+        <div class="row"><strong>我的地址 <span id="account-type" class="account-type"></span></strong><button id="copy-address-button" class="secondary" type="button">复制</button></div>
+        <p id="address" class="address"></p>
+        <p id="account-type-warning" class="warning" hidden></p>
+        <div class="actions"><button id="export-wallet-button" class="secondary" type="button">导出私钥备份</button></div>
+      </div>
+      <div class="card"><div class="row"><strong>可用余额</strong><button id="refresh-button" class="secondary" type="button">刷新</button></div><p id="balance" class="balance">-- <small>CKB</small></p></div>
+      <form id="transfer-form" class="card">
+        <h2>发送 CKB</h2><label for="recipient">收款测试网地址</label>
+        <input id="recipient" autocomplete="off" spellcheck="false" placeholder="ckt1..." required>
+        <label for="amount">金额（CKB）</label><input id="amount" inputmode="decimal" autocomplete="off" placeholder="至少 61 CKB" required>
+        <div id="sign-mode-field" hidden>
+          <label for="sign-mode">签名方式</label>
+          <select id="sign-mode">
+            <option value="stateful">stateful（状态化）</option>
+            <option value="stateless">stateless（无状态）</option>
+          </select>
+        </div>
+        <div class="actions"><button id="send-button" type="submit">签名并发送</button><button id="lock-button" class="secondary" type="button">锁定</button></div>
+        <p id="wallet-status" class="status" role="status"></p>
+        <progress id="signing-progress" class="signing-progress" aria-label="签名进度" hidden></progress>
+      </form>
+    </section>
+  </main>
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

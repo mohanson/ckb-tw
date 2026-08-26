@@ -1,0 +1,27 @@
+{
+  "name": "ckb-testnet-wallet",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "npm run build:shrincs && vite build && cp manifest.json dist/manifest.json",
+    "build:shrincs": "RUSTFLAGS='-C target-feature=+atomics,+bulk-memory,+mutable-globals -C link-arg=--shared-memory -C link-arg=--import-memory -C link-arg=--max-memory=268435456 -C link-arg=--export=__heap_base -C link-arg=--export=__wasm_init_tls -C link-arg=--export=__tls_size -C link-arg=--export=__tls_align -C link-arg=--export=__tls_base' cargo +nightly build -Z build-std=panic_abort,std --manifest-path ../shrincs-rs/Cargo.toml --target wasm32-unknown-unknown --features wasm-web --release && rm -rf shrincs-wasm/pkg && wasm-bindgen --target web --out-dir shrincs-wasm/pkg ../shrincs-rs/target/wasm32-unknown-unknown/release/shrincs.wasm && cp shrincs-wasm/index.js shrincs-wasm/pkg/index.js",
+    "test:shrincs": "cargo test --manifest-path ../shrincs-rs/Cargo.toml --release"
+  },
+  "dependencies": {
+    "@ckb-lumos/bi": "^0.23.0",
+    "@ckb-lumos/base": "^0.23.0",
+    "@ckb-lumos/ckb-indexer": "^0.23.0",
+    "@ckb-lumos/codec": "^0.23.0",
+    "@ckb-lumos/common-scripts": "^0.23.0",
+    "@ckb-lumos/config-manager": "^0.23.0",
+    "@ckb-lumos/hd": "^0.23.0",
+    "@ckb-lumos/helpers": "^0.23.0",
+    "@ckb-lumos/rpc": "^0.23.0",
+    "buffer": "^6.0.3",
+    "immutable": "^5.1.4"
+  },
+  "devDependencies": {
+    "vite": "^7.1.7"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "CKB Testnet Wallet",
+  "version": "1.0",
+  "description": "本地管理私钥并在 CKB 测试网查看余额和转账",
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "permissions": ["storage"],
+  "host_permissions": ["https://testnet.ckb.dev/*"],
+  "cross_origin_opener_policy": {
+    "value": "same-origin"
+  },
+  "cross_origin_embedder_policy": {
+    "value": "require-corp"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}
