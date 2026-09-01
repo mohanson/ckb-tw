@@ -45,6 +45,26 @@ const SHRINCS_SCRIPT = {
     depType: "code",
   },
 };
+const translations = {
+  "zh-CN": {
+    appTitle: "CKB Wallet", network: "AGGRON4 TESTNET", generationProgress: "生成账户进度", signingProgress: "签名进度", setupTitle: "创建或导入账户", setupHint: "私钥只会以加密形式保存在此浏览器。请单独备份私钥，丢失密码无法恢复。", accountTypeLabel: "账户类型", shrincsExperimental: "shrincs（实验性）", privateKeyLabel: "私钥（32 字节十六进制）", passwordLabel: "保护密码", passwordPlaceholder: "至少 8 位", generateButton: "随机生成账户", importButton: "导入已有账户", importSaveButton: "导入并保存", unlockTitle: "解锁钱包", unlockHint: "私钥已加密保存在此浏览器。", passwordOnlyLabel: "密码", unlockPlaceholder: "输入保护密码", unlockButton: "解锁", resetButton: "清除钱包", settingsTitle: "设置", languageLabel: "语言", chinese: "中文", english: "English", backButton: "返回", myAddress: "我的地址", copyButton: "复制", exportButton: "导出私钥备份", availableBalance: "可用余额", refreshButton: "刷新", sendTitle: "发送 CKB", recipientLabel: "收款测试网地址", recipientPlaceholder: "ckt1...", amountLabel: "金额（CKB）", amountPlaceholder: "至少 61 CKB", signModeLabel: "签名方式", statefulOption: "stateful（状态化）", statelessOption: "stateless（无状态）", sendButton: "签名并发送", lockButton: "锁定", passwordShort: "保护密码至少需要 8 位。", accountImported: "账户已导入，直接进入钱包。", accountGenerated: "账户已生成，直接进入钱包。", generatingKey: "正在生成 SHRINCS-B 密钥材料...", verifyingPassword: "正在验证密码...", restoringKey: "正在恢复 SHRINCS 密钥材料...", missingVault: "未找到钱包数据。", wrongPassword: "密码不正确或钱包数据已损坏。", balanceQuery: "正在查询测试网余额...", balanceUpdated: "余额已更新。", balanceError: "无法查询余额：{error}", copySuccess: "地址已复制。", copyError: "无法复制地址。", exportSuccess: "私钥备份已下载，请妥善保管并及时删除临时文件。", exportError: "导出失败：{error}", preparingFast: "首次使用 Fast stateless signing，正在预计算...", fastSigning: "正在生成 SHRINCS Fast 无状态签名。", buildingTransaction: "正在构造并签名交易...", broadcasting: "正在广播交易...", transferError: "转账失败：{error}", shrincsRejected: "SHRINCS 签名已完成，但测试网拒绝了零占位脚本交易：{error}", invalidAddress: "请输入 CKB 测试网地址（ckt1...）。", invalidAmount: "请输入最多 8 位小数的有效 CKB 金额。", amountTooSmall: "CKB 单个转账输出至少需要 61 CKB。", invalidPasswordData: "密码不正确或钱包数据已损坏。", unsupportedAccount: "不支持的账户类型。", invalidShrincsKey: "无效的 SHRINCS 签名密钥。", walletLocked: "钱包尚未解锁。", missingData: "SHRINCS 钱包数据不可用。", importedOnlyStateless: "导入的 SHRINCS 账户仅支持 stateless 签名。", noState: "此账户没有可用的状态化签名状态。", stateExhausted: "SHRINCS 状态化签名叶子已耗尽，请切换为无状态签名。", stateMismatch: "SHRINCS 状态计数器不一致。", verifyFailed: "SHRINCS 本地验签失败。", addressMismatch: "钱包地址校验失败。", notEnoughKey: "钱包加密密钥不可用，请重新解锁。", invalidPrepared: "无效的 Fast stateless signing 缓存。", txSuccess: "交易已广播。交易哈希：", explorerLink: "在区块浏览器中查看" },
+  "en-US": {
+    appTitle: "CKB Wallet", network: "AGGRON4 TESTNET", generationProgress: "Account generation progress", signingProgress: "Signing progress", setupTitle: "Create or Import Account", setupHint: "Your private key is stored encrypted in this browser. Back it up separately; it cannot be recovered without the password.", accountTypeLabel: "Account type", shrincsExperimental: "shrincs (experimental)", privateKeyLabel: "Private key (32-byte hex)", passwordLabel: "Protection password", passwordPlaceholder: "At least 8 characters", generateButton: "Generate account", importButton: "Import account", importSaveButton: "Import and save", unlockTitle: "Unlock wallet", unlockHint: "Your private key is stored encrypted in this browser.", passwordOnlyLabel: "Password", unlockPlaceholder: "Enter protection password", unlockButton: "Unlock", resetButton: "Clear wallet", settingsTitle: "Settings", languageLabel: "Language", chinese: "中文", english: "English", backButton: "Back", myAddress: "My address", copyButton: "Copy", exportButton: "Export key backup", availableBalance: "Available balance", refreshButton: "Refresh", sendTitle: "Send CKB", recipientLabel: "Testnet recipient address", recipientPlaceholder: "ckt1...", amountLabel: "Amount (CKB)", amountPlaceholder: "At least 61 CKB", signModeLabel: "Signing mode", statefulOption: "stateful", statelessOption: "stateless", sendButton: "Sign and send", lockButton: "Lock", passwordShort: "The protection password must be at least 8 characters.", accountImported: "Account imported. Entering wallet.", accountGenerated: "Account generated. Entering wallet.", generatingKey: "Generating SHRINCS-B key material...", verifyingPassword: "Verifying password...", restoringKey: "Restoring SHRINCS key material...", missingVault: "Wallet data not found.", wrongPassword: "Incorrect password or corrupted wallet data.", balanceQuery: "Querying testnet balance...", balanceUpdated: "Balance updated.", balanceError: "Unable to query balance: {error}", copySuccess: "Address copied.", copyError: "Unable to copy address.", exportSuccess: "Key backup downloaded. Keep it secure and delete the temporary file.", exportError: "Export failed: {error}", preparingFast: "Preparing Fast stateless signing for the first transfer...", fastSigning: "Generating SHRINCS Fast stateless signature.", buildingTransaction: "Building and signing transaction...", broadcasting: "Broadcasting transaction...", transferError: "Transfer failed: {error}", shrincsRejected: "SHRINCS signing completed, but the testnet rejected the zero-placeholder script transaction: {error}", invalidAddress: "Enter a CKB testnet address (ckt1...).", invalidAmount: "Enter a valid CKB amount with at most 8 decimals.", amountTooSmall: "Each CKB transfer output must be at least 61 CKB.", invalidPasswordData: "Incorrect password or corrupted wallet data.", unsupportedAccount: "Unsupported account type.", invalidShrincsKey: "Invalid SHRINCS signing key.", walletLocked: "Wallet is not unlocked.", missingData: "SHRINCS wallet data is unavailable.", importedOnlyStateless: "Imported SHRINCS accounts only support stateless signing.", noState: "This account has no usable stateful signing state.", stateExhausted: "SHRINCS stateful signing leaves are exhausted. Switch to stateless signing.", stateMismatch: "SHRINCS state counter mismatch.", verifyFailed: "Local SHRINCS signature verification failed.", addressMismatch: "Wallet address verification failed.", notEnoughKey: "Wallet encryption key is unavailable. Unlock again.", invalidPrepared: "Invalid Fast stateless signing cache.", txSuccess: "Transaction broadcast. Transaction hash:", explorerLink: "View in block explorer" },
+};
+let language = "zh-CN";
+let viewBeforeSettings = "setup";
+function t(key, variables = {}) {
+  return Object.entries(variables).reduce((text, [name, value]) => text.replace(`{${name}}`, value), translations[language][key] || key);
+}
+function applyTranslations() {
+  document.documentElement.lang = language;
+  document.querySelectorAll("[data-i18n]").forEach((element) => { element.textContent = t(element.dataset.i18n); });
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => { element.placeholder = t(element.dataset.i18nPlaceholder); });
+  document.querySelectorAll("[data-i18n-aria]").forEach((element) => { element.setAttribute("aria-label", t(element.dataset.i18nAria)); });
+  elements.settingsButton?.setAttribute("aria-label", t("settingsTitle"));
+  elements.settingsButton?.setAttribute("title", t("settingsTitle"));
+  updateSetupAccountType();
+}
 const ACCOUNT_TYPES = {
   secp256k1: {
     createAccount(privateKey) {
@@ -57,7 +77,7 @@ const ACCOUNT_TYPES = {
   },
   shrincs: {
     createAccount(seed, publicKey) {
-      if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error("SHRINCS 公钥必须是 32 字节十六进制字符。");
+      if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(language === "zh-CN" ? "SHRINCS 公钥必须是 32 字节十六进制字符。" : "SHRINCS public key must be 32-byte hexadecimal.");
       const lock = { codeHash: SHRINCS_SCRIPT.codeHash, hashType: SHRINCS_SCRIPT.hashType, args: publicKey };
       return { address: helpers.encodeToAddress(lock), publicKey, lock };
     },
@@ -69,12 +89,13 @@ globalThis.Buffer ??= Buffer;
 config.initializeConfig(config.predefined.AGGRON4);
 
 const elements = {
-  setupView: document.querySelector("#setup-view"), unlockView: document.querySelector("#unlock-view"), walletView: document.querySelector("#wallet-view"),
+  setupView: document.querySelector("#setup-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), walletView: document.querySelector("#wallet-view"),
   importFields: document.querySelector("#import-fields"), privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), newPassword: document.querySelector("#new-password"), importActions: document.querySelector("#import-actions"), setupStatus: document.querySelector("#setup-status"), generationProgress: document.querySelector("#generation-progress"),
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), walletStatus: document.querySelector("#wallet-status"),
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), accountTypeWarning: document.querySelector("#account-type-warning"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signModeField: document.querySelector("#sign-mode-field"), signMode: document.querySelector("#sign-mode"), signingProgress: document.querySelector("#signing-progress"),
   generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetButton: document.querySelector("#reset-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), exportWalletButton: document.querySelector("#export-wallet-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"), lockButton: document.querySelector("#lock-button"),
+  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsBackButton: document.querySelector("#settings-back-button"),
 };
 
 let account = null;
@@ -100,13 +121,19 @@ function nextPaint() {
 function showView(view) {
   elements.setupView.hidden = view !== "setup";
   elements.unlockView.hidden = view !== "unlock";
+  elements.settingsView.hidden = view !== "settings";
   elements.walletView.hidden = view !== "wallet";
+}
+
+function openSettings() {
+  viewBeforeSettings = ["setup", "unlock", "wallet"].find((view) => !elements[`${view}View`].hidden) || "setup";
+  showView("settings");
 }
 
 function normalizePrivateKey(value, accountType = DEFAULT_ACCOUNT_TYPE) {
   const normalized = value.trim().toLowerCase().replace(/^0x/, "");
   const expectedLength = accountType === "shrincs" ? 96 : 64;
-  if (!new RegExp(`^[0-9a-f]{${expectedLength}}$`).test(normalized)) throw new Error(`${accountType === "shrincs" ? "SHRINCS 主种子" : "私钥"}必须是 ${expectedLength} 位十六进制字符。`);
+  if (!new RegExp(`^[0-9a-f]{${expectedLength}}$`).test(normalized)) throw new Error(language === "zh-CN" ? `${accountType === "shrincs" ? "SHRINCS 主种子" : "私钥"}必须是 ${expectedLength} 位十六进制字符。` : `${accountType === "shrincs" ? "SHRINCS master seed" : "Private key"} must be ${expectedLength} hexadecimal characters.`);
   return `0x${normalized}`;
 }
 
@@ -121,7 +148,7 @@ function shrincsSeedFromSecretKey(secretKeyHex) {
 
 function getAccountType(accountType) {
   const implementation = ACCOUNT_TYPES[accountType];
-  if (!implementation) throw new Error("不支持的账户类型。");
+  if (!implementation) throw new Error(t("unsupportedAccount"));
   return implementation;
 }
 
@@ -265,9 +292,9 @@ async function encryptPrivateKey(privateKey, password, accountType, publicKey, s
 }
 
 async function persistShrincsPreparedKey(preparedKey) {
-  if (!vaultEncryptionKey) throw new Error("钱包加密密钥不可用，请重新解锁。");
+  if (!vaultEncryptionKey) throw new Error(t("notEnoughKey"));
   const { vault } = await chrome.storage.local.get("vault");
-  if (!vault) throw new Error("未找到钱包数据。");
+  if (!vault) throw new Error(t("missingVault"));
   const plainText = await crypto.subtle.decrypt({ name: "AES-GCM", iv: decodeBase64(vault.iv) }, vaultEncryptionKey, decodeBase64(vault.cipherText));
   const { privateKey, shrincsSecretKey } = JSON.parse(new TextDecoder().decode(plainText));
   const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -283,16 +310,16 @@ async function decryptPrivateKey(vault, password) {
     const payload = JSON.parse(new TextDecoder().decode(plainText));
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
     const privateKey = normalizePrivateKey(payload.privateKey, accountType);
-    if (accountType === "shrincs" && !/^0x[0-9a-f]{192}$/.test(payload.shrincsSecretKey || "")) throw new Error("无效的 SHRINCS 签名密钥。");
+    if (accountType === "shrincs" && !/^0x[0-9a-f]{192}$/.test(payload.shrincsSecretKey || "")) throw new Error(t("invalidShrincsKey"));
     return { privateKey, shrincsSecretKey: payload.shrincsSecretKey, shrincsPreparedKey: payload.shrincsPreparedKey ? decodeBase64(payload.shrincsPreparedKey) : null, encryptionKey: key };
-  } catch { throw new Error("密码不正确或钱包数据已损坏。"); }
+  } catch { throw new Error(t("wrongPassword")); }
 }
 
 async function ensureShrincsPreparedKey() {
   if (shrincsPreparedKeyInMemory) return shrincsPreparedKeyInMemory;
   if (!shrincsPreparedKeyPromise) {
     shrincsPreparedKeyPromise = (async () => {
-      setStatus(elements.walletStatus, "首次使用 Fast stateless signing，正在预计算...");
+      setStatus(elements.walletStatus, t("preparingFast"));
       elements.signingProgress.hidden = false;
       await nextPaint();
       await shrincsInitialization;
@@ -310,41 +337,41 @@ async function signShrincsMessage(message) {
   const messageBytes = bytes.bytify(message);
   const secretKey = bytes.bytify(privateKeyInMemory);
   const { vault } = await chrome.storage.local.get("vault");
-  if (!vault || vault.accountType !== "shrincs") throw new Error("SHRINCS 钱包数据不可用。");
+  if (!vault || vault.accountType !== "shrincs") throw new Error(t("missingData"));
   const mode = currentShrincsSignMode();
-  if (account.imported && mode !== "stateless") throw new Error("导入的 SHRINCS 账户仅支持 stateless 签名。");
+  if (account.imported && mode !== "stateless") throw new Error(t("importedOnlyStateless"));
   let signature;
   if (mode === "stateful") {
     const state = vault.shrincsState;
-    if (!state || state.mode !== "stateful" || !state.data) throw new Error("此账户没有可用的状态化签名状态。");
+    if (!state || state.mode !== "stateful" || !state.data) throw new Error(t("noState"));
     const stateBytes = bytes.bytify(state.data);
     const q = stateCounter(stateBytes);
-    if (q >= SHRINCS_MAX_STATEFUL_SIGNATURES) throw new Error("SHRINCS 状态化签名叶子已耗尽，请切换为无状态签名。");
+    if (q >= SHRINCS_MAX_STATEFUL_SIGNATURES) throw new Error(t("stateExhausted"));
     const reservedState = { mode: "stateful", q: q + 1, data: bytes.hexify(incrementShrincsState(stateBytes)) };
     await chrome.storage.local.set({ vault: { ...vault, version: 4, shrincsState: reservedState } });
     account.shrincsState = reservedState;
     const result = signStateful(ParamsType.B, messageBytes, secretKey, stateBytes);
     const nextState = stateFromStatefulSignResult(result);
-    if (stateCounter(nextState) !== reservedState.q) throw new Error("SHRINCS 状态计数器不一致。");
+    if (stateCounter(nextState) !== reservedState.q) throw new Error(t("stateMismatch"));
     signature = signatureFromStatefulSignResult(result);
   } else {
     const preparedKey = await ensureShrincsPreparedKey();
-    setStatus(elements.walletStatus, "正在生成 SHRINCS Fast 无状态签名。", "");
+    setStatus(elements.walletStatus, t("fastSigning"), "");
     elements.signingProgress.hidden = false;
     await nextPaint();
     signature = signStatelessWithPrepare(ParamsType.B, messageBytes, secretKey, preparedKey);
   }
   const publicKey = bytes.bytify(account.publicKey);
-  if (!verify(ParamsType.B, messageBytes, signature, publicKey)) throw new Error("SHRINCS 本地验签失败。");
+  if (!verify(ParamsType.B, messageBytes, signature, publicKey)) throw new Error(t("verifyFailed"));
   return bytes.hexify(signature);
 }
 
 function parseCkbAmount(value) {
   const match = value.trim().match(/^(\d+)(?:\.(\d{1,8}))?$/);
-  if (!match) throw new Error("请输入最多 8 位小数的有效 CKB 金额。");
+  if (!match) throw new Error(t("invalidAmount"));
   const fraction = (match[2] || "").padEnd(8, "0");
   const amount = BigInt(match[1]) * SHANNONS_PER_CKB + BigInt(fraction);
-  if (amount < MIN_TRANSFER_CKB * SHANNONS_PER_CKB) throw new Error("CKB 单个转账输出至少需要 61 CKB。");
+  if (amount < MIN_TRANSFER_CKB * SHANNONS_PER_CKB) throw new Error(t("amountTooSmall"));
   return amount;
 }
 
@@ -364,29 +391,29 @@ function showTransactionLink(transactionHash) {
   link.href = `https://pudge.explorer.nervos.org/transaction/${transactionHash}`;
   link.target = "_blank";
   link.rel = "noreferrer";
-  link.textContent = "在区块浏览器中查看";
-  elements.walletStatus.replaceChildren("交易已广播。交易哈希：", hash, lineBreak, link);
+  link.textContent = t("explorerLink");
+  elements.walletStatus.replaceChildren(t("txSuccess"), hash, lineBreak, link);
   elements.walletStatus.className = "status success";
 }
 
 async function refreshBalance() {
   elements.refreshButton.disabled = true;
-  setStatus(elements.walletStatus, "正在查询测试网余额...");
+  setStatus(elements.walletStatus, t("balanceQuery"));
   try {
     let capacity = 0n;
     const lock = helpers.parseAddress(account.address);
     for await (const cell of indexer.collector({ lock }).collect()) capacity += BigInt(cell.cellOutput.capacity);
     elements.balance.innerHTML = `${formatCkb(capacity)} <small>CKB</small>`;
-    setStatus(elements.walletStatus, "余额已更新。", "success");
+    setStatus(elements.walletStatus, t("balanceUpdated"), "success");
   } catch (error) {
-    setStatus(elements.walletStatus, `无法查询余额：${error.message}`, "error");
+    setStatus(elements.walletStatus, t("balanceError", { error: error.message }), "error");
   } finally { elements.refreshButton.disabled = false; }
 }
 
 // 进入钱包视图（生成/导入后直接进入，或解锁后进入）。privateKey 为内存中用于签名的密钥。
 async function enterWallet({ accountType, privateKey, publicKey, shrincsState, imported, expectedAddress }) {
   const restoredAccount = createAccount(privateKey, accountType, publicKey);
-  if (expectedAddress && restoredAccount.address !== expectedAddress) throw new Error("钱包地址校验失败。");
+  if (expectedAddress && restoredAccount.address !== expectedAddress) throw new Error(t("addressMismatch"));
   privateKeyInMemory = privateKey;
   account = { ...restoredAccount, accountType, shrincsState: accountType === "shrincs" ? shrincsState : undefined, imported };
   elements.address.textContent = account.address;
@@ -407,7 +434,9 @@ async function enterWallet({ accountType, privateKey, publicKey, shrincsState, i
   }
   elements.accountTypeWarning.hidden = accountType !== "shrincs";
   elements.accountTypeWarning.textContent = accountType === "shrincs"
-    ? `实验账户：使用全零 code hash 和 cell dep 占位。${imported ? "导入账户，仅支持 stateless 签名" : `随机生成账户，stateful q=${shrincsState.q}（可切换 stateless）`}；测试网会拒绝未部署脚本的交易。`
+    ? (language === "zh-CN"
+      ? `实验账户：使用全零 code hash 和 cell dep 占位。${imported ? "导入账户，仅支持 stateless 签名" : `随机生成账户，stateful q=${shrincsState.q}（可切换 stateless）`}；测试网会拒绝未部署脚本的交易。`
+      : `Experimental account: zero code hash and cell dep placeholders are used. ${imported ? "Imported accounts support stateless signing only." : `Generated account, stateful q=${shrincsState.q} (stateless also available).`} The testnet will reject transactions using the undeployed script.`)
     : "";
   showView("wallet");
   await refreshBalance();
@@ -418,7 +447,7 @@ async function saveWallet() {
   try {
     const accountType = elements.setupAccountType.value;
     const password = elements.newPassword.value;
-    if (password.length < 8) throw new Error("保护密码至少需要 8 位。");
+    if (password.length < 8) throw new Error(t("passwordShort"));
     let privateKey = elements.privateKey.value;
     let publicKey;
     let secretKey;
@@ -438,7 +467,7 @@ async function saveWallet() {
     await chrome.storage.local.set({ vault });
     elements.privateKey.value = "";
     elements.newPassword.value = "";
-    setStatus(elements.setupStatus, "账户已导入，直接进入钱包。", "success");
+    setStatus(elements.setupStatus, t("accountImported"), "success");
     await enterWallet({ accountType, privateKey: accountType === "shrincs" ? secretKey : privateKey, publicKey, shrincsState, imported: true });
   } catch (error) { setStatus(elements.setupStatus, error.message, "error"); }
 }
@@ -449,13 +478,13 @@ async function generateWallet() {
   try {
     const accountType = elements.setupAccountType.value;
     const password = elements.newPassword.value;
-    if (password.length < 8) throw new Error("保护密码至少需要 8 位。");
+    if (password.length < 8) throw new Error(t("passwordShort"));
     let privateKey;
     let publicKey;
     let secretKey;
     let shrincsState;
     if (accountType === "shrincs") {
-      setStatus(elements.setupStatus, "正在生成 SHRINCS-B 密钥材料...");
+      setStatus(elements.setupStatus, t("generatingKey"));
       elements.generationProgress.hidden = false;
       await nextPaint();
       await shrincsInitialization;
@@ -471,7 +500,7 @@ async function generateWallet() {
     const vault = await encryptPrivateKey(privateKey, password, accountType, publicKey, shrincsState, false, secretKey);
     await chrome.storage.local.set({ vault });
     elements.newPassword.value = "";
-    setStatus(elements.setupStatus, "账户已生成，直接进入钱包。", "success");
+    setStatus(elements.setupStatus, t("accountGenerated"), "success");
     await enterWallet({ accountType, privateKey: accountType === "shrincs" ? secretKey : privateKey, publicKey, shrincsState, imported: false });
   } catch (error) {
     setStatus(elements.setupStatus, error.message, "error");
@@ -486,9 +515,9 @@ async function unlockWallet() {
   elements.unlockButton.disabled = true;
   try {
     const { vault } = await chrome.storage.local.get("vault");
-    if (!vault) throw new Error("未找到钱包数据。");
+    if (!vault) throw new Error(t("missingVault"));
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
-    setStatus(elements.unlockStatus, "正在验证密码...");
+    setStatus(elements.unlockStatus, t("verifyingPassword"));
     const { privateKey: seed, shrincsSecretKey, shrincsPreparedKey: preparedKey, encryptionKey } = await decryptPrivateKey(vault, elements.unlockPassword.value);
     vaultEncryptionKey = encryptionKey;
     shrincsPreparedKeyInMemory = preparedKey;
@@ -505,11 +534,11 @@ async function unlockWallet() {
 async function sendTransfer(event) {
   event.preventDefault();
   elements.sendButton.disabled = true;
-  setStatus(elements.walletStatus, "正在构造并签名交易...");
+  setStatus(elements.walletStatus, t("buildingTransaction"));
   let transactionSigned = false;
   try {
     const recipient = elements.recipient.value.trim();
-    if (!recipient.startsWith("ckt1")) throw new Error("请输入 CKB 测试网地址（ckt1...）。");
+    if (!recipient.startsWith("ckt1")) throw new Error(t("invalidAddress"));
     helpers.parseAddress(recipient);
     const amount = parseCkbAmount(elements.amount.value);
     let transaction = helpers.TransactionSkeleton({ cellProvider: indexer });
@@ -521,16 +550,16 @@ async function sendTransfer(event) {
       : getAccountType(account.accountType).sign(entry.message, privateKeyInMemory)).toArray());
     const sealed = helpers.sealTransaction(transaction, signatures);
     transactionSigned = true;
-    setStatus(elements.walletStatus, "正在广播交易...");
+    setStatus(elements.walletStatus, t("broadcasting"));
     const transactionHash = await rpc.sendTransaction(sealed, "passthrough");
     elements.amount.value = "";
     await refreshBalance();
     showTransactionLink(transactionHash);
   } catch (error) {
     const prefix = account?.accountType === "shrincs" && transactionSigned
-      ? "SHRINCS 签名已完成，但测试网拒绝了零占位脚本交易："
-      : "转账失败：";
-    setStatus(elements.walletStatus, `${prefix}${error.message}`, "error");
+      ? t("shrincsRejected", { error: error.message })
+      : t("transferError", { error: error.message });
+    setStatus(elements.walletStatus, prefix, "error");
   } finally {
     elements.signingProgress.hidden = true;
     elements.sendButton.disabled = false;
@@ -539,16 +568,16 @@ async function sendTransfer(event) {
 
 async function copyAddress() {
   await navigator.clipboard.writeText(account.address);
-  setStatus(elements.walletStatus, "地址已复制。", "success");
+  setStatus(elements.walletStatus, t("copySuccess"), "success");
 }
 
 async function exportWallet() {
-  if (!privateKeyInMemory || !account) throw new Error("钱包尚未解锁。");
-  const password = window.prompt("请输入钱包密码以确认导出：");
+  if (!privateKeyInMemory || !account) throw new Error(t("walletLocked"));
+  const password = window.prompt(language === "zh-CN" ? "请输入钱包密码以确认导出：" : "Enter your wallet password to confirm export:");
   if (password === null) return;
 
   const { vault } = await chrome.storage.local.get("vault");
-  if (!vault) throw new Error("未找到钱包数据。");
+  if (!vault) throw new Error(t("missingVault"));
   await decryptPrivateKey(vault, password);
 
   const backup = account.accountType === "shrincs"
@@ -576,12 +605,12 @@ async function exportWallet() {
   link.download = `${account.accountType}-wallet-backup.json`;
   link.click();
   URL.revokeObjectURL(url);
-  setStatus(elements.walletStatus, "私钥备份已下载，请妥善保管并及时删除临时文件。", "success");
+  setStatus(elements.walletStatus, t("exportSuccess"), "success");
 }
 
 function updateSetupAccountType() {
   const isShrincs = elements.setupAccountType.value === "shrincs";
-  elements.privateKeyLabel.textContent = isShrincs ? "SHRINCS 主种子（48 字节十六进制）" : "私钥（32 字节十六进制）";
+  elements.privateKeyLabel.textContent = isShrincs ? (language === "zh-CN" ? "SHRINCS 主种子（48 字节十六进制）" : "SHRINCS master seed (48-byte hex)") : t("privateKeyLabel");
 }
 
 elements.generateButton.addEventListener("click", generateWallet);
@@ -596,8 +625,21 @@ elements.saveWalletButton.addEventListener("click", saveWallet);
 elements.unlockButton.addEventListener("click", unlockWallet);
 elements.refreshButton.addEventListener("click", refreshBalance);
 elements.transferForm.addEventListener("submit", sendTransfer);
-elements.copyAddressButton.addEventListener("click", () => copyAddress().catch(() => setStatus(elements.walletStatus, "无法复制地址。", "error")));
-elements.exportWalletButton.addEventListener("click", () => exportWallet().catch((error) => setStatus(elements.walletStatus, `导出失败：${error.message}`, "error")));
+elements.copyAddressButton.addEventListener("click", () => copyAddress().catch(() => setStatus(elements.walletStatus, t("copyError"), "error")));
+elements.exportWalletButton.addEventListener("click", () => exportWallet().catch((error) => setStatus(elements.walletStatus, t("exportError", { error: error.message }), "error")));
+elements.settingsButton.addEventListener("click", openSettings);
+elements.settingsBackButton.addEventListener("click", () => showView(viewBeforeSettings));
+elements.languageSelect.addEventListener("change", async () => {
+  language = elements.languageSelect.value;
+  await chrome.storage.local.set({ language });
+  applyTranslations();
+  if (account?.accountType === "shrincs") {
+    const imported = account.imported;
+    elements.accountTypeWarning.textContent = language === "zh-CN"
+      ? `实验账户：使用全零 code hash 和 cell dep 占位。${imported ? "导入账户，仅支持 stateless 签名" : `随机生成账户，stateful q=${account.shrincsState.q}（可切换 stateless）`}；测试网会拒绝未部署脚本的交易。`
+      : `Experimental account: zero code hash and cell dep placeholders are used. ${imported ? "Imported accounts support stateless signing only." : `Generated account, stateful q=${account.shrincsState.q} (stateless also available).`} The testnet will reject transactions using the undeployed script.`;
+  }
+});
 elements.lockButton.addEventListener("click", () => { privateKeyInMemory = null; shrincsPreparedKeyInMemory = null; shrincsPreparedKeyPromise = null; vaultEncryptionKey = null; account = null; elements.balance.textContent = "-- CKB"; showView("unlock"); });
 elements.resetButton.addEventListener("click", async () => {
   await chrome.storage.local.remove("vault");
@@ -610,7 +652,9 @@ elements.resetButton.addEventListener("click", async () => {
 });
 
 (async () => {
-  const { vault } = await chrome.storage.local.get("vault");
-  updateSetupAccountType();
+  const { vault, language: storedLanguage } = await chrome.storage.local.get(["vault", "language"]);
+  language = storedLanguage === "en-US" ? "en-US" : "zh-CN";
+  elements.languageSelect.value = language;
+  applyTranslations();
   showView(vault ? "unlock" : "setup");
 })();

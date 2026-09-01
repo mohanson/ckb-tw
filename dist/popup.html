@@ -10,6 +10,8 @@
     body { width:390px; min-height:500px; margin:0; background:linear-gradient(145deg,#eef8f4 0%,#f9fbf9 48%,#f8f1ec 100%); color:var(--ink); font:14px/1.45 "Avenir Next","Noto Sans SC",sans-serif; }
     main { padding:22px; }
     header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:22px; }
+    .header-actions { display:flex; align-items:center; gap:8px; }
+    .settings-button { padding:6px 9px; font-size:16px; line-height:1; }
     h1 { margin:0; font-size:20px; letter-spacing:0; }
     h2 { margin:0 0 14px; font-size:16px; }
     .network { color:var(--mint-dark); background:var(--soft-mint); border:1px solid #bae2d5; border-radius:4px; padding:3px 7px; font-size:11px; font-weight:700; }
@@ -43,59 +45,65 @@
     .signing-progress { width:100%; height:5px; margin-top:8px; accent-color:var(--mint); }
     [hidden] { display:none !important; }
   </style>
-  <script type="module" crossorigin src="/assets/popup-DpMQ5JEF.js"></script>
+  <script type="module" crossorigin src="/assets/popup-aPaFrCTe.js"></script>
 </head>
 <body>
   <main>
-    <header><h1>CKB Wallet</h1><span class="network">AGGRON4 TESTNET</span></header>
+    <header><h1 data-i18n="appTitle">CKB Wallet</h1><div class="header-actions"><span class="network" data-i18n="network">AGGRON4 TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="设置" title="设置">⚙</button></div></header>
     <section id="setup-view" class="card">
-      <h2>创建或导入账户</h2>
-      <p class="hint">私钥只会以加密形式保存在此浏览器。请单独备份私钥，丢失密码无法恢复。</p>
-      <label for="setup-account-type">账户类型</label>
+      <h2 data-i18n="setupTitle">创建或导入账户</h2>
+      <p class="hint" data-i18n="setupHint">私钥只会以加密形式保存在此浏览器。请单独备份私钥，丢失密码无法恢复。</p>
+      <label for="setup-account-type" data-i18n="accountTypeLabel">账户类型</label>
       <select id="setup-account-type">
         <option value="secp256k1">secp256k1</option>
-        <option value="shrincs">shrincs（实验性）</option>
+        <option value="shrincs" data-i18n="shrincsExperimental">shrincs（实验性）</option>
       </select>
       <div id="import-fields" hidden>
-        <label id="private-key-label" for="private-key">私钥（32 字节十六进制）</label>
+        <label id="private-key-label" for="private-key" data-i18n="privateKeyLabel">私钥（32 字节十六进制）</label>
         <textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
       </div>
-      <label for="new-password">保护密码</label>
-      <input id="new-password" type="password" autocomplete="new-password" placeholder="至少 8 位">
-      <div class="actions"><button id="generate-button" type="button">随机生成账户</button><button id="show-import-button" class="secondary" type="button">导入已有账户</button></div>
-      <div id="import-actions" class="actions" hidden><button id="save-wallet-button" type="button">导入并保存</button></div>
+      <label for="new-password" data-i18n="passwordLabel">保护密码</label>
+      <input id="new-password" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="至少 8 位">
+      <div class="actions"><button id="generate-button" type="button" data-i18n="generateButton">随机生成账户</button><button id="show-import-button" class="secondary" type="button" data-i18n="importButton">导入已有账户</button></div>
+      <div id="import-actions" class="actions" hidden><button id="save-wallet-button" type="button" data-i18n="importSaveButton">导入并保存</button></div>
       <p id="setup-status" class="status" role="status"></p>
-      <progress id="generation-progress" class="signing-progress" aria-label="生成账户进度" hidden></progress>
+      <progress id="generation-progress" class="signing-progress" data-i18n-aria="generationProgress" aria-label="生成账户进度" hidden></progress>
     </section>
     <section id="unlock-view" class="card" hidden>
-      <h2>解锁钱包</h2><p class="hint">私钥已加密保存在此浏览器。</p>
-      <label for="unlock-password">密码</label>
-      <input id="unlock-password" type="password" autocomplete="current-password" placeholder="输入保护密码">
-      <div class="actions"><button id="unlock-button" type="button">解锁</button><button id="reset-button" class="danger" type="button">清除钱包</button></div>
+      <h2 data-i18n="unlockTitle">解锁钱包</h2><p class="hint" data-i18n="unlockHint">私钥已加密保存在此浏览器。</p>
+      <label for="unlock-password" data-i18n="passwordOnlyLabel">密码</label>
+      <input id="unlock-password" type="password" autocomplete="current-password" data-i18n-placeholder="unlockPlaceholder" placeholder="输入保护密码">
+      <div class="actions"><button id="unlock-button" type="button" data-i18n="unlockButton">解锁</button><button id="reset-button" class="danger" type="button" data-i18n="resetButton">清除钱包</button></div>
       <p id="unlock-status" class="status" role="status"></p>
+    </section>
+    <section id="settings-view" class="card" hidden>
+      <h2 data-i18n="settingsTitle">设置</h2>
+      <label for="language-select" data-i18n="languageLabel">语言</label>
+      <select id="language-select"><option value="zh-CN" data-i18n="chinese">中文</option><option value="en-US" data-i18n="english">English</option></select>
+      <div class="actions"><button id="settings-back-button" class="secondary" type="button" data-i18n="backButton">返回</button></div>
     </section>
     <section id="wallet-view" hidden>
       <div class="card">
-        <div class="row"><strong>我的地址 <span id="account-type" class="account-type"></span></strong><button id="copy-address-button" class="secondary" type="button">复制</button></div>
+        <div class="row"><strong><span data-i18n="myAddress">我的地址</span> <span id="account-type" class="account-type"></span></strong><button id="copy-address-button" class="secondary" type="button" data-i18n="copyButton">复制</button></div>
         <p id="address" class="address"></p>
         <p id="account-type-warning" class="warning" hidden></p>
-        <div class="actions"><button id="export-wallet-button" class="secondary" type="button">导出私钥备份</button></div>
+        <div class="actions"><button id="export-wallet-button" class="secondary" type="button" data-i18n="exportButton">导出私钥备份</button></div>
       </div>
-      <div class="card"><div class="row"><strong>可用余额</strong><button id="refresh-button" class="secondary" type="button">刷新</button></div><p id="balance" class="balance">-- <small>CKB</small></p></div>
+      <div class="card"><div class="row"><strong data-i18n="availableBalance">可用余额</strong><button id="refresh-button" class="secondary" type="button" data-i18n="refreshButton">刷新</button></div><p id="balance" class="balance">-- <small>CKB</small></p></div>
       <form id="transfer-form" class="card">
-        <h2>发送 CKB</h2><label for="recipient">收款测试网地址</label>
-        <input id="recipient" autocomplete="off" spellcheck="false" placeholder="ckt1..." required>
-        <label for="amount">金额（CKB）</label><input id="amount" inputmode="decimal" autocomplete="off" placeholder="至少 61 CKB" required>
+        <h2 data-i18n="sendTitle">发送 CKB</h2><label for="recipient" data-i18n="recipientLabel">收款测试网地址</label>
+        <input id="recipient" autocomplete="off" spellcheck="false" data-i18n-placeholder="recipientPlaceholder" placeholder="ckt1..." required>
+        <label for="amount" data-i18n="amountLabel">金额（CKB）</label><input id="amount" inputmode="decimal" autocomplete="off" data-i18n-placeholder="amountPlaceholder" placeholder="至少 61 CKB" required>
         <div id="sign-mode-field" hidden>
-          <label for="sign-mode">签名方式</label>
+          <label for="sign-mode" data-i18n="signModeLabel">签名方式</label>
           <select id="sign-mode">
-            <option value="stateful">stateful（状态化）</option>
-            <option value="stateless">stateless（无状态）</option>
+            <option value="stateful" data-i18n="statefulOption">stateful（状态化）</option>
+            <option value="stateless" data-i18n="statelessOption">stateless（无状态）</option>
           </select>
         </div>
-        <div class="actions"><button id="send-button" type="submit">签名并发送</button><button id="lock-button" class="secondary" type="button">锁定</button></div>
+        <div class="actions"><button id="send-button" type="submit" data-i18n="sendButton">签名并发送</button><button id="lock-button" class="secondary" type="button" data-i18n="lockButton">锁定</button></div>
         <p id="wallet-status" class="status" role="status"></p>
-        <progress id="signing-progress" class="signing-progress" aria-label="签名进度" hidden></progress>
+        <progress id="signing-progress" class="signing-progress" data-i18n-aria="signingProgress" aria-label="签名进度" hidden></progress>
       </form>
     </section>
   </main>
