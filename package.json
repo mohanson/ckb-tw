@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "npm run build:shrincs && vite build && cp manifest.json dist/manifest.json",
-    "build:shrincs": "RUSTFLAGS='-C target-feature=+atomics,+bulk-memory,+mutable-globals -C link-arg=--shared-memory -C link-arg=--import-memory -C link-arg=--max-memory=268435456 -C link-arg=--export=__heap_base -C link-arg=--export=__wasm_init_tls -C link-arg=--export=__tls_size -C link-arg=--export=__tls_align -C link-arg=--export=__tls_base' cargo +nightly build -Z build-std=panic_abort,std --manifest-path ../shrincs-rs/Cargo.toml --target wasm32-unknown-unknown --features wasm-web --release && rm -rf shrincs-wasm/pkg && wasm-bindgen --target web --out-dir shrincs-wasm/pkg ../shrincs-rs/target/wasm32-unknown-unknown/release/shrincs.wasm && cp shrincs-wasm/index.js shrincs-wasm/pkg/index.js",
+    "build:shrincs": "RUSTFLAGS='-C target-feature=+atomics,+bulk-memory,+mutable-globals -C link-arg=--shared-memory -C link-arg=--import-memory -C link-arg=--max-memory=268435456 -C link-arg=--export=__heap_base -C link-arg=--export=__wasm_init_tls -C link-arg=--export=__tls_size -C link-arg=--export=__tls_align -C link-arg=--export=__tls_base' cargo +nightly build -Z build-std=panic_abort,std --manifest-path ../shrincs-rs/Cargo.toml --target wasm32-unknown-unknown --features wasm-web --release && rm -rf shrincs-wasm/pkg && wasm-bindgen --target web --out-name shrincs --out-dir shrincs-wasm/pkg ../shrincs-rs/target/wasm32-unknown-unknown/release/shrincs_rs.wasm && cp shrincs-wasm/index.js shrincs-wasm/pkg/index.js",
     "test:shrincs": "cargo test --manifest-path ../shrincs-rs/Cargo.toml --release"
   },
   "dependencies": {

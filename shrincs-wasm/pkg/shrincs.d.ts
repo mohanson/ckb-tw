@@ -17,6 +17,8 @@ export function keypairFromSeed(params: ParamsType, seed: Uint8Array): Uint8Arra
 
 export function keypairLen(): number;
 
+export function preparedStatelessKeyLen(params: ParamsType): number;
+
 export function publicKeyFromKeypair(keypair: Uint8Array): Uint8Array;
 
 export function publicKeyLen(): number;
@@ -28,6 +30,10 @@ export function secretKeyLen(): number;
 export function signStateful(params: ParamsType, message: Uint8Array, secret_key: Uint8Array, state: Uint8Array): Uint8Array;
 
 export function signStateless(params: ParamsType, message: Uint8Array, secret_key: Uint8Array): Uint8Array;
+
+export function signStatelessPrepare(params: ParamsType, secret_key: Uint8Array): Uint8Array;
+
+export function signStatelessWithPrepare(params: ParamsType, message: Uint8Array, secret_key: Uint8Array, prepared_key: Uint8Array): Uint8Array;
 
 export function signatureFromStatefulSignResult(result: Uint8Array): Uint8Array;
 
@@ -63,12 +69,15 @@ export interface InitOutput {
     readonly keygen: (a: number) => [number, number, number, number];
     readonly keypairFromSeed: (a: number, b: number, c: number) => [number, number, number, number];
     readonly keypairLen: () => number;
+    readonly preparedStatelessKeyLen: (a: number) => number;
     readonly publicKeyFromKeypair: (a: number, b: number) => [number, number, number, number];
     readonly publicKeyLen: () => number;
     readonly secretKeyFromKeypair: (a: number, b: number) => [number, number, number, number];
     readonly secretKeyLen: () => number;
     readonly signStateful: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number, number, number];
     readonly signStateless: (a: number, b: number, c: number, d: number, e: number) => [number, number, number, number];
+    readonly signStatelessPrepare: (a: number, b: number, c: number) => [number, number, number, number];
+    readonly signStatelessWithPrepare: (a: number, b: number, c: number, d: number, e: number, f: number, g: number) => [number, number, number, number];
     readonly signatureFromStatefulSignResult: (a: number, b: number) => [number, number, number, number];
     readonly stateCounter: (a: number, b: number) => [number, number, number];
     readonly stateFromStatefulSignResult: (a: number, b: number) => [number, number, number, number];

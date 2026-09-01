@@ -18,8 +18,9 @@ import initShrincs, {
   publicKeyFromKeypair,
   secretKeyFromKeypair,
   signStateful,
-  signStateless,
   signatureFromStatefulSignResult,
+  signStatelessPrepare,
+  signStatelessWithPrepare,
   stateCounter,
   stateFromStatefulSignResult,
   statelessSignatureLen,
@@ -78,6 +79,9 @@ const elements = {
 
 let account = null;
 let privateKeyInMemory = null;
+let shrincsPreparedKeyInMemory = null;
+let shrincsPreparedKeyPromise = null;
+let vaultEncryptionKey = null;
 const shrincsInitialization = initShrincs().then(() => initThreadPool(Math.min(navigator.hardwareConcurrency || 1, 8)));
 const indexer = new Indexer(INDEXER_URL, RPC_URL);
 const rpc = new RPC(RPC_URL, {
@@ -253,22 +257,52 @@ async function encryptPrivateKey(privateKey, password, accountType, publicKey, s
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const key = await deriveEncryptionKey(password, salt, ["encrypt"]);
-  const payload = JSON.stringify({ privateKey, shrincsSecretKey });
+  const payload = JSON.stringify({ privateKey, shrincsSecretKey, shrincsPreparedKey: undefined });
   const cipherText = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(payload));
   const account = createAccount(privateKey, accountType, publicKey);
-  return { version: 5, salt: encodeBase64(salt), iv: encodeBase64(iv), cipherText: encodeBase64(cipherText), accountType, publicKey: account.publicKey, address: account.address, shrincsState, imported };
+  vaultEncryptionKey = key;
+  return { version: 6, salt: encodeBase64(salt), iv: encodeBase64(iv), cipherText: encodeBase64(cipherText), accountType, publicKey: account.publicKey, address: account.address, shrincsState, imported };
+}
+
+async function persistShrincsPreparedKey(preparedKey) {
+  if (!vaultEncryptionKey) throw new Error("钱包加密密钥不可用，请重新解锁。");
+  const { vault } = await chrome.storage.local.get("vault");
+  if (!vault) throw new Error("未找到钱包数据。");
+  const plainText = await crypto.subtle.decrypt({ name: "AES-GCM", iv: decodeBase64(vault.iv) }, vaultEncryptionKey, decodeBase64(vault.cipherText));
+  const { privateKey, shrincsSecretKey } = JSON.parse(new TextDecoder().decode(plainText));
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const payload = JSON.stringify({ privateKey, shrincsSecretKey, shrincsPreparedKey: encodeBase64(preparedKey) });
+  const cipherText = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, vaultEncryptionKey, new TextEncoder().encode(payload));
+  await chrome.storage.local.set({ vault: { ...vault, version: 6, iv: encodeBase64(iv), cipherText: encodeBase64(cipherText) } });
 }
 
 async function decryptPrivateKey(vault, password) {
   try {
-    const key = await deriveEncryptionKey(password, decodeBase64(vault.salt), ["decrypt"]);
+    const key = await deriveEncryptionKey(password, decodeBase64(vault.salt), ["encrypt", "decrypt"]);
     const plainText = await crypto.subtle.decrypt({ name: "AES-GCM", iv: decodeBase64(vault.iv) }, key, decodeBase64(vault.cipherText));
     const payload = JSON.parse(new TextDecoder().decode(plainText));
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
     const privateKey = normalizePrivateKey(payload.privateKey, accountType);
     if (accountType === "shrincs" && !/^0x[0-9a-f]{192}$/.test(payload.shrincsSecretKey || "")) throw new Error("无效的 SHRINCS 签名密钥。");
-    return { privateKey, shrincsSecretKey: payload.shrincsSecretKey };
+    return { privateKey, shrincsSecretKey: payload.shrincsSecretKey, shrincsPreparedKey: payload.shrincsPreparedKey ? decodeBase64(payload.shrincsPreparedKey) : null, encryptionKey: key };
   } catch { throw new Error("密码不正确或钱包数据已损坏。"); }
+}
+
+async function ensureShrincsPreparedKey() {
+  if (shrincsPreparedKeyInMemory) return shrincsPreparedKeyInMemory;
+  if (!shrincsPreparedKeyPromise) {
+    shrincsPreparedKeyPromise = (async () => {
+      setStatus(elements.walletStatus, "首次使用 Fast stateless signing，正在预计算...");
+      elements.signingProgress.hidden = false;
+      await nextPaint();
+      await shrincsInitialization;
+      const preparedKey = signStatelessPrepare(ParamsType.B, bytes.bytify(privateKeyInMemory));
+      await persistShrincsPreparedKey(preparedKey);
+      shrincsPreparedKeyInMemory = preparedKey;
+      return preparedKey;
+    })().finally(() => { shrincsPreparedKeyPromise = null; });
+  }
+  return shrincsPreparedKeyPromise;
 }
 
 async function signShrincsMessage(message) {
@@ -294,10 +328,11 @@ async function signShrincsMessage(message) {
     if (stateCounter(nextState) !== reservedState.q) throw new Error("SHRINCS 状态计数器不一致。");
     signature = signatureFromStatefulSignResult(result);
   } else {
-    setStatus(elements.walletStatus, "正在生成 SHRINCS 无状态签名，可能需要较长时间。", "");
+    const preparedKey = await ensureShrincsPreparedKey();
+    setStatus(elements.walletStatus, "正在生成 SHRINCS Fast 无状态签名。", "");
     elements.signingProgress.hidden = false;
     await nextPaint();
-    signature = signStateless(ParamsType.B, messageBytes, secretKey);
+    signature = signStatelessWithPrepare(ParamsType.B, messageBytes, secretKey, preparedKey);
   }
   const publicKey = bytes.bytify(account.publicKey);
   if (!verify(ParamsType.B, messageBytes, signature, publicKey)) throw new Error("SHRINCS 本地验签失败。");
@@ -454,7 +489,9 @@ async function unlockWallet() {
     if (!vault) throw new Error("未找到钱包数据。");
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
     setStatus(elements.unlockStatus, "正在验证密码...");
-    const { privateKey: seed, shrincsSecretKey } = await decryptPrivateKey(vault, elements.unlockPassword.value);
+    const { privateKey: seed, shrincsSecretKey, shrincsPreparedKey: preparedKey, encryptionKey } = await decryptPrivateKey(vault, elements.unlockPassword.value);
+    vaultEncryptionKey = encryptionKey;
+    shrincsPreparedKeyInMemory = preparedKey;
     let privateKey = seed;
     if (accountType === "shrincs") {
       privateKey = shrincsSecretKey;
@@ -561,7 +598,7 @@ elements.refreshButton.addEventListener("click", refreshBalance);
 elements.transferForm.addEventListener("submit", sendTransfer);
 elements.copyAddressButton.addEventListener("click", () => copyAddress().catch(() => setStatus(elements.walletStatus, "无法复制地址。", "error")));
 elements.exportWalletButton.addEventListener("click", () => exportWallet().catch((error) => setStatus(elements.walletStatus, `导出失败：${error.message}`, "error")));
-elements.lockButton.addEventListener("click", () => { privateKeyInMemory = null; account = null; elements.balance.textContent = "-- CKB"; showView("unlock"); });
+elements.lockButton.addEventListener("click", () => { privateKeyInMemory = null; shrincsPreparedKeyInMemory = null; shrincsPreparedKeyPromise = null; vaultEncryptionKey = null; account = null; elements.balance.textContent = "-- CKB"; showView("unlock"); });
 elements.resetButton.addEventListener("click", async () => {
   await chrome.storage.local.remove("vault");
   elements.unlockPassword.value = "";
