@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "CKB Testnet Wallet",
+  "name": "CKB Testnet Wallet BETA",
   "version": "1.0",
-  "description": "本地管理私钥并在 CKB 测试网查看余额和转账",
+  "description": "CKB Testnet Wallet. This extension is currently in the Beta testing phase.",
   "action": {
     "default_popup": "popup.html"
   },
