@@ -6,7 +6,10 @@
   "action": {
     "default_popup": "popup.html"
   },
-  "permissions": ["storage"],
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "permissions": ["storage", "sidePanel"],
   "host_permissions": ["https://testnet.ckb.dev/*"],
   "cross_origin_opener_policy": {
     "value": "same-origin"

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CKB Testnet Wallet</title>
   <style>
-    :root { --ink:#13222d; --muted:#5e7280; --paper:#f3f8f6; --panel:#ffffff; --line:#d6e1dd; --mint:#0a806d; --mint-dark:#056355; --coral:#d7634f; --soft-mint:#e0f2eb; }
+    :root { --ink:#13222d; --muted:#5e7280; --paper:#f3f8f6; --panel:#ffffff; --line:#d6e1dd; --mint:#0a806d; --mint-dark:#056355; --coral:#d7634f; --soft-mint:#e0f2eb; --sun:#f2b84b; }
     * { box-sizing:border-box; }
     body { width:390px; min-height:500px; margin:0; background:linear-gradient(145deg,#eef8f4 0%,#f9fbf9 48%,#f8f1ec 100%); color:var(--ink); font:14px/1.45 "Avenir Next","Noto Sans SC",sans-serif; }
-    main { padding:22px; }
+    main { padding:20px; }
     header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:22px; }
     .header-actions { display:flex; align-items:center; gap:8px; }
     .settings-button { padding:6px 9px; font-size:16px; line-height:1; }
@@ -30,6 +30,24 @@
     button:disabled { cursor:wait; opacity:.62; }
     .actions { display:flex; gap:8px; margin-top:14px; }
     .actions > button { flex:1; }
+    .choice-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
+    .choice { min-height:92px; text-align:left; background:#fff; color:var(--ink); border:1px solid var(--line); box-shadow:none; }
+    .choice strong, .choice span { display:block; }
+    .choice span { margin-top:5px; color:var(--muted); font-size:11px; font-weight:400; }
+    .choice:hover { border-color:var(--mint); background:var(--soft-mint); }
+    .back-link { padding:0; background:transparent; color:var(--muted); font-size:12px; }
+    .back-link:hover { background:transparent; color:var(--mint-dark); }
+    .tabs { display:flex; gap:4px; padding:4px; margin-bottom:12px; background:#e7eeeb; border-radius:6px; }
+    .tab { flex:1; padding:8px; background:transparent; color:var(--muted); }
+    .tab:hover, .tab.active { background:#fff; color:var(--mint-dark); }
+    .history-list { display:grid; gap:8px; margin:0; padding:0; list-style:none; }
+    .history-item { padding:10px; border:1px solid var(--line); border-radius:6px; background:#fbfdfc; }
+    .history-item .row { align-items:flex-start; }
+    .history-meta { color:var(--muted); font-size:11px; }
+    .empty-state { margin:10px 0 0; color:var(--muted); font-size:12px; text-align:center; }
+    .setting-row { padding:12px 0; border-bottom:1px solid var(--line); }
+    .setting-row:first-of-type { padding-top:0; }
+    .setting-row:last-of-type { border-bottom:0; }
     .address { overflow-wrap:anywhere; margin:6px 0 0; font:12px/1.45 ui-monospace,"Cascadia Code",monospace; color:#23413b; }
     .balance { margin:4px 0 0; color:var(--mint-dark); font:700 27px/1.1 "Avenir Next","Noto Sans SC",sans-serif; letter-spacing:0; }
     .balance small { color:var(--muted); font-size:13px; font-weight:600; }
@@ -45,29 +63,34 @@
     .signing-progress { width:100%; height:5px; margin-top:8px; accent-color:var(--mint); }
     [hidden] { display:none !important; }
   </style>
-  <script type="module" crossorigin src="/assets/popup-aPaFrCTe.js"></script>
+  <script type="module" crossorigin src="/assets/popup-riKotrty.js"></script>
 </head>
 <body>
   <main>
     <header><h1 data-i18n="appTitle">CKB Wallet</h1><div class="header-actions"><span class="network" data-i18n="network">AGGRON4 TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="设置" title="设置">⚙</button></div></header>
     <section id="setup-view" class="card">
-      <h2 data-i18n="setupTitle">创建或导入账户</h2>
+      <h2 data-i18n="setupTitle">创建账户</h2>
       <p class="hint" data-i18n="setupHint">私钥只会以加密形式保存在此浏览器。请单独备份私钥，丢失密码无法恢复。</p>
-      <label for="setup-account-type" data-i18n="accountTypeLabel">账户类型</label>
-      <select id="setup-account-type">
-        <option value="secp256k1">secp256k1</option>
-        <option value="shrincs" data-i18n="shrincsExperimental">shrincs（实验性）</option>
-      </select>
-      <div id="import-fields" hidden>
-        <label id="private-key-label" for="private-key" data-i18n="privateKeyLabel">私钥（32 字节十六进制）</label>
-        <textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
-      </div>
-      <label for="new-password" data-i18n="passwordLabel">保护密码</label>
-      <input id="new-password" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="至少 8 位">
-      <div class="actions"><button id="generate-button" type="button" data-i18n="generateButton">随机生成账户</button><button id="show-import-button" class="secondary" type="button" data-i18n="importButton">导入已有账户</button></div>
-      <div id="import-actions" class="actions" hidden><button id="save-wallet-button" type="button" data-i18n="importSaveButton">导入并保存</button></div>
+      <div class="choice-grid"><button id="new-account-button" class="choice" type="button"><strong data-i18n="newAccountTitle">生成随机账户</strong><span data-i18n="newAccountHint">创建新的安全账户</span></button><button id="show-import-button" class="choice" type="button"><strong data-i18n="importTitle">导入已有账户</strong><span data-i18n="importHint">使用私钥恢复账户</span></button></div>
       <p id="setup-status" class="status" role="status"></p>
+    </section>
+    <section id="create-view" class="card" hidden>
+      <button id="create-back-button" class="back-link" type="button" data-i18n="backButton">返回</button>
+      <h2 data-i18n="newAccountTitle">生成随机账户</h2>
+      <label for="setup-account-type" data-i18n="accountTypeLabel">账户类型</label>
+      <select id="setup-account-type"><option value="secp256k1">secp256k1</option><option value="shrincs" data-i18n="shrincsExperimental">shrincs（实验性）</option></select>
+      <label for="new-password" data-i18n="passwordLabel">保护密码</label><input id="new-password" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="至少 8 位">
+      <div class="actions"><button id="generate-button" type="button" data-i18n="generateButton">确定并生成</button></div><p id="create-status" class="status" role="status"></p>
       <progress id="generation-progress" class="signing-progress" data-i18n-aria="generationProgress" aria-label="生成账户进度" hidden></progress>
+    </section>
+    <section id="import-view" class="card" hidden>
+      <button id="import-back-button" class="back-link" type="button" data-i18n="backButton">返回</button>
+      <h2 data-i18n="importTitle">导入已有账户</h2>
+      <label for="setup-account-type-import" data-i18n="accountTypeLabel">账户类型</label>
+      <select id="setup-account-type-import"><option value="secp256k1">secp256k1</option><option value="shrincs" data-i18n="shrincsExperimental">shrincs（实验性）</option></select>
+      <label id="private-key-label" for="private-key" data-i18n="privateKeyLabel">私钥（32 字节十六进制）</label><textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
+      <label for="new-password-import" data-i18n="passwordLabel">保护密码</label><input id="new-password-import" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="至少 8 位">
+      <div class="actions"><button id="save-wallet-button" type="button" data-i18n="importSaveButton">确定并导入</button></div><p id="import-status" class="status" role="status"></p>
     </section>
     <section id="unlock-view" class="card" hidden>
       <h2 data-i18n="unlockTitle">解锁钱包</h2><p class="hint" data-i18n="unlockHint">私钥已加密保存在此浏览器。</p>
@@ -78,8 +101,9 @@
     </section>
     <section id="settings-view" class="card" hidden>
       <h2 data-i18n="settingsTitle">设置</h2>
-      <label for="language-select" data-i18n="languageLabel">语言</label>
-      <select id="language-select"><option value="zh-CN" data-i18n="chinese">中文</option><option value="en-US" data-i18n="english">English</option></select>
+      <div class="setting-row"><label for="language-select" data-i18n="languageLabel">语言</label><select id="language-select"><option value="zh-CN" data-i18n="chinese">中文</option><option value="en-US" data-i18n="english">English</option></select></div>
+      <div class="setting-row"><label for="settings-sign-mode" data-i18n="signModeLabel">签名方式</label><select id="settings-sign-mode"><option value="default" data-i18n="defaultOption">默认</option><option value="stateful" data-i18n="statefulOption">有状态</option><option value="stateless" data-i18n="statelessOption">无状态</option></select></div>
+      <div class="actions"><button id="export-settings-button" class="secondary" type="button" data-i18n="exportButton">备份私钥</button><button id="settings-lock-button" class="danger" type="button" data-i18n="lockButton">锁定钱包</button></div>
       <div class="actions"><button id="settings-back-button" class="secondary" type="button" data-i18n="backButton">返回</button></div>
     </section>
     <section id="wallet-view" hidden>
@@ -87,24 +111,18 @@
         <div class="row"><strong><span data-i18n="myAddress">我的地址</span> <span id="account-type" class="account-type"></span></strong><button id="copy-address-button" class="secondary" type="button" data-i18n="copyButton">复制</button></div>
         <p id="address" class="address"></p>
         <p id="account-type-warning" class="warning" hidden></p>
-        <div class="actions"><button id="export-wallet-button" class="secondary" type="button" data-i18n="exportButton">导出私钥备份</button></div>
       </div>
       <div class="card"><div class="row"><strong data-i18n="availableBalance">可用余额</strong><button id="refresh-button" class="secondary" type="button" data-i18n="refreshButton">刷新</button></div><p id="balance" class="balance">-- <small>CKB</small></p></div>
-      <form id="transfer-form" class="card">
+      <div class="tabs"><button id="send-tab" class="tab active" type="button" data-i18n="sendTitle">发起交易</button><button id="history-tab" class="tab" type="button" data-i18n="historyTitle">交易历史</button></div>
+      <form id="transfer-form" class="card wallet-panel">
         <h2 data-i18n="sendTitle">发送 CKB</h2><label for="recipient" data-i18n="recipientLabel">收款测试网地址</label>
         <input id="recipient" autocomplete="off" spellcheck="false" data-i18n-placeholder="recipientPlaceholder" placeholder="ckt1..." required>
         <label for="amount" data-i18n="amountLabel">金额（CKB）</label><input id="amount" inputmode="decimal" autocomplete="off" data-i18n-placeholder="amountPlaceholder" placeholder="至少 61 CKB" required>
-        <div id="sign-mode-field" hidden>
-          <label for="sign-mode" data-i18n="signModeLabel">签名方式</label>
-          <select id="sign-mode">
-            <option value="stateful" data-i18n="statefulOption">stateful（状态化）</option>
-            <option value="stateless" data-i18n="statelessOption">stateless（无状态）</option>
-          </select>
-        </div>
-        <div class="actions"><button id="send-button" type="submit" data-i18n="sendButton">签名并发送</button><button id="lock-button" class="secondary" type="button" data-i18n="lockButton">锁定</button></div>
+        <div class="actions"><button id="send-button" type="submit" data-i18n="sendButton">签名并发送</button></div>
         <p id="wallet-status" class="status" role="status"></p>
         <progress id="signing-progress" class="signing-progress" data-i18n-aria="signingProgress" aria-label="签名进度" hidden></progress>
       </form>
+      <section id="history-panel" class="card wallet-panel" hidden><h2 data-i18n="historyTitle">交易历史</h2><ul id="transaction-history" class="history-list"></ul><p id="history-empty" class="empty-state" data-i18n="historyEmpty">暂无交易记录</p></section>
     </section>
   </main>
 </body>
