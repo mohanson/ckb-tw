@@ -55,8 +55,8 @@ translations["en-US"].shrincsExperimental = "shrincs";
 translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成，但测试网拒绝了交易：{error}";
 translations["en-US"].shrincsRejected = "SHRINCS signing completed, but the testnet rejected the transaction: {error}";
 const extraTranslations = {
-  "zh-CN": { newAccountTitle: "生成随机账户", newAccountHint: "创建新的安全账户", importTitle: "导入已有账户", importHint: "使用私钥恢复账户", historyTitle: "交易历史", historyEmpty: "暂无交易记录", historyPending: "已提交", historySuccess: "已完成", historyAmount: "金额", historyTime: "时间", historyHash: "交易哈希", defaultOption: "默认" },
-  "en-US": { newAccountTitle: "Generate account", newAccountHint: "Create a new secure account", importTitle: "Import account", importHint: "Restore with a private key", historyTitle: "Transaction history", historyEmpty: "No transactions yet", historyPending: "Submitted", historySuccess: "Completed", historyAmount: "Amount", historyTime: "Time", historyHash: "Transaction hash", defaultOption: "Default" },
+  "zh-CN": { newAccountTitle: "生成随机账户", newAccountHint: "创建新的安全账户", importTitle: "导入已有账户", importHint: "使用私钥恢复账户", historyTitle: "交易历史", historyEmpty: "暂无交易记录", historyPending: "已提交", historySuccess: "已完成", historyAmount: "金额", historyTime: "时间", historyHash: "交易哈希", defaultOption: "默认", deleteAccountTitle: "删除账户", deleteAccountHint: "删除本地保存的账户和私钥。此操作无法撤销。", deleteAccountConfirm: "确认删除账户", deleteAccountCancel: "取消" },
+  "en-US": { newAccountTitle: "Generate account", newAccountHint: "Create a new secure account", importTitle: "Import account", importHint: "Restore with a private key", historyTitle: "Transaction history", historyEmpty: "No transactions yet", historyPending: "Submitted", historySuccess: "Completed", historyAmount: "Amount", historyTime: "Time", historyHash: "Transaction hash", defaultOption: "Default", deleteAccountTitle: "Delete account", deleteAccountHint: "Delete the locally stored account and private key. This cannot be undone.", deleteAccountConfirm: "Delete account", deleteAccountCancel: "Cancel" },
 };
 let language = "en-US";
 let viewBeforeSettings = "setup";
@@ -96,11 +96,11 @@ globalThis.Buffer ??= Buffer;
 config.initializeConfig(config.predefined.AGGRON4);
 
 const elements = {
-  setupView: document.querySelector("#setup-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), walletView: document.querySelector("#wallet-view"),
+  setupView: document.querySelector("#setup-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), resetConfirmView: document.querySelector("#reset-confirm-view"), walletView: document.querySelector("#wallet-view"),
   privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), newPassword: document.querySelector("#new-password"), importPassword: document.querySelector("#new-password-import"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), generationProgress: document.querySelector("#generation-progress"),
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), walletStatus: document.querySelector("#wallet-status"),
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"),
-  generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetButton: document.querySelector("#reset-button"),
+  generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
   settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), settingsBackButton: document.querySelector("#settings-back-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
@@ -131,6 +131,7 @@ function showView(view) {
   elements.importView.hidden = view !== "import";
   elements.unlockView.hidden = view !== "unlock";
   elements.settingsView.hidden = view !== "settings";
+  elements.resetConfirmView.hidden = view !== "reset-confirm";
   elements.walletView.hidden = view !== "wallet";
 }
 
@@ -751,6 +752,8 @@ document.querySelector("#export-settings-button").addEventListener("click", () =
 elements.settingsButton.addEventListener("click", openSettings);
 elements.settingsBackButton.addEventListener("click", () => showView(viewBeforeSettings));
 document.querySelector("#settings-lock-button").addEventListener("click", lockWallet);
+document.querySelector("#delete-account-button").addEventListener("click", () => showView("reset-confirm"));
+elements.resetCancelButton.addEventListener("click", () => showView("settings"));
 elements.settingsSignMode.addEventListener("change", () => {
   if (account?.accountType !== "shrincs") return;
   if (account.imported) {
@@ -767,7 +770,7 @@ elements.languageSelect.addEventListener("change", async () => {
   await chrome.storage.local.set({ language });
   applyTranslations();
 });
-elements.resetButton.addEventListener("click", async () => {
+elements.resetConfirmButton.addEventListener("click", async () => {
   await chrome.storage.local.remove("vault");
   account = null;
   updateSignModeOptions();
