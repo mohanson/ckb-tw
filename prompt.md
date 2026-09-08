@@ -36,3 +36,16 @@
 - 设置页面. 从上往下, 分别是选择语言(中英文), 备份私钥按钮, 签名类型下拉框, 锁定钱包按钮. 对于 secp256k1 账户, 签名类型下拉框只显示并可选默认; 对于 shrincs-rs 账户, 签名类型下拉框显示并可选有状态化(stateful)和无状态化(stateless).
 
 插件允许在边栏中打开.
+
+# 5
+
+- shrincs 账号使用 CKB_TX_MESSAGE_ALL 方案. spec 描述: https://github.com/nervosnetwork/rfcs/pull/446. 你需要在 js 里实现 CKB_TX_MESSAGE_ALL 方案, 然后仅在 shrincs 账户进行签名时使用该方案.
+- 目前 shrincs 算法已经部署在 testnet, 可以在测试网上进行实际的签名和交易操作, 移除关于实验性, 空占位之类的描述. 部署信息如下:
+
+| parameter |                               value                                |
+| --------- | ------------------------------------------------------------------ |
+| code_hash | 0x387496fafe46562bb3bb2fa4446f1fc1054ba2f1b4df229a88056d5422a196ac |
+| hash_type | type                                                               |
+| tx_hash   | 0x3216d00b72e8229d7dbb46a93ea47bd0c650f2bdae42be2f92837328413da48e |
+| index     | 0x0                                                                |
+| dep_type  | code                                                               |

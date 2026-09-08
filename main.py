@@ -9,5 +9,7 @@ acc2 = pyckb.wallet.Wallet(2)
 
 acc3_seed = 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001
 acc3_script = pyckb.core.Script.addr_decode('ckt1qqu8f9h6ler9v2anhvh6g3r0rlqs2jaz7x6d7g563qzk64pz5xt2cqgqqqqqqqqqqqqqqqqqqqqqqqqpmy0pkhmfg04h04lwrhm33len3q8uyk8p')
-txid = acc1.transfer(acc3_script, 1000 * pyckb.denomination.ckbytes)
+
+acc4_script = pyckb.core.Script.addr_decode('ckt1qqu8f9h6ler9v2anhvh6g3r0rlqs2jaz7x6d7g563qzk64pz5xt2cqw9vawlamu9tgtce9qreenmf9xl7h0u797dj83x60ka64duzewfxvsaf6kv')
+txid = acc1.transfer(acc4_script, 1000 * pyckb.denomination.ckbytes)
 print(txid.hex())

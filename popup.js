@@ -1,12 +1,4 @@
-import { BI } from "@ckb-lumos/bi";
-import { blockchain, utils, values } from "@ckb-lumos/base";
-import { Indexer } from "@ckb-lumos/ckb-indexer";
-import { bytes } from "@ckb-lumos/codec";
-import * as commons from "@ckb-lumos/common-scripts";
-import * as config from "@ckb-lumos/config-manager";
-import { privateKeyToBlake160, signRecoverable } from "@ckb-lumos/hd/lib/key";
-import * as helpers from "@ckb-lumos/helpers";
-import { RPC } from "@ckb-lumos/rpc";
+import { ccc } from "@ckb-ccc/ccc";
 import { Buffer } from "buffer";
 import blake2b from "blake2b";
 import initShrincs, {
@@ -28,7 +20,6 @@ import initShrincs, {
 } from "./shrincs-wasm/pkg/shrincs.js";
 
 const RPC_URL = "https://testnet.ckb.dev/rpc";
-const INDEXER_URL = "https://testnet.ckb.dev/indexer";
 const SHANNONS_PER_CKB = 100000000n;
 const MIN_TRANSFER_CKB = 61n;
 const FEE_RATE = 1000n;
@@ -74,11 +65,10 @@ function applyTranslations() {
 }
 const ACCOUNT_TYPES = {
   secp256k1: {
-    createAccount(privateKey) {
-      return { address: helpers.encodeToConfigAddress(privateKeyToBlake160(privateKey), "SECP256K1_BLAKE160") };
-    },
-    sign(message, privateKey) {
-      return signRecoverable(message, privateKey);
+    async createAccount(privateKey) {
+      const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKey);
+      const address = await signer.getRecommendedAddress();
+      return { address };
     },
     canBroadcast: true,
   },
@@ -86,14 +76,13 @@ const ACCOUNT_TYPES = {
     createAccount(seed, publicKey) {
       if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(language === "zh-CN" ? "SHRINCS 公钥必须是 32 字节十六进制字符。" : "SHRINCS public key must be 32-byte hexadecimal.");
       const lock = { codeHash: SHRINCS_SCRIPT.codeHash, hashType: SHRINCS_SCRIPT.hashType, args: publicKey };
-      return { address: helpers.encodeToAddress(lock), publicKey, lock };
+      return { address: ccc.Address.fromScript(lock, cccClient).toString(), publicKey, lock };
     },
     canBroadcast: true,
   },
 };
 
 globalThis.Buffer ??= Buffer;
-config.initializeConfig(config.predefined.AGGRON4);
 
 const elements = {
   setupView: document.querySelector("#setup-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), resetConfirmView: document.querySelector("#reset-confirm-view"), changePasswordView: document.querySelector("#change-password-view"), walletView: document.querySelector("#wallet-view"),
@@ -111,10 +100,11 @@ let shrincsPreparedKeyInMemory = null;
 let shrincsPreparedKeyPromise = null;
 let vaultEncryptionKey = null;
 const shrincsInitialization = initShrincs().then(() => initThreadPool(Math.min(navigator.hardwareConcurrency || 1, 8)));
-const indexer = new Indexer(INDEXER_URL, RPC_URL);
-const rpc = new RPC(RPC_URL, {
-  fetch: (...argumentsList) => globalThis.fetch(...argumentsList),
-});
+const cccClient = new ccc.ClientPublicTestnet({ url: RPC_URL });
+const bytes = {
+  bytify: (value) => new Uint8Array(ccc.bytesFrom(value)),
+  hexify: (value) => ccc.hexFrom(value),
+};
 
 function setStatus(target, message = "", kind = "") {
   target.textContent = message;
@@ -182,7 +172,7 @@ function getAccountType(accountType) {
   return implementation;
 }
 
-function createAccount(privateKey, accountType = DEFAULT_ACCOUNT_TYPE, publicKey) {
+async function createAccount(privateKey, accountType = DEFAULT_ACCOUNT_TYPE, publicKey) {
   return getAccountType(accountType).createAccount(privateKey, publicKey);
 }
 
@@ -213,10 +203,9 @@ function isShrincsLock(lock) {
   return lock.codeHash === SHRINCS_SCRIPT.codeHash && lock.hashType === SHRINCS_SCRIPT.hashType;
 }
 
-function addShrincsCellDep(txSkeleton) {
-  const exists = txSkeleton.get("cellDeps").some((cellDep) => cellDep.depType === SHRINCS_SCRIPT.cellDep.depType
-    && new values.OutPointValue(cellDep.outPoint, { validate: false }).equals(new values.OutPointValue(SHRINCS_SCRIPT.cellDep.outPoint, { validate: false })));
-  return exists ? txSkeleton : txSkeleton.update("cellDeps", (cellDeps) => cellDeps.push(SHRINCS_SCRIPT.cellDep));
+function addShrincsCellDep(transaction) {
+  transaction.addCellDeps(SHRINCS_SCRIPT.cellDep);
+  return transaction;
 }
 
 function appendUint32LE(hasher, length) {
@@ -232,14 +221,22 @@ function appendShrincsWitness(hasher, witness) {
 }
 
 function appendShrincsCell(hasher, input) {
-  const cellData = bytes.bytify(input.data || "0x");
-  hasher.update(blockchain.CellOutput.pack(input.cellOutput));
+  const cellData = bytes.bytify(input.outputData || "0x");
+  hasher.update(bytes.bytify(ccc.CellOutput.from(input.cellOutput).toBytes()));
   appendUint32LE(hasher, cellData.length);
   hasher.update(cellData);
 }
 
 function appendShrincsWitnessField(hasher, field) {
-  const fieldBytes = blockchain.BytesOpt.pack(field);
+  const fieldBytes = field === undefined || field === null
+    ? new Uint8Array(0)
+    : (() => {
+      const value = bytes.bytify(field);
+      const result = new Uint8Array(4 + value.length);
+      new DataView(result.buffer).setUint32(0, value.length, true);
+      result.set(value, 4);
+      return result;
+    })();
   appendUint32LE(hasher, fieldBytes.length);
   hasher.update(fieldBytes);
 }
@@ -261,85 +258,54 @@ class ShrincsMessageHasher {
   }
 }
 
-class ShrincsCellCollector {
-  constructor(fromInfo, cellProvider) {
-    if (!cellProvider) throw new Error("Cell provider is missing!");
-    this.fromScript = helpers.parseAddress(fromInfo);
-    this.cellCollector = cellProvider.collector({ lock: this.fromScript, type: "empty" });
-  }
-
-  async *collect() {
-    if (!isShrincsLock(this.fromScript)) return;
-    yield* this.cellCollector.collect();
-  }
+function sameScript(left, right) {
+  return ccc.Script.from(left).eq(ccc.Script.from(right));
 }
 
-async function setupShrincsInputCell(txSkeleton, inputCell, _fromInfo, { defaultWitness = "0x", since } = {}) {
-  const fromScript = inputCell.cellOutput.lock;
-  if (!isShrincsLock(fromScript)) throw new Error("Not a SHRINCS input!");
-  txSkeleton = txSkeleton.update("inputs", (inputs) => inputs.push(inputCell));
-  txSkeleton = txSkeleton.update("outputs", (outputs) => outputs.push({ cellOutput: inputCell.cellOutput, data: inputCell.data }));
-  if (since) txSkeleton = txSkeleton.update("inputSinces", (inputSinces) => inputSinces.set(txSkeleton.get("inputs").size - 1, since));
-  txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.push(defaultWitness));
-  txSkeleton = addShrincsCellDep(txSkeleton);
-  const firstIndex = txSkeleton.get("inputs").findIndex((input) => new values.ScriptValue(input.cellOutput.lock, { validate: false }).equals(new values.ScriptValue(fromScript, { validate: false })));
-  const lock = `0x${"00".repeat(shrincsSignaturePlaceholderSize())}`;
-  const witness = txSkeleton.get("witnesses").get(firstIndex);
-  const witnessArgs = witness === "0x" ? {} : blockchain.WitnessArgs.unpack(bytes.bytify(witness));
-  txSkeleton = txSkeleton.update("witnesses", (witnesses) => witnesses.set(firstIndex, bytes.hexify(blockchain.WitnessArgs.pack({ lock, inputType: witnessArgs.inputType, outputType: witnessArgs.outputType }))));
-  return txSkeleton;
-}
-
-function prepareShrincsSigningEntries(txSkeleton) {
-  const tx = helpers.createTransactionFromSkeleton(txSkeleton);
-  const txHash = utils.ckbHash(blockchain.RawTransaction.pack(tx));
-  const inputs = txSkeleton.get("inputs");
-  const witnesses = txSkeleton.get("witnesses");
-  let signingEntries = txSkeleton.get("signingEntries");
-  const processedArgs = new Set();
-  for (let index = 0; index < inputs.size; index += 1) {
-    const input = inputs.get(index);
-    const lock = input.cellOutput.lock;
-    if (!isShrincsLock(lock) || processedArgs.has(lock.args)) continue;
-    processedArgs.add(lock.args);
-    const lockValue = new values.ScriptValue(lock, { validate: false });
-    const firstWitness = witnesses.get(index) || "0x";
-    let witnessArgs;
-    try {
-      witnessArgs = blockchain.WitnessArgs.unpack(bytes.bytify(firstWitness));
-    } catch {
-      throw new Error("The first SHRINCS witness must be valid WitnessArgs.");
-    }
-    const hasher = new ShrincsMessageHasher();
-    hasher.update(txHash);
-    for (let inputIndex = 0; inputIndex < inputs.size; inputIndex += 1) appendShrincsCell(hasher, inputs.get(inputIndex));
-    appendShrincsWitnessField(hasher, witnessArgs.inputType);
-    appendShrincsWitnessField(hasher, witnessArgs.outputType);
-    for (let witnessIndex = index + 1; witnessIndex < inputs.size; witnessIndex += 1) {
-      const otherLock = inputs.get(witnessIndex).cellOutput.lock;
-      if (lockValue.equals(new values.ScriptValue(otherLock, { validate: false }))) appendShrincsWitness(hasher, witnesses.get(witnessIndex));
-    }
-    for (let witnessIndex = inputs.size; witnessIndex < witnesses.size; witnessIndex += 1) appendShrincsWitness(hasher, witnesses.get(witnessIndex));
-    signingEntries = signingEntries.push({ type: "witness_args_lock", index, message: hasher.digestHex() });
+function shrincsSigningMessage(transaction, inputCells, firstIndex) {
+  const firstWitness = transaction.getWitnessArgs(firstIndex);
+  if (!firstWitness) throw new Error("The first SHRINCS witness must be valid WitnessArgs.");
+  const hasher = new ShrincsMessageHasher();
+  hasher.update(transaction.hash());
+  inputCells.forEach((cell) => appendShrincsCell(hasher, cell));
+  appendShrincsWitnessField(hasher, firstWitness.inputType);
+  appendShrincsWitnessField(hasher, firstWitness.outputType);
+  for (let witnessIndex = firstIndex + 1; witnessIndex < transaction.inputs.length; witnessIndex += 1) {
+    if (sameScript(inputCells[witnessIndex].cellOutput.lock, inputCells[firstIndex].cellOutput.lock)) appendShrincsWitness(hasher, transaction.getWitness(witnessIndex));
   }
-  return txSkeleton.set("signingEntries", signingEntries);
+  for (let witnessIndex = transaction.inputs.length; witnessIndex < transaction.witnesses.length; witnessIndex += 1) appendShrincsWitness(hasher, transaction.getWitness(witnessIndex));
+  return hasher.digestHex();
 }
 
-commons.common.registerCustomLockScriptInfos([{
-  codeHash: SHRINCS_SCRIPT.codeHash,
-  hashType: SHRINCS_SCRIPT.hashType,
-  lockScriptInfo: {
-    CellCollector: ShrincsCellCollector,
-    setupInputCell: setupShrincsInputCell,
-    prepareSigningEntries: prepareShrincsSigningEntries,
-  },
-}]);
+async function buildShrincsTransaction(recipient, amount) {
+  const sender = (await ccc.Address.fromString(account.address, cccClient)).script;
+  const signer = new ccc.SignerCkbScriptReadonly(cccClient, sender);
+  const transaction = ccc.Transaction.from({ outputs: [{ capacity: amount, lock: recipient.script }], outputsData: ["0x"] });
+  addShrincsCellDep(transaction);
+  const placeholder = `0x${"00".repeat(shrincsSignaturePlaceholderSize())}`;
+  const inputCells = [];
+  let inputCapacity = 0n;
+  for await (const cell of cccClient.findCellsByLock(sender, null, true)) {
+    inputCells.push(cell);
+    inputCapacity += BigInt(cell.cellOutput.capacity);
+    transaction.addInput(cell);
+    if (inputCapacity >= amount + MIN_TRANSFER_CKB * SHANNONS_PER_CKB) break;
+  }
+  if (inputCells.length === 0) throw new Error("No spendable SHRINCS cells found.");
+  for (let index = 0; index < inputCells.length; index += 1) transaction.setWitness(index, index === 0 ? ccc.WitnessArgs.from({ lock: placeholder }).toBytes() : "0x");
+  await transaction.completeFeeBy(signer, FEE_RATE, { shouldAddInputs: false });
+  const firstIndex = inputCells.findIndex((cell) => sameScript(cell.cellOutput.lock, sender));
+  transaction.setWitnessArgs(firstIndex, { lock: placeholder });
+  const signature = await signShrincsMessage(shrincsSigningMessage(transaction, inputCells, firstIndex));
+  transaction.setWitnessArgs(firstIndex, { lock: signature });
+  return transaction;
+}
 
 function generatePrivateKey() {
   while (true) {
     const bytes = crypto.getRandomValues(new Uint8Array(32));
     const key = `0x${Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
-    try { createAccount(key); return key; } catch { /* Reject the invalid secp256k1 scalar edge case. */ }
+    try { new ccc.SignerCkbPrivateKey(cccClient, key); return key; } catch { /* Reject the invalid secp256k1 scalar edge case. */ }
   }
 }
 
@@ -359,10 +325,10 @@ async function deriveEncryptionKey(password, salt, usages) {
 async function encryptPrivateKey(privateKey, password, accountType, publicKey, shrincsState, imported = false, shrincsSecretKey) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveEncryptionKey(password, salt, ["encrypt"]);
+  const key = await deriveEncryptionKey(password, salt, ["encrypt", "decrypt"]);
   const payload = JSON.stringify({ privateKey, shrincsSecretKey, shrincsPreparedKey: undefined });
   const cipherText = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(payload));
-  const account = createAccount(privateKey, accountType, publicKey);
+  const account = await createAccount(privateKey, accountType, publicKey);
   vaultEncryptionKey = key;
   return { version: 6, salt: encodeBase64(salt), iv: encodeBase64(iv), cipherText: encodeBase64(cipherText), accountType, publicKey: account.publicKey, address: account.address, shrincsState, imported };
 }
@@ -403,7 +369,7 @@ async function changeWalletPassword() {
     const decrypted = await decryptPrivateKey(vault, currentPassword);
     const salt = crypto.getRandomValues(new Uint8Array(16));
     const iv = crypto.getRandomValues(new Uint8Array(12));
-    const key = await deriveEncryptionKey(newPassword, salt, ["encrypt"]);
+    const key = await deriveEncryptionKey(newPassword, salt, ["encrypt", "decrypt"]);
     const payload = JSON.stringify({
       privateKey: decrypted.privateKey,
       shrincsSecretKey: decrypted.shrincsSecretKey,
@@ -506,9 +472,8 @@ async function refreshBalance() {
   elements.refreshButton.disabled = true;
   setStatus(elements.walletStatus, t("balanceQuery"));
   try {
-    let capacity = 0n;
-    const lock = helpers.parseAddress(account.address);
-    for await (const cell of indexer.collector({ lock }).collect()) capacity += BigInt(cell.cellOutput.capacity);
+    const { script } = await ccc.Address.fromString(account.address, cccClient);
+    const capacity = BigInt((await cccClient.getBalance([script])).toString());
     elements.balance.innerHTML = `${formatCkb(capacity)} <small>CKB</small>`;
     setStatus(elements.walletStatus, t("balanceUpdated"), "success");
   } catch (error) {
@@ -518,7 +483,7 @@ async function refreshBalance() {
 
 // 进入钱包视图（生成/导入后直接进入，或解锁后进入）。privateKey 为内存中用于签名的密钥。
 async function enterWallet({ accountType, privateKey, publicKey, shrincsState, imported, expectedAddress }) {
-  const restoredAccount = createAccount(privateKey, accountType, publicKey);
+  const restoredAccount = await createAccount(privateKey, accountType, publicKey);
   if (expectedAddress && restoredAccount.address !== expectedAddress) throw new Error(t("addressMismatch"));
   privateKeyInMemory = privateKey;
   account = { ...restoredAccount, accountType, shrincsState: accountType === "shrincs" ? shrincsState : undefined, imported };
@@ -629,19 +594,20 @@ async function sendTransfer(event) {
   try {
     const recipient = elements.recipient.value.trim();
     if (!recipient.startsWith("ckt1")) throw new Error(t("invalidAddress"));
-    helpers.parseAddress(recipient);
+    const recipientAddress = await ccc.Address.fromString(recipient, cccClient);
     const amount = parseCkbAmount(elements.amount.value);
-    let transaction = helpers.TransactionSkeleton({ cellProvider: indexer });
-    transaction = await commons.common.transfer(transaction, [account.address], recipient, BI.from(amount));
-    transaction = await commons.common.payFeeByFeeRate(transaction, [account.address], BI.from(FEE_RATE));
-    transaction = commons.common.prepareSigningEntries(transaction);
-    const signatures = await Promise.all(transaction.get("signingEntries").map((entry) => account.accountType === "shrincs"
-      ? signShrincsMessage(entry.message)
-      : getAccountType(account.accountType).sign(entry.message, privateKeyInMemory)).toArray());
-    const sealed = helpers.sealTransaction(transaction, signatures);
+    let sealed;
+    if (account.accountType === "shrincs") {
+      sealed = await buildShrincsTransaction(recipientAddress, amount);
+    } else {
+      const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKeyInMemory);
+      const transaction = ccc.Transaction.from({ outputs: [{ capacity: amount, lock: recipientAddress.script }], outputsData: ["0x"] });
+      await transaction.completeFeeBy(signer, FEE_RATE);
+      sealed = await signer.signTransaction(transaction);
+    }
     transactionSigned = true;
     setStatus(elements.walletStatus, t("broadcasting"));
-    const transactionHash = await rpc.sendTransaction(sealed, "passthrough");
+    const transactionHash = await cccClient.sendTransaction(sealed);
     await recordTransaction(transactionHash, amount);
     elements.amount.value = "";
     await refreshBalance();
@@ -731,8 +697,8 @@ async function loadTransactionHistory() {
     const updatedRecords = await Promise.all(records.map(async (record) => {
       if (record.status === "completed") return record;
       try {
-        const transaction = await rpc.getTransaction(record.hash);
-        const transactionStatus = transaction?.txStatus?.status || transaction?.tx_status?.status || transaction?.status;
+        const transaction = await cccClient.getTransaction(record.hash);
+        const transactionStatus = transaction?.status;
         return transactionStatus === "committed" ? { ...record, status: "completed" } : record;
       } catch {
         return record;
