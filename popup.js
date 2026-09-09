@@ -15,7 +15,6 @@ import initShrincs, {
   signStatelessWithPrepare,
   stateCounter,
   stateFromStatefulSignResult,
-  statelessSignatureLen,
   verify,
 } from "./shrincs-wasm/pkg/shrincs.js";
 
@@ -24,6 +23,7 @@ const SHANNONS_PER_CKB = 100000000n;
 const MIN_TRANSFER_CKB = 61n;
 const FEE_RATE = 1000n;
 const DEFAULT_ACCOUNT_TYPE = "secp256k1";
+const VAULT_VERSION = 6;
 const SHRINCS_MAX_STATEFUL_SIGNATURES = 142;
 const SHRINCS_WOTS_SIGNATURE_SIZE = 292;
 const SHRINCS_STATELESS_SIGNATURE_SIZE = 2568;
@@ -268,8 +268,11 @@ const elements = {
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"),
   generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
-  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
+  newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
+  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
+
+const VIEW_NAMES = ["setup", "create", "import", "unlock", "settings", "reset-confirm", "change-password", "wallet"];
 
 let account = null;
 let privateKeyInMemory = null;
@@ -293,14 +296,10 @@ function nextPaint() {
 }
 
 function showView(view) {
-  elements.setupView.hidden = view !== "setup";
-  elements.createView.hidden = view !== "create";
-  elements.importView.hidden = view !== "import";
-  elements.unlockView.hidden = view !== "unlock";
-  elements.settingsView.hidden = view !== "settings";
-  elements.resetConfirmView.hidden = view !== "reset-confirm";
-  elements.changePasswordView.hidden = view !== "change-password";
-  elements.walletView.hidden = view !== "wallet";
+  for (const name of VIEW_NAMES) {
+    const elementName = name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()) + "View";
+    elements[elementName].hidden = name !== view;
+  }
 }
 
 function updateSignModeOptions(accountType = account?.accountType, imported = account?.imported) {
@@ -325,7 +324,7 @@ function lockWallet() {
 }
 
 function openSettings() {
-  viewBeforeSettings = ["setup", "create", "import", "unlock", "wallet"].find((view) => !elements[`${view}View`].hidden) || "setup";
+  viewBeforeSettings = VIEW_NAMES.find((view) => view !== "settings" && !elements[`${view.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase())}View`].hidden) || "setup";
   showView("settings");
 }
 
@@ -501,34 +500,39 @@ async function deriveEncryptionKey(password, salt, usages) {
   return crypto.subtle.deriveKey({ name: "PBKDF2", salt, iterations: 250000, hash: "SHA-256" }, material, { name: "AES-GCM", length: 256 }, false, usages);
 }
 
+async function encryptVaultPayload(payload, key) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const cipherText = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(JSON.stringify(payload)));
+  return { iv: encodeBase64(iv), cipherText: encodeBase64(cipherText) };
+}
+
+async function decryptVaultPayload(vault, key) {
+  const plainText = await crypto.subtle.decrypt({ name: "AES-GCM", iv: decodeBase64(vault.iv) }, key, decodeBase64(vault.cipherText));
+  return JSON.parse(new TextDecoder().decode(plainText));
+}
+
 async function encryptPrivateKey(privateKey, password, accountType, publicKey, shrincsState, imported = false, shrincsSecretKey) {
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
   const key = await deriveEncryptionKey(password, salt, ["encrypt", "decrypt"]);
-  const payload = JSON.stringify({ privateKey, shrincsSecretKey, shrincsPreparedKey: undefined });
-  const cipherText = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(payload));
+  const encrypted = await encryptVaultPayload({ privateKey, shrincsSecretKey }, key);
   const account = await createAccount(privateKey, accountType, publicKey);
   vaultEncryptionKey = key;
-  return { version: 6, salt: encodeBase64(salt), iv: encodeBase64(iv), cipherText: encodeBase64(cipherText), accountType, publicKey: account.publicKey, address: account.address, shrincsState, imported };
+  return { version: VAULT_VERSION, salt: encodeBase64(salt), ...encrypted, accountType, publicKey: account.publicKey, address: account.address, shrincsState, imported };
 }
 
 async function persistShrincsPreparedKey(preparedKey) {
   if (!vaultEncryptionKey) throw new Error(t("notEnoughKey"));
   const { vault } = await chrome.storage.local.get("vault");
   if (!vault) throw new Error(t("missingVault"));
-  const plainText = await crypto.subtle.decrypt({ name: "AES-GCM", iv: decodeBase64(vault.iv) }, vaultEncryptionKey, decodeBase64(vault.cipherText));
-  const { privateKey, shrincsSecretKey } = JSON.parse(new TextDecoder().decode(plainText));
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const payload = JSON.stringify({ privateKey, shrincsSecretKey, shrincsPreparedKey: encodeBase64(preparedKey) });
-  const cipherText = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, vaultEncryptionKey, new TextEncoder().encode(payload));
-  await chrome.storage.local.set({ vault: { ...vault, version: 6, iv: encodeBase64(iv), cipherText: encodeBase64(cipherText) } });
+  const { privateKey, shrincsSecretKey } = await decryptVaultPayload(vault, vaultEncryptionKey);
+  const encrypted = await encryptVaultPayload({ privateKey, shrincsSecretKey, shrincsPreparedKey: encodeBase64(preparedKey) }, vaultEncryptionKey);
+  await chrome.storage.local.set({ vault: { ...vault, version: VAULT_VERSION, ...encrypted } });
 }
 
 async function decryptPrivateKey(vault, password) {
   try {
     const key = await deriveEncryptionKey(password, decodeBase64(vault.salt), ["encrypt", "decrypt"]);
-    const plainText = await crypto.subtle.decrypt({ name: "AES-GCM", iv: decodeBase64(vault.iv) }, key, decodeBase64(vault.cipherText));
-    const payload = JSON.parse(new TextDecoder().decode(plainText));
+    const payload = await decryptVaultPayload(vault, key);
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
     const privateKey = normalizePrivateKey(payload.privateKey, accountType);
     if (accountType === "shrincs" && !/^0x[0-9a-f]{192}$/.test(payload.shrincsSecretKey || "")) throw new Error(t("invalidShrincsKey"));
@@ -547,15 +551,14 @@ async function changeWalletPassword() {
     if (!vault) throw new Error(t("missingVault"));
     const decrypted = await decryptPrivateKey(vault, currentPassword);
     const salt = crypto.getRandomValues(new Uint8Array(16));
-    const iv = crypto.getRandomValues(new Uint8Array(12));
     const key = await deriveEncryptionKey(newPassword, salt, ["encrypt", "decrypt"]);
-    const payload = JSON.stringify({
+    const payload = {
       privateKey: decrypted.privateKey,
       shrincsSecretKey: decrypted.shrincsSecretKey,
       shrincsPreparedKey: decrypted.shrincsPreparedKey ? encodeBase64(decrypted.shrincsPreparedKey) : undefined,
-    });
-    const cipherText = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(payload));
-    await chrome.storage.local.set({ vault: { ...vault, version: 6, salt: encodeBase64(salt), iv: encodeBase64(iv), cipherText: encodeBase64(cipherText) } });
+    };
+    const encrypted = await encryptVaultPayload(payload, key);
+    await chrome.storage.local.set({ vault: { ...vault, version: VAULT_VERSION, salt: encodeBase64(salt), ...encrypted } });
     vaultEncryptionKey = key;
     elements.changePasswordCurrent.value = "";
     elements.changePasswordNew.value = "";
@@ -670,7 +673,6 @@ async function enterWallet({ accountType, privateKey, publicKey, shrincsState, i
   elements.accountType.textContent = accountType;
   updateSignModeOptions(accountType, imported);
   elements.settingsSignMode.value = accountType === "shrincs" ? currentShrincsSignMode() : "default";
-  updateSignModeOptions(accountType, imported);
   elements.settingsSignMode.disabled = false;
   showView("wallet");
   await refreshBalance();
@@ -908,14 +910,16 @@ function showWalletPanel(panel) {
   elements.historyPanel.hidden = !history;
   elements.sendTab.classList.toggle("active", !history);
   elements.historyTab.classList.toggle("active", history);
+  elements.sendTab.setAttribute("aria-selected", String(!history));
+  elements.historyTab.setAttribute("aria-selected", String(history));
   if (history) loadTransactionHistory();
 }
 
 elements.generateButton.addEventListener("click", generateWallet);
-document.querySelector("#new-account-button").addEventListener("click", () => showView("create"));
+elements.newAccountButton.addEventListener("click", () => showView("create"));
 elements.showImportButton.addEventListener("click", () => showView("import"));
-document.querySelector("#create-back-button").addEventListener("click", () => showView("setup"));
-document.querySelector("#import-back-button").addEventListener("click", () => showView("setup"));
+elements.createBackButton.addEventListener("click", () => showView("setup"));
+elements.importBackButton.addEventListener("click", () => showView("setup"));
 elements.setupAccountType.addEventListener("change", updateSetupAccountType);
 elements.importAccountType.addEventListener("change", () => {
   elements.setupAccountType.value = elements.importAccountType.value;
@@ -926,13 +930,13 @@ elements.unlockButton.addEventListener("click", unlockWallet);
 elements.refreshButton.addEventListener("click", refreshBalance);
 elements.transferForm.addEventListener("submit", sendTransfer);
 elements.copyAddressButton.addEventListener("click", () => copyAddress().catch(() => setStatus(elements.walletStatus, t("copyError"), "error")));
-document.querySelector("#export-settings-button").addEventListener("click", () => exportWallet().catch((error) => setStatus(elements.walletStatus, t("exportError", { error: error.message }), "error")));
+elements.exportButton.addEventListener("click", () => exportWallet().catch((error) => setStatus(elements.walletStatus, t("exportError", { error: error.message }), "error")));
 elements.settingsButton.addEventListener("click", openSettings);
 elements.settingsBackButton.addEventListener("click", () => showView(viewBeforeSettings));
-document.querySelector("#settings-lock-button").addEventListener("click", lockWallet);
-document.querySelector("#settings-change-password-button").addEventListener("click", () => showView("change-password"));
+elements.settingsLockButton.addEventListener("click", lockWallet);
+elements.settingsChangePasswordButton.addEventListener("click", () => showView("change-password"));
 elements.changePasswordCancelButton.addEventListener("click", () => showView("settings"));
-document.querySelector("#delete-account-button").addEventListener("click", () => showView("reset-confirm"));
+elements.deleteAccountButton.addEventListener("click", () => showView("reset-confirm"));
 elements.resetCancelButton.addEventListener("click", () => showView("settings"));
 elements.settingsSignMode.addEventListener("change", () => {
   if (account?.accountType !== "shrincs") return;

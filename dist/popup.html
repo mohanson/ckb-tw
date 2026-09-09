@@ -66,16 +66,16 @@
     .signing-progress { width:100%; height:5px; margin-top:8px; accent-color:var(--mint); }
     [hidden] { display:none !important; }
   </style>
-  <script type="module" crossorigin src="/assets/popup-BaAu4QtV.js"></script>
+  <script type="module" crossorigin src="/assets/popup-pHBu9FNa.js"></script>
 </head>
 <body>
   <main>
-    <header><h1 data-i18n="appTitle">CKB Wallet</h1><div class="header-actions"><span class="network" data-i18n="network">TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="Settings" title="Settings">⚙</button></div></header>
+    <header><h1 data-i18n="appTitle">CKB Testnet Wallet</h1><div class="header-actions"><span class="network" data-i18n="network">TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="Settings" title="Settings">⚙</button></div></header>
     <section id="setup-view" class="card">
       <h2 data-i18n="setupTitle">Create or Import Account</h2>
       <p class="hint" data-i18n="setupHint">Your private key is stored encrypted in this browser. Back it up separately; it cannot be recovered without the password.</p>
       <div class="choice-grid"><button id="new-account-button" class="choice" type="button"><strong data-i18n="newAccountTitle">Generate account</strong><span data-i18n="newAccountHint">Create a new secure account</span></button><button id="show-import-button" class="choice" type="button"><strong data-i18n="importTitle">Import account</strong><span data-i18n="importHint">Restore with a private key</span></button></div>
-      <p id="setup-status" class="status" role="status"></p>
+      <p id="setup-status" class="status" role="status" aria-live="polite"></p>
     </section>
     <section id="create-view" class="card" hidden>
       <button id="create-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
@@ -83,7 +83,7 @@
       <label for="setup-account-type" data-i18n="accountTypeLabel">Account type</label>
       <select id="setup-account-type"><option value="secp256k1">secp256k1</option><option value="shrincs">shrincs</option></select>
       <label for="new-password" data-i18n="passwordLabel">Protection password</label><input id="new-password" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
-      <div class="actions"><button id="generate-button" type="button" data-i18n="generateButton">Generate account</button></div><p id="create-status" class="status" role="status"></p>
+      <div class="actions"><button id="generate-button" type="button" data-i18n="generateButton">Generate account</button></div><p id="create-status" class="status" role="status" aria-live="polite"></p>
       <progress id="generation-progress" class="signing-progress" data-i18n-aria="generationProgress" aria-label="Account generation progress" hidden></progress>
     </section>
     <section id="import-view" class="card" hidden>
@@ -93,14 +93,14 @@
       <select id="setup-account-type-import"><option value="secp256k1">secp256k1</option><option value="shrincs">shrincs</option></select>
       <label id="private-key-label" for="private-key" data-i18n="privateKeyLabel">Private key (32-byte hex)</label><textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
       <label for="new-password-import" data-i18n="passwordLabel">Protection password</label><input id="new-password-import" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
-      <div class="actions"><button id="save-wallet-button" type="button" data-i18n="importSaveButton">Import and save</button></div><p id="import-status" class="status" role="status"></p>
+      <div class="actions"><button id="save-wallet-button" type="button" data-i18n="importSaveButton">Import and save</button></div><p id="import-status" class="status" role="status" aria-live="polite"></p>
     </section>
     <section id="unlock-view" class="card" hidden>
       <h2 data-i18n="unlockTitle">Unlock wallet</h2><p class="hint" data-i18n="unlockHint">Your private key is stored encrypted in this browser.</p>
       <label for="unlock-password" data-i18n="passwordOnlyLabel">Password</label>
       <input id="unlock-password" type="password" autocomplete="current-password" data-i18n-placeholder="unlockPlaceholder" placeholder="Enter your wallet password">
       <div class="actions"><button id="unlock-button" type="button" data-i18n="unlockButton">Unlock</button></div>
-      <p id="unlock-status" class="status" role="status"></p>
+      <p id="unlock-status" class="status" role="status" aria-live="polite"></p>
     </section>
     <section id="settings-view" class="card" hidden>
       <button id="settings-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
@@ -121,7 +121,7 @@
       <label for="change-password-new" data-i18n="newPasswordLabel">New password</label>
       <input id="change-password-new" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
       <div class="actions"><button id="change-password-button" type="button" data-i18n="changePasswordButton">Change password</button></div>
-      <p id="change-password-status" class="status" role="status"></p>
+      <p id="change-password-status" class="status" role="status" aria-live="polite"></p>
     </section>
     <section id="reset-confirm-view" class="card" hidden>
       <h2 data-i18n="deleteAccountTitle">Delete account</h2>
@@ -134,13 +134,13 @@
         <p id="address" class="address"></p>
       </div>
       <div class="card"><div class="row"><strong data-i18n="availableBalance">Available balance</strong><button id="refresh-button" class="secondary" type="button" data-i18n="refreshButton">Refresh</button></div><p id="balance" class="balance">-- <small>CKB</small></p></div>
-      <div class="tabs"><button id="send-tab" class="tab active" type="button" data-i18n="sendTitle">Send CKB</button><button id="history-tab" class="tab" type="button" data-i18n="historyTitle">Transaction history</button></div>
+      <div class="tabs" role="tablist"><button id="send-tab" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="transfer-form" data-i18n="sendTitle">Send CKB</button><button id="history-tab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="history-panel" data-i18n="historyTitle">Transaction history</button></div>
       <form id="transfer-form" class="card wallet-panel">
         <h2 data-i18n="sendTitle">Send CKB</h2><label for="recipient" data-i18n="recipientLabel">Testnet recipient address</label>
         <input id="recipient" autocomplete="off" spellcheck="false" data-i18n-placeholder="recipientPlaceholder" placeholder="ckt1..." required>
         <label for="amount" data-i18n="amountLabel">Amount (CKB)</label><input id="amount" inputmode="decimal" autocomplete="off" data-i18n-placeholder="amountPlaceholder" placeholder="At least 61 CKB" required>
         <div class="actions"><button id="send-button" type="submit" data-i18n="sendButton">Sign and send</button></div>
-        <p id="wallet-status" class="status" role="status"></p>
+        <p id="wallet-status" class="status" role="status" aria-live="polite"></p>
         <progress id="signing-progress" class="signing-progress" data-i18n-aria="signingProgress" aria-label="Signing progress" hidden></progress>
       </form>
       <section id="history-panel" class="card wallet-panel" hidden><h2 data-i18n="historyTitle">Transaction history</h2><ul id="transaction-history" class="history-list"></ul><p id="history-empty" class="empty-state" data-i18n="historyEmpty">No transactions yet</p></section>
