@@ -3,7 +3,13 @@
   "name": "CKB Testnet Wallet BETA",
   "version": "1.0",
   "description": "CKB Testnet Wallet. This extension is currently in the Beta testing phase.",
+  "icons": {
+    "128": "logo_128.png"
+  },
   "action": {
+    "default_icon": {
+      "128": "logo_128.png"
+    },
     "default_popup": "popup.html"
   },
   "side_panel": {
