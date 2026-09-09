@@ -7,7 +7,10 @@
   <style>
     :root { --ink:#13222d; --muted:#5e7280; --paper:#f3f8f6; --panel:#ffffff; --line:#d6e1dd; --mint:#0a806d; --mint-dark:#056355; --coral:#d7634f; --soft-mint:#e0f2eb; --sun:#f2b84b; }
     * { box-sizing:border-box; }
-    body { width:390px; min-height:500px; margin:0; background:linear-gradient(145deg,#eef8f4 0%,#f9fbf9 48%,#f8f1ec 100%); color:var(--ink); font:14px/1.45 "Avenir Next","Noto Sans SC",sans-serif; }
+    html { scrollbar-width:none; }
+    html::-webkit-scrollbar { display:none; }
+    body { width:390px; min-height:500px; margin:0; overflow-y:auto; scrollbar-width:none; background:linear-gradient(145deg,#eef8f4 0%,#f9fbf9 48%,#f8f1ec 100%); color:var(--ink); font:14px/1.45 "Avenir Next","Noto Sans SC",sans-serif; }
+    body::-webkit-scrollbar { display:none; }
     main { padding:20px; }
     header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:22px; }
     .header-actions { display:flex; align-items:center; gap:8px; }
