@@ -35,26 +35,201 @@ const SHRINCS_SCRIPT = {
     depType: "code",
   },
 };
-const translations = {
-  "zh-CN": {
-    appTitle: "CKB Wallet", network: "TESTNET", generationProgress: "生成账户进度", signingProgress: "签名进度", setupTitle: "创建或导入账户", setupHint: "私钥只会以加密形式保存在此浏览器。请单独备份私钥，丢失密码无法恢复。", accountTypeLabel: "账户类型", shrincsExperimental: "shrincs（实验性）", privateKeyLabel: "私钥（32 字节十六进制）", passwordLabel: "保护密码", passwordPlaceholder: "至少 8 位", generateButton: "随机生成账户", importButton: "导入已有账户", importSaveButton: "导入并保存", unlockTitle: "解锁钱包", unlockHint: "私钥已加密保存在此浏览器。", passwordOnlyLabel: "密码", unlockPlaceholder: "输入保护密码", unlockButton: "解锁", resetButton: "清除钱包", settingsTitle: "设置", languageLabel: "语言", chinese: "中文", english: "English", backButton: "返回", myAddress: "我的地址", copyButton: "复制", exportButton: "导出私钥备份", availableBalance: "可用余额", refreshButton: "刷新", sendTitle: "发送 CKB", recipientLabel: "收款测试网地址", recipientPlaceholder: "ckt1...", amountLabel: "金额（CKB）", amountPlaceholder: "至少 61 CKB", signModeLabel: "签名方式", statefulOption: "有状态", statelessOption: "无状态", sendButton: "签名并发送", lockButton: "锁定", passwordShort: "保护密码至少需要 8 位。", accountImported: "账户已导入，直接进入钱包。", accountGenerated: "账户已生成，直接进入钱包。", generatingKey: "正在生成 SHRINCS-B 密钥材料...", verifyingPassword: "正在验证密码...", restoringKey: "正在恢复 SHRINCS 密钥材料...", missingVault: "未找到钱包数据。", wrongPassword: "密码不正确或钱包数据已损坏。", balanceQuery: "正在查询测试网余额...", balanceUpdated: "余额已更新。", balanceError: "无法查询余额：{error}", copySuccess: "地址已复制。", copyError: "无法复制地址。", exportSuccess: "私钥备份已下载，请妥善保管并及时删除临时文件。", exportError: "导出失败：{error}", preparingFast: "首次使用 Fast stateless signing，正在预计算...", fastSigning: "正在生成 SHRINCS Fast 无状态签名。", buildingTransaction: "正在构造并签名交易...", broadcasting: "正在广播交易...", transferError: "转账失败：{error}", shrincsRejected: "SHRINCS 签名已完成，但测试网拒绝了零占位脚本交易：{error}", invalidAddress: "请输入 CKB 测试网地址（ckt1...）。", invalidAmount: "请输入最多 8 位小数的有效 CKB 金额。", amountTooSmall: "CKB 单个转账输出至少需要 61 CKB。", invalidPasswordData: "密码不正确或钱包数据已损坏。", unsupportedAccount: "不支持的账户类型。", invalidShrincsKey: "无效的 SHRINCS 签名密钥。", walletLocked: "钱包尚未解锁。", missingData: "SHRINCS 钱包数据不可用。", importedOnlyStateless: "导入的 SHRINCS 账户仅支持无状态签名。", noState: "此账户没有可用的状态化签名状态。", stateExhausted: "SHRINCS 状态化签名叶子已耗尽，请切换为无状态签名。", stateMismatch: "SHRINCS 状态计数器不一致。", verifyFailed: "SHRINCS 本地验签失败。", addressMismatch: "钱包地址校验失败。", notEnoughKey: "钱包加密密钥不可用，请重新解锁。", invalidPrepared: "无效的 Fast stateless signing 缓存。", txSuccess: "交易已广播。交易哈希：", explorerLink: "在区块浏览器中查看" },
-  "en-US": {
-    appTitle: "CKB Wallet", network: "TESTNET", generationProgress: "Account generation progress", signingProgress: "Signing progress", setupTitle: "Create or Import Account", setupHint: "Your private key is stored encrypted in this browser. Back it up separately; it cannot be recovered without the password.", accountTypeLabel: "Account type", shrincsExperimental: "shrincs (experimental)", privateKeyLabel: "Private key (32-byte hex)", passwordLabel: "Protection password", passwordPlaceholder: "At least 8 characters", generateButton: "Generate account", importButton: "Import account", importSaveButton: "Import and save", unlockTitle: "Unlock wallet", unlockHint: "Your private key is stored encrypted in this browser.", passwordOnlyLabel: "Password", unlockPlaceholder: "Enter protection password", unlockButton: "Unlock", resetButton: "Clear wallet", settingsTitle: "Settings", languageLabel: "Language", chinese: "中文", english: "English", backButton: "Back", myAddress: "My address", copyButton: "Copy", exportButton: "Export key backup", availableBalance: "Available balance", refreshButton: "Refresh", sendTitle: "Send CKB", recipientLabel: "Testnet recipient address", recipientPlaceholder: "ckt1...", amountLabel: "Amount (CKB)", amountPlaceholder: "At least 61 CKB", signModeLabel: "Signing mode", statefulOption: "stateful", statelessOption: "stateless", sendButton: "Sign and send", lockButton: "Lock", passwordShort: "The protection password must be at least 8 characters.", accountImported: "Account imported. Entering wallet.", accountGenerated: "Account generated. Entering wallet.", generatingKey: "Generating SHRINCS-B key material...", verifyingPassword: "Verifying password...", restoringKey: "Restoring SHRINCS key material...", missingVault: "Wallet data not found.", wrongPassword: "Incorrect password or corrupted wallet data.", balanceQuery: "Querying testnet balance...", balanceUpdated: "Balance updated.", balanceError: "Unable to query balance: {error}", copySuccess: "Address copied.", copyError: "Unable to copy address.", exportSuccess: "Key backup downloaded. Keep it secure and delete the temporary file.", exportError: "Export failed: {error}", preparingFast: "Preparing Fast stateless signing for the first transfer...", fastSigning: "Generating SHRINCS Fast stateless signature.", buildingTransaction: "Building and signing transaction...", broadcasting: "Broadcasting transaction...", transferError: "Transfer failed: {error}", shrincsRejected: "SHRINCS signing completed, but the testnet rejected the zero-placeholder script transaction: {error}", invalidAddress: "Enter a CKB testnet address (ckt1...).", invalidAmount: "Enter a valid CKB amount with at most 8 decimals.", amountTooSmall: "Each CKB transfer output must be at least 61 CKB.", invalidPasswordData: "Incorrect password or corrupted wallet data.", unsupportedAccount: "Unsupported account type.", invalidShrincsKey: "Invalid SHRINCS signing key.", walletLocked: "Wallet is not unlocked.", missingData: "SHRINCS wallet data is unavailable.", importedOnlyStateless: "Imported SHRINCS accounts only support stateless signing.", noState: "This account has no usable stateful signing state.", stateExhausted: "SHRINCS stateful signing leaves are exhausted. Switch to stateless signing.", stateMismatch: "SHRINCS state counter mismatch.", verifyFailed: "Local SHRINCS signature verification failed.", addressMismatch: "Wallet address verification failed.", notEnoughKey: "Wallet encryption key is unavailable. Unlock again.", invalidPrepared: "Invalid Fast stateless signing cache.", txSuccess: "Transaction broadcast. Transaction hash:", explorerLink: "View in block explorer" },
-};
-translations["zh-CN"].shrincsExperimental = "shrincs";
-translations["en-US"].shrincsExperimental = "shrincs";
-translations["zh-CN"].statelessSigningHint = "无状态签名使用更大的签名，并会产生更高的交易手续费。";
-translations["en-US"].statelessSigningHint = "Stateless signing uses larger signatures and costs more transaction fees.";
-translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成，但测试网拒绝了交易：{error}";
+const translations = { "zh-CN": {}, "en-US": {} };
+translations["zh-CN"].appTitle = "CKB Testnet Wallet";
+translations["en-US"].appTitle = "CKB Testnet Wallet";
+translations["zh-CN"].network = "TESTNET";
+translations["en-US"].network = "TESTNET";
+translations["zh-CN"].generationProgress = "生成账户进度";
+translations["en-US"].generationProgress = "Account generation progress";
+translations["zh-CN"].signingProgress = "签名进度";
+translations["en-US"].signingProgress = "Signing progress";
+translations["zh-CN"].setupTitle = "创建或导入账户";
+translations["en-US"].setupTitle = "Create or Import Account";
+translations["zh-CN"].setupHint = "私钥只会以加密形式保存在此浏览器. 请单独备份私钥, 丢失密码无法恢复.";
+translations["en-US"].setupHint = "Your private key is stored encrypted in this browser. Back it up separately; it cannot be recovered without the password.";
+translations["zh-CN"].accountTypeLabel = "账户类型";
+translations["en-US"].accountTypeLabel = "Account type";
+translations["zh-CN"].privateKeyLabel = "私钥(32 字节十六进制)";
+translations["en-US"].privateKeyLabel = "Private key (32-byte hex)";
+translations["zh-CN"].passwordLabel = "保护密码";
+translations["en-US"].passwordLabel = "Protection password";
+translations["zh-CN"].passwordPlaceholder = "至少 8 位";
+translations["en-US"].passwordPlaceholder = "At least 8 characters";
+translations["zh-CN"].generateButton = "随机生成账户";
+translations["en-US"].generateButton = "Generate account";
+translations["zh-CN"].importSaveButton = "导入并保存";
+translations["en-US"].importSaveButton = "Import and save";
+translations["zh-CN"].unlockTitle = "解锁钱包";
+translations["en-US"].unlockTitle = "Unlock wallet";
+translations["zh-CN"].unlockHint = "私钥已加密保存在此浏览器.";
+translations["en-US"].unlockHint = "Your private key is stored encrypted in this browser.";
+translations["zh-CN"].passwordOnlyLabel = "密码";
+translations["en-US"].passwordOnlyLabel = "Password";
+translations["zh-CN"].unlockPlaceholder = "输入保护密码";
+translations["en-US"].unlockPlaceholder = "Enter protection password";
+translations["zh-CN"].unlockButton = "解锁";
+translations["en-US"].unlockButton = "Unlock";
+translations["zh-CN"].settingsTitle = "设置";
+translations["en-US"].settingsTitle = "Settings";
+translations["zh-CN"].languageLabel = "语言";
+translations["en-US"].languageLabel = "Language";
+translations["zh-CN"].chinese = "中文";
+translations["en-US"].chinese = "中文";
+translations["zh-CN"].english = "English";
+translations["en-US"].english = "English";
+translations["zh-CN"].backButton = "返回";
+translations["en-US"].backButton = "Back";
+translations["zh-CN"].myAddress = "我的地址";
+translations["en-US"].myAddress = "My address";
+translations["zh-CN"].copyButton = "复制";
+translations["en-US"].copyButton = "Copy";
+translations["zh-CN"].exportButton = "导出私钥备份";
+translations["en-US"].exportButton = "Export key backup";
+translations["zh-CN"].availableBalance = "可用余额";
+translations["en-US"].availableBalance = "Available balance";
+translations["zh-CN"].refreshButton = "刷新";
+translations["en-US"].refreshButton = "Refresh";
+translations["zh-CN"].sendTitle = "发送 CKB";
+translations["en-US"].sendTitle = "Send CKB";
+translations["zh-CN"].recipientLabel = "收款测试网地址";
+translations["en-US"].recipientLabel = "Testnet recipient address";
+translations["zh-CN"].recipientPlaceholder = "ckt1...";
+translations["en-US"].recipientPlaceholder = "ckt1...";
+translations["zh-CN"].amountLabel = "金额(CKB)";
+translations["en-US"].amountLabel = "Amount (CKB)";
+translations["zh-CN"].amountPlaceholder = "至少 61 CKB";
+translations["en-US"].amountPlaceholder = "At least 61 CKB";
+translations["zh-CN"].signModeLabel = "签名方式";
+translations["en-US"].signModeLabel = "Signing mode";
+translations["zh-CN"].statefulOption = "有状态";
+translations["en-US"].statefulOption = "stateful";
+translations["zh-CN"].statelessOption = "无状态";
+translations["en-US"].statelessOption = "stateless";
+translations["zh-CN"].sendButton = "签名并发送";
+translations["en-US"].sendButton = "Sign and send";
+translations["zh-CN"].lockButton = "锁定";
+translations["en-US"].lockButton = "Lock";
+translations["zh-CN"].passwordShort = "保护密码至少需要 8 位.";
+translations["en-US"].passwordShort = "The protection password must be at least 8 characters.";
+translations["zh-CN"].accountImported = "账户已导入, 直接进入钱包.";
+translations["en-US"].accountImported = "Account imported. Entering wallet.";
+translations["zh-CN"].accountGenerated = "账户已生成, 直接进入钱包.";
+translations["en-US"].accountGenerated = "Account generated. Entering wallet.";
+translations["zh-CN"].generatingKey = "正在生成 SHRINCS-B 密钥材料...";
+translations["en-US"].generatingKey = "Generating SHRINCS-B key material...";
+translations["zh-CN"].verifyingPassword = "正在验证密码...";
+translations["en-US"].verifyingPassword = "Verifying password...";
+translations["zh-CN"].missingVault = "未找到钱包数据.";
+translations["en-US"].missingVault = "Wallet data not found.";
+translations["zh-CN"].wrongPassword = "密码不正确或钱包数据已损坏.";
+translations["en-US"].wrongPassword = "Incorrect password or corrupted wallet data.";
+translations["zh-CN"].balanceQuery = "正在查询测试网余额...";
+translations["en-US"].balanceQuery = "Querying testnet balance...";
+translations["zh-CN"].balanceUpdated = "余额已更新.";
+translations["en-US"].balanceUpdated = "Balance updated.";
+translations["zh-CN"].balanceError = "无法查询余额: {error}";
+translations["en-US"].balanceError = "Unable to query balance: {error}";
+translations["zh-CN"].copySuccess = "地址已复制.";
+translations["en-US"].copySuccess = "Address copied.";
+translations["zh-CN"].copyError = "无法复制地址.";
+translations["en-US"].copyError = "Unable to copy address.";
+translations["zh-CN"].exportSuccess = "私钥备份已下载, 请妥善保管并及时删除临时文件.";
+translations["en-US"].exportSuccess = "Key backup downloaded. Keep it secure and delete the temporary file.";
+translations["zh-CN"].exportError = "导出失败: {error}";
+translations["en-US"].exportError = "Export failed: {error}";
+translations["zh-CN"].preparingFast = "首次使用 Fast stateless signing, 正在预计算...";
+translations["en-US"].preparingFast = "Preparing Fast stateless signing for the first transfer...";
+translations["zh-CN"].fastSigning = "正在生成 SHRINCS Fast 无状态签名.";
+translations["en-US"].fastSigning = "Generating SHRINCS Fast stateless signature.";
+translations["zh-CN"].buildingTransaction = "正在构造并签名交易...";
+translations["en-US"].buildingTransaction = "Building and signing transaction...";
+translations["zh-CN"].broadcasting = "正在广播交易...";
+translations["en-US"].broadcasting = "Broadcasting transaction...";
+translations["zh-CN"].transferError = "转账失败: {error}";
+translations["en-US"].transferError = "Transfer failed: {error}";
+translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成, 但测试网拒绝了零占位脚本交易: {error}";
+translations["en-US"].shrincsRejected = "SHRINCS signing completed, but the testnet rejected the zero-placeholder script transaction: {error}";
+translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成, 但测试网拒绝了交易: {error}";
 translations["en-US"].shrincsRejected = "SHRINCS signing completed, but the testnet rejected the transaction: {error}";
-const extraTranslations = {
-  "zh-CN": { newAccountTitle: "生成随机账户", newAccountHint: "创建新的安全账户", importTitle: "导入已有账户", importHint: "使用私钥恢复账户", historyTitle: "交易历史", historyEmpty: "暂无交易记录", historyPending: "已提交", historySuccess: "已完成", historyAmount: "金额", historyTime: "时间", historyHash: "交易哈希", defaultOption: "默认", deleteAccountTitle: "删除账户", deleteAccountHint: "删除本地保存的账户和私钥。此操作无法撤销。", deleteAccountConfirm: "确认删除账户", deleteAccountCancel: "取消", changePasswordTitle: "修改密码", changePasswordHint: "请输入原密码和新密码。", currentPasswordLabel: "原密码", newPasswordLabel: "新密码", changePasswordButton: "确认修改", passwordChanged: "密码修改成功。", passwordChangeError: "密码修改失败：{error}" },
-  "en-US": { newAccountTitle: "Generate account", newAccountHint: "Create a new secure account", importTitle: "Import account", importHint: "Restore with a private key", historyTitle: "Transaction history", historyEmpty: "No transactions yet", historyPending: "Submitted", historySuccess: "Completed", historyAmount: "Amount", historyTime: "Time", historyHash: "Transaction hash", defaultOption: "Default", deleteAccountTitle: "Delete account", deleteAccountHint: "Delete the locally stored account and private key. This cannot be undone.", deleteAccountConfirm: "Delete account", deleteAccountCancel: "Cancel", changePasswordTitle: "Change password", changePasswordHint: "Enter your current password and a new password.", currentPasswordLabel: "Current password", newPasswordLabel: "New password", changePasswordButton: "Change password", passwordChanged: "Password changed successfully.", passwordChangeError: "Unable to change password: {error}" },
-};
+translations["zh-CN"].invalidAddress = "请输入 CKB 测试网地址(ckt1...).";
+translations["en-US"].invalidAddress = "Enter a CKB testnet address (ckt1...).";
+translations["zh-CN"].invalidAmount = "请输入最多 8 位小数的有效 CKB 金额.";
+translations["en-US"].invalidAmount = "Enter a valid CKB amount with at most 8 decimals.";
+translations["zh-CN"].amountTooSmall = "CKB 单个转账输出至少需要 61 CKB.";
+translations["en-US"].amountTooSmall = "Each CKB transfer output must be at least 61 CKB.";
+translations["zh-CN"].unsupportedAccount = "不支持的账户类型.";
+translations["en-US"].unsupportedAccount = "Unsupported account type.";
+translations["zh-CN"].invalidShrincsKey = "无效的 SHRINCS 签名密钥.";
+translations["en-US"].invalidShrincsKey = "Invalid SHRINCS signing key.";
+translations["zh-CN"].walletLocked = "钱包尚未解锁.";
+translations["en-US"].walletLocked = "Wallet is not unlocked.";
+translations["zh-CN"].missingData = "SHRINCS 钱包数据不可用.";
+translations["en-US"].missingData = "SHRINCS wallet data is unavailable.";
+translations["zh-CN"].noState = "此账户没有可用的状态化签名状态.";
+translations["en-US"].noState = "This account has no usable stateful signing state.";
+translations["zh-CN"].stateExhausted = "SHRINCS 状态化签名叶子已耗尽, 请切换为无状态签名.";
+translations["en-US"].stateExhausted = "SHRINCS stateful signing leaves are exhausted. Switch to stateless signing.";
+translations["zh-CN"].stateMismatch = "SHRINCS 状态计数器不一致.";
+translations["en-US"].stateMismatch = "SHRINCS state counter mismatch.";
+translations["zh-CN"].verifyFailed = "SHRINCS 本地验签失败.";
+translations["en-US"].verifyFailed = "Local SHRINCS signature verification failed.";
+translations["zh-CN"].addressMismatch = "钱包地址校验失败.";
+translations["en-US"].addressMismatch = "Wallet address verification failed.";
+translations["zh-CN"].notEnoughKey = "钱包加密密钥不可用, 请重新解锁.";
+translations["en-US"].notEnoughKey = "Wallet encryption key is unavailable. Unlock again.";
+translations["zh-CN"].txSuccess = "交易已广播. 交易哈希: ";
+translations["en-US"].txSuccess = "Transaction broadcast. Transaction hash:";
+translations["zh-CN"].explorerLink = "在区块浏览器中查看";
+translations["en-US"].explorerLink = "View in block explorer";
+translations["zh-CN"].statelessSigningHint = "无状态签名使用更大的签名, 并会产生更高的交易手续费.";
+translations["en-US"].statelessSigningHint = "Stateless signing uses larger signatures and costs more transaction fees.";
+translations["zh-CN"].newAccountTitle = "生成随机账户";
+translations["en-US"].newAccountTitle = "Generate account";
+translations["zh-CN"].newAccountHint = "创建新的安全账户";
+translations["en-US"].newAccountHint = "Create a new secure account";
+translations["zh-CN"].importTitle = "导入已有账户";
+translations["en-US"].importTitle = "Import account";
+translations["zh-CN"].importHint = "使用私钥恢复账户";
+translations["en-US"].importHint = "Restore with a private key";
+translations["zh-CN"].historyTitle = "交易历史";
+translations["en-US"].historyTitle = "Transaction history";
+translations["zh-CN"].historyEmpty = "暂无交易记录";
+translations["en-US"].historyEmpty = "No transactions yet";
+translations["zh-CN"].historyPending = "已提交";
+translations["en-US"].historyPending = "Submitted";
+translations["zh-CN"].historySuccess = "已完成";
+translations["en-US"].historySuccess = "Completed";
+translations["zh-CN"].historyAmount = "金额";
+translations["en-US"].historyAmount = "Amount";
+translations["zh-CN"].defaultOption = "默认";
+translations["en-US"].defaultOption = "Default";
+translations["zh-CN"].deleteAccountTitle = "删除账户";
+translations["en-US"].deleteAccountTitle = "Delete account";
+translations["zh-CN"].deleteAccountHint = "删除本地保存的账户和私钥. 此操作无法撤销.";
+translations["en-US"].deleteAccountHint = "Delete the locally stored account and private key. This cannot be undone.";
+translations["zh-CN"].deleteAccountConfirm = "确认删除账户";
+translations["en-US"].deleteAccountConfirm = "Delete account";
+translations["zh-CN"].deleteAccountCancel = "取消";
+translations["en-US"].deleteAccountCancel = "Cancel";
+translations["zh-CN"].changePasswordTitle = "修改密码";
+translations["en-US"].changePasswordTitle = "Change password";
+translations["zh-CN"].changePasswordHint = "请输入原密码和新密码.";
+translations["en-US"].changePasswordHint = "Enter your current password and a new password.";
+translations["zh-CN"].currentPasswordLabel = "原密码";
+translations["en-US"].currentPasswordLabel = "Current password";
+translations["zh-CN"].newPasswordLabel = "新密码";
+translations["en-US"].newPasswordLabel = "New password";
+translations["zh-CN"].changePasswordButton = "确认修改";
+translations["en-US"].changePasswordButton = "Change password";
+translations["zh-CN"].passwordChanged = "密码修改成功.";
+translations["en-US"].passwordChanged = "Password changed successfully.";
+translations["zh-CN"].passwordChangeError = "密码修改失败: {error}";
+translations["en-US"].passwordChangeError = "Unable to change password: {error}";
 let language = "en-US";
 let viewBeforeSettings = "setup";
 function t(key, variables = {}) {
-  return Object.entries(variables).reduce((text, [name, value]) => text.replace(`{${name}}`, value), translations[language][key] || extraTranslations[language][key] || key);
+  return Object.entries(variables).reduce((text, [name, value]) => text.replace(`{${name}}`, value), translations[language][key] || key);
 }
 function applyTranslations() {
   document.documentElement.lang = language;
@@ -76,7 +251,7 @@ const ACCOUNT_TYPES = {
   },
   shrincs: {
     createAccount(seed, publicKey) {
-      if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(language === "zh-CN" ? "SHRINCS 公钥必须是 32 字节十六进制字符。" : "SHRINCS public key must be 32-byte hexadecimal.");
+      if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(language === "zh-CN" ? "SHRINCS 公钥必须是 32 字节十六进制字符." : "SHRINCS public key must be 32-byte hexadecimal.");
       const lock = { codeHash: SHRINCS_SCRIPT.codeHash, hashType: SHRINCS_SCRIPT.hashType, args: publicKey };
       return { address: ccc.Address.fromScript(lock, cccClient).toString(), publicKey, lock };
     },
@@ -157,11 +332,11 @@ function openSettings() {
 function normalizePrivateKey(value, accountType = DEFAULT_ACCOUNT_TYPE) {
   const normalized = value.trim().toLowerCase().replace(/^0x/, "");
   const expectedLength = accountType === "shrincs" ? 96 : 64;
-  if (!new RegExp(`^[0-9a-f]{${expectedLength}}$`).test(normalized)) throw new Error(language === "zh-CN" ? `${accountType === "shrincs" ? "SHRINCS 主种子" : "私钥"}必须是 ${expectedLength} 位十六进制字符。` : `${accountType === "shrincs" ? "SHRINCS master seed" : "Private key"} must be ${expectedLength} hexadecimal characters.`);
+  if (!new RegExp(`^[0-9a-f]{${expectedLength}}$`).test(normalized)) throw new Error(language === "zh-CN" ? `${accountType === "shrincs" ? "SHRINCS 主种子" : "私钥"}必须是 ${expectedLength} 位十六进制字符. ` : `${accountType === "shrincs" ? "SHRINCS master seed" : "Private key"} must be ${expectedLength} hexadecimal characters.`);
   return `0x${normalized}`;
 }
 
-// SHRINCS 的 48 字节主种子 = sk_seed ‖ sk_prf ‖ pk_seed，可从 96 字节 secret key 还原。
+// SHRINCS 的 48 字节主种子 = sk_seed ‖ sk_prf ‖ pk_seed, 可从 96 字节 secret key 还原.
 function shrincsSeedFromSecretKey(secretKeyHex) {
   const secretKey = bytes.bytify(secretKeyHex);
   return bytes.hexify(Uint8Array.from([
@@ -184,7 +359,7 @@ function shrincsStatefulSignatureSize(q) {
   return 16 + SHRINCS_WOTS_SIGNATURE_SIZE + Math.min(q, SHRINCS_MAX_STATEFUL_SIGNATURES - 1) * 16;
 }
 
-// 当前转账采用的 SHRINCS 签名方式。
+// 当前转账采用的 SHRINCS 签名方式.
 function currentShrincsSignMode() {
   if (account?.imported) return "stateless";
   if (elements.settingsSignMode?.value && elements.settingsSignMode.value !== "default") return elements.settingsSignMode.value;
@@ -485,7 +660,7 @@ async function refreshBalance() {
   } finally { elements.refreshButton.disabled = false; }
 }
 
-// 进入钱包视图（生成/导入后直接进入，或解锁后进入）。privateKey 为内存中用于签名的密钥。
+// 进入钱包视图(生成/导入后直接进入, 或解锁后进入). privateKey 为内存中用于签名的密钥.
 async function enterWallet({ accountType, privateKey, publicKey, shrincsState, imported, expectedAddress }) {
   const restoredAccount = await createAccount(privateKey, accountType, publicKey);
   if (expectedAddress && restoredAccount.address !== expectedAddress) throw new Error(t("addressMismatch"));
@@ -635,7 +810,7 @@ async function copyAddress() {
 
 async function exportWallet() {
   if (!privateKeyInMemory || !account) throw new Error(t("walletLocked"));
-  const password = window.prompt(language === "zh-CN" ? "请输入钱包密码以确认导出：" : "Enter your wallet password to confirm export:");
+  const password = window.prompt(language === "zh-CN" ? "请输入钱包密码以确认导出: " : "Enter your wallet password to confirm export:");
   if (password === null) return;
 
   const { vault } = await chrome.storage.local.get("vault");
@@ -672,7 +847,7 @@ async function exportWallet() {
 
 function updateSetupAccountType() {
   const isShrincs = elements.setupAccountType.value === "shrincs";
-  elements.privateKeyLabel.textContent = isShrincs ? (language === "zh-CN" ? "SHRINCS 主种子（48 字节十六进制）" : "SHRINCS master seed (48-byte hex)") : t("privateKeyLabel");
+  elements.privateKeyLabel.textContent = isShrincs ? (language === "zh-CN" ? "SHRINCS 主种子(48 字节十六进制)" : "SHRINCS master seed (48-byte hex)") : t("privateKeyLabel");
   elements.importAccountType.value = elements.setupAccountType.value;
 }
 
