@@ -43,6 +43,8 @@ const translations = {
 };
 translations["zh-CN"].shrincsExperimental = "shrincs";
 translations["en-US"].shrincsExperimental = "shrincs";
+translations["zh-CN"].statelessSigningHint = "无状态签名使用更大的签名，并会产生更高的交易手续费。";
+translations["en-US"].statelessSigningHint = "Stateless signing uses larger signatures and costs more transaction fees.";
 translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成，但测试网拒绝了交易：{error}";
 translations["en-US"].shrincsRejected = "SHRINCS signing completed, but the testnet rejected the transaction: {error}";
 const extraTranslations = {
@@ -91,7 +93,7 @@ const elements = {
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"),
   generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
-  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), settingsBackButton: document.querySelector("#settings-back-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
+  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
 
 let account = null;
@@ -128,10 +130,12 @@ function showView(view) {
 
 function updateSignModeOptions(accountType = account?.accountType, imported = account?.imported) {
   const isShrincs = accountType === "shrincs";
+  const supportsBothModes = isShrincs && !imported;
   elements.settingsSignMode.querySelector('option[value="default"]').hidden = isShrincs;
   elements.settingsSignMode.querySelector('option[value="stateful"]').hidden = !isShrincs || Boolean(imported);
   elements.settingsSignMode.querySelector('option[value="stateless"]').hidden = !isShrincs;
   if (!isShrincs) elements.settingsSignMode.value = "default";
+  elements.statelessSigningHint.hidden = !supportsBothModes || elements.settingsSignMode.value !== "stateless";
 }
 
 function lockWallet() {
@@ -491,6 +495,7 @@ async function enterWallet({ accountType, privateKey, publicKey, shrincsState, i
   elements.accountType.textContent = accountType;
   updateSignModeOptions(accountType, imported);
   elements.settingsSignMode.value = accountType === "shrincs" ? currentShrincsSignMode() : "default";
+  updateSignModeOptions(accountType, imported);
   elements.settingsSignMode.disabled = false;
   showView("wallet");
   await refreshBalance();
@@ -759,9 +764,11 @@ elements.settingsSignMode.addEventListener("change", () => {
   if (account.imported) {
     elements.settingsSignMode.value = "stateless";
     account.shrincsState.mode = "stateless";
+    updateSignModeOptions(account.accountType, account.imported);
     return;
   }
   account.shrincsState.mode = elements.settingsSignMode.value;
+  updateSignModeOptions(account.accountType, account.imported);
 });
 elements.changePasswordButton.addEventListener("click", changeWalletPassword);
 elements.sendTab.addEventListener("click", () => showWalletPanel("send"));
