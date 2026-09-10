@@ -52,6 +52,8 @@ translations["zh-CN"].accountTypeLabel = "账户类型";
 translations["en-US"].accountTypeLabel = "Account type";
 translations["zh-CN"].privateKeyLabel = "私钥(32 字节十六进制)";
 translations["en-US"].privateKeyLabel = "Private key (32-byte hex)";
+translations["zh-CN"].privateKeyName = "私钥";
+translations["en-US"].privateKeyName = "Private key";
 translations["zh-CN"].passwordLabel = "保护密码";
 translations["en-US"].passwordLabel = "Protection password";
 translations["zh-CN"].passwordPlaceholder = "至少 8 位";
@@ -86,6 +88,8 @@ translations["zh-CN"].copyButton = "复制";
 translations["en-US"].copyButton = "Copy";
 translations["zh-CN"].exportButton = "导出私钥备份";
 translations["en-US"].exportButton = "Export key backup";
+translations["zh-CN"].exportPasswordPrompt = "请输入钱包密码以确认导出: ";
+translations["en-US"].exportPasswordPrompt = "Enter your wallet password to confirm export: ";
 translations["zh-CN"].availableBalance = "可用余额";
 translations["en-US"].availableBalance = "Available balance";
 translations["zh-CN"].refreshButton = "刷新";
@@ -112,6 +116,12 @@ translations["zh-CN"].lockButton = "锁定";
 translations["en-US"].lockButton = "Lock";
 translations["zh-CN"].passwordShort = "保护密码至少需要 8 位.";
 translations["en-US"].passwordShort = "The protection password must be at least 8 characters.";
+translations["zh-CN"].invalidPrivateKey = "{keyType}必须是 {length} 位十六进制字符.";
+translations["en-US"].invalidPrivateKey = "{keyType} must be {length} hexadecimal characters.";
+translations["zh-CN"].shrincsMasterSeedLabel = "SHRINCS 主种子(48 字节十六进制)";
+translations["en-US"].shrincsMasterSeedLabel = "SHRINCS master seed (48-byte hex)";
+translations["zh-CN"].shrincsMasterSeedName = "SHRINCS 主种子";
+translations["en-US"].shrincsMasterSeedName = "SHRINCS master seed";
 translations["zh-CN"].accountImported = "账户已导入, 直接进入钱包.";
 translations["en-US"].accountImported = "Account imported. Entering wallet.";
 translations["zh-CN"].accountGenerated = "账户已生成, 直接进入钱包.";
@@ -154,6 +164,8 @@ translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成, 但测试网�
 translations["en-US"].shrincsRejected = "SHRINCS signing completed, but the testnet rejected the transaction: {error}";
 translations["zh-CN"].invalidAddress = "请输入 CKB 测试网地址(ckt1...).";
 translations["en-US"].invalidAddress = "Enter a CKB testnet address (ckt1...).";
+translations["zh-CN"].invalidShrincsPublicKey = "SHRINCS 公钥必须是 32 字节十六进制字符.";
+translations["en-US"].invalidShrincsPublicKey = "SHRINCS public key must be 32-byte hexadecimal.";
 translations["zh-CN"].invalidAmount = "请输入最多 8 位小数的有效 CKB 金额.";
 translations["en-US"].invalidAmount = "Enter a valid CKB amount with at most 8 decimals.";
 translations["zh-CN"].amountTooSmall = "CKB 单个转账输出至少需要 61 CKB.";
@@ -256,7 +268,7 @@ const ACCOUNT_TYPES = {
   },
   shrincs: {
     createAccount(seed, publicKey) {
-      if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(language === "zh-CN" ? "SHRINCS 公钥必须是 32 字节十六进制字符." : "SHRINCS public key must be 32-byte hexadecimal.");
+      if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(t("invalidShrincsPublicKey"));
       const lock = { codeHash: SHRINCS_SCRIPT.codeHash, hashType: SHRINCS_SCRIPT.hashType, args: publicKey };
       return { address: ccc.Address.fromScript(lock, cccClient).toString(), publicKey, lock };
     },
@@ -338,7 +350,7 @@ function openSettings() {
 function normalizePrivateKey(value, accountType = DEFAULT_ACCOUNT_TYPE) {
   const normalized = value.trim().toLowerCase().replace(/^0x/, "");
   const expectedLength = accountType === "shrincs" ? 96 : 64;
-  if (!new RegExp(`^[0-9a-f]{${expectedLength}}$`).test(normalized)) throw new Error(language === "zh-CN" ? `${accountType === "shrincs" ? "SHRINCS 主种子" : "私钥"}必须是 ${expectedLength} 位十六进制字符. ` : `${accountType === "shrincs" ? "SHRINCS master seed" : "Private key"} must be ${expectedLength} hexadecimal characters.`);
+  if (!new RegExp(`^[0-9a-f]{${expectedLength}}$`).test(normalized)) throw new Error(t("invalidPrivateKey", { keyType: accountType === "shrincs" ? t("shrincsMasterSeedName") : t("privateKeyName"), length: expectedLength }));
   return `0x${normalized}`;
 }
 
@@ -819,7 +831,7 @@ async function copyAddress() {
 
 async function exportWallet() {
   if (!privateKeyInMemory || !account) throw new Error(t("walletLocked"));
-  const password = window.prompt(language === "zh-CN" ? "请输入钱包密码以确认导出: " : "Enter your wallet password to confirm export:");
+  const password = window.prompt(t("exportPasswordPrompt"));
   if (password === null) return;
 
   const { vault } = await chrome.storage.local.get("vault");
@@ -856,7 +868,7 @@ async function exportWallet() {
 
 function updateSetupAccountType() {
   const isShrincs = elements.setupAccountType.value === "shrincs";
-  elements.privateKeyLabel.textContent = isShrincs ? (language === "zh-CN" ? "SHRINCS 主种子(48 字节十六进制)" : "SHRINCS master seed (48-byte hex)") : t("privateKeyLabel");
+  elements.privateKeyLabel.textContent = isShrincs ? t("shrincsMasterSeedLabel") : t("privateKeyLabel");
   elements.importAccountType.value = elements.setupAccountType.value;
   elements.importSigningHint.hidden = elements.importAccountType.value !== "shrincs";
 }
