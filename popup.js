@@ -184,6 +184,8 @@ translations["zh-CN"].explorerLink = "在区块浏览器中查看";
 translations["en-US"].explorerLink = "View in block explorer";
 translations["zh-CN"].statelessSigningHint = "无状态签名使用更大的签名, 并会产生更高的交易手续费.";
 translations["en-US"].statelessSigningHint = "Stateless signing uses larger signatures and costs more transaction fees.";
+translations["zh-CN"].shrincsImportSigningHint = "SHRINCS 导入账户只能使用无状态签名.";
+translations["en-US"].shrincsImportSigningHint = "Imported SHRINCS accounts can only use stateless signing.";
 translations["zh-CN"].newAccountTitle = "生成随机账户";
 translations["en-US"].newAccountTitle = "Generate account";
 translations["zh-CN"].newAccountHint = "创建新的安全账户";
@@ -269,7 +271,7 @@ const elements = {
   generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
   newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
-  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
+  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
 
 const VIEW_NAMES = ["setup", "create", "import", "unlock", "settings", "reset-confirm", "change-password", "wallet"];
@@ -851,6 +853,7 @@ function updateSetupAccountType() {
   const isShrincs = elements.setupAccountType.value === "shrincs";
   elements.privateKeyLabel.textContent = isShrincs ? (language === "zh-CN" ? "SHRINCS 主种子(48 字节十六进制)" : "SHRINCS master seed (48-byte hex)") : t("privateKeyLabel");
   elements.importAccountType.value = elements.setupAccountType.value;
+  elements.importSigningHint.hidden = elements.importAccountType.value !== "shrincs";
 }
 
 function renderTransactionHistory(records) {

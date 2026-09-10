@@ -63,7 +63,10 @@
     .transaction-hash { display:block; overflow-wrap:anywhere; margin-top:3px; font:11px/1.4 ui-monospace,"Cascadia Code",monospace; color:var(--ink); }
     .warning { margin:10px 0 0; color:#8b4c00; font-size:12px; }
     .account-type { color:var(--mint-dark); background:var(--soft-mint); border:1px solid #bae2d5; border-radius:4px; padding:2px 6px; font:11px ui-monospace,"Cascadia Code",monospace; }
-    .signing-progress { width:100%; height:5px; margin-top:8px; accent-color:var(--mint); }
+    .signing-progress { width:100%; height:5px; margin-top:8px; }
+    .transaction-progress { position:relative; overflow:hidden; border-radius:999px; background:#dce9e4; }
+    .transaction-progress::after { position:absolute; inset:0 auto 0 -35%; width:35%; border-radius:inherit; background:linear-gradient(90deg,transparent,var(--mint),#8bd8c4,transparent); content:""; animation:transaction-progress-sweep 1.25s linear infinite; }
+    @keyframes transaction-progress-sweep { from { transform:translateX(0); } to { transform:translateX(385%); } }
     [hidden] { display:none !important; }
   </style>
 </head>
@@ -90,6 +93,7 @@
       <h2 data-i18n="importTitle">Import account</h2>
       <label for="setup-account-type-import" data-i18n="accountTypeLabel">Account type</label>
       <select id="setup-account-type-import"><option value="secp256k1">secp256k1</option><option value="shrincs">shrincs</option></select>
+      <p id="import-signing-hint" class="warning" data-i18n="shrincsImportSigningHint" hidden>Imported SHRINCS accounts can only use stateless signing.</p>
       <label id="private-key-label" for="private-key" data-i18n="privateKeyLabel">Private key (32-byte hex)</label><textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
       <label for="new-password-import" data-i18n="passwordLabel">Protection password</label><input id="new-password-import" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
       <div class="actions"><button id="save-wallet-button" type="button" data-i18n="importSaveButton">Import and save</button></div><p id="import-status" class="status" role="status" aria-live="polite"></p>
@@ -140,7 +144,7 @@
         <label for="amount" data-i18n="amountLabel">Amount (CKB)</label><input id="amount" inputmode="decimal" autocomplete="off" data-i18n-placeholder="amountPlaceholder" placeholder="At least 61 CKB" required>
         <div class="actions"><button id="send-button" type="submit" data-i18n="sendButton">Sign and send</button></div>
         <p id="wallet-status" class="status" role="status" aria-live="polite"></p>
-        <progress id="signing-progress" class="signing-progress" data-i18n-aria="signingProgress" aria-label="Signing progress" hidden></progress>
+        <div id="signing-progress" class="signing-progress transaction-progress" data-i18n-aria="signingProgress" role="progressbar" aria-label="Signing progress" hidden></div>
       </form>
       <section id="history-panel" class="card wallet-panel" hidden><h2 data-i18n="historyTitle">Transaction history</h2><ul id="transaction-history" class="history-list"></ul><p id="history-empty" class="empty-state" data-i18n="historyEmpty">No transactions yet</p></section>
     </section>
