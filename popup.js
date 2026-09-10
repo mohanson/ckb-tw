@@ -658,14 +658,7 @@ function showTransactionLink(transactionHash) {
   const hash = document.createElement("code");
   hash.className = "transaction-hash";
   hash.textContent = transactionHash;
-  const lineBreak = document.createElement("br");
-  const link = document.createElement("a");
-  link.className = "tx-link";
-  link.href = `https://pudge.explorer.nervos.org/transaction/${transactionHash}`;
-  link.target = "_blank";
-  link.rel = "noreferrer";
-  link.textContent = t("explorerLink");
-  elements.walletStatus.replaceChildren(t("txSuccess"), hash, lineBreak, link);
+  elements.walletStatus.replaceChildren(t("txSuccess"), hash);
   elements.walletStatus.className = "status success";
 }
 
