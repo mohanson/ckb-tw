@@ -4,6 +4,8 @@
 
 A testnet web wallet extension for the CKB blockchain.
 
+![img](./res/show.png)
+
 # Install (Source Code)
 
 ```bash
@@ -15,6 +17,16 @@ In Chrome, enable **Developer Mode** by toggling the switch in the top right cor
 # Install (Chrome Web Store)
 
 TODO: Add link to Chrome Web Store.
+
+# Test account
+
+The test network includes some accounts with funds available for your testing.
+
+| Account Type |                                         Private Key / Seed                                         |
+| ------------ | -------------------------------------------------------------------------------------------------- |
+| secp256k1    | 0x0000000000000000000000000000000000000000000000000000000000000001                                 |
+| secp256k1    | 0x0000000000000000000000000000000000000000000000000000000000000002                                 |
+| shrincs      | 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001 |
 
 # License
 
