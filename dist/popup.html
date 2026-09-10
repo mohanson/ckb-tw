@@ -75,7 +75,7 @@
     @keyframes transaction-progress-sweep { from { transform:translateX(0); } to { transform:translateX(385%); } }
     [hidden] { display:none !important; }
   </style>
-  <script type="module" crossorigin src="/assets/popup-BQgbg5T8.js"></script>
+  <script type="module" crossorigin src="/assets/popup-BODthx3P.js"></script>
 </head>
 <body>
   <main>
@@ -104,6 +104,7 @@
       <label id="private-key-label" for="private-key" data-i18n="privateKeyLabel">Private key (32-byte hex)</label><textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
       <label for="new-password-import" data-i18n="passwordLabel">Protection password</label><input id="new-password-import" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
       <div class="actions"><button id="save-wallet-button" type="button" data-i18n="importSaveButton">Import and save</button></div><p id="import-status" class="status" role="status" aria-live="polite"></p>
+      <div id="import-progress" class="signing-progress transaction-progress" data-i18n-aria="generationProgress" role="progressbar" aria-label="Account import progress" hidden></div>
     </section>
     <section id="unlock-view" class="card" hidden>
       <h2 data-i18n="unlockTitle">Unlock wallet</h2><p class="hint" data-i18n="unlockHint">Your private key is stored encrypted in this browser.</p>
@@ -117,7 +118,6 @@
       <h2 data-i18n="settingsTitle">Settings</h2>
       <div class="setting-row"><label for="language-select" data-i18n="languageLabel">Language</label><select id="language-select"><option value="en-US" data-i18n="english">English</option><option value="zh-CN" data-i18n="chinese">中文</option></select></div>
       <div class="setting-row"><label class="setting-label" for="settings-sign-mode"><span data-i18n="signModeLabel">Signing mode</span><span id="sign-mode-help" class="info-tooltip" role="img" tabindex="0" aria-hidden="true" hidden>?</span></label><select id="settings-sign-mode"><option value="default" data-i18n="defaultOption">Default</option><option value="stateful" data-i18n="statefulOption">stateful</option><option value="stateless" data-i18n="statelessOption">stateless</option></select></div>
-      <p id="stateless-signing-hint" class="hint" data-i18n="statelessSigningHint" hidden>Stateless signing uses larger signatures and costs more transaction fees.</p>
       <div class="actions"><button id="export-settings-button" class="secondary" type="button" data-i18n="exportButton">Export key backup</button><button id="settings-lock-button" class="danger" type="button" data-i18n="lockButton">Lock</button></div>
       <div class="actions"><button id="settings-change-password-button" class="secondary" type="button" data-i18n="changePasswordTitle">Change password</button></div>
       <div class="actions"><button id="delete-account-button" class="danger" type="button" data-i18n="deleteAccountTitle">Delete account</button></div>

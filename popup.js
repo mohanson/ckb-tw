@@ -194,8 +194,6 @@ translations["zh-CN"].txSuccess = "交易已广播. 交易哈希: ";
 translations["en-US"].txSuccess = "Transaction broadcast. Transaction hash:";
 translations["zh-CN"].explorerLink = "在区块浏览器中查看";
 translations["en-US"].explorerLink = "View in block explorer";
-translations["zh-CN"].statelessSigningHint = "无状态签名使用更大的签名, 并会产生更高的交易手续费.";
-translations["en-US"].statelessSigningHint = "Stateless signing uses larger signatures and costs more transaction fees.";
 translations["zh-CN"].signModeHelp = "导入的 SHRINCS 账户不能使用有状态签名, 以避免签名状态在多台设备之间不同步而带来安全风险。新生成的账户应优先使用有状态签名, 因为签名更小、手续费更低。";
 translations["en-US"].signModeHelp = "Imported SHRINCS accounts cannot use stateful signing, because an unsynchronized state across devices could create a security risk. For newly generated accounts, stateful signing is preferred because its signatures are smaller and fees are lower.";
 translations["zh-CN"].shrincsImportSigningHint = "SHRINCS 导入账户已禁用 stateful 签名, 只能使用 stateless 签名.";
@@ -280,13 +278,13 @@ globalThis.Buffer ??= Buffer;
 
 const elements = {
   setupView: document.querySelector("#setup-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), resetConfirmView: document.querySelector("#reset-confirm-view"), changePasswordView: document.querySelector("#change-password-view"), walletView: document.querySelector("#wallet-view"),
-  privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), newPassword: document.querySelector("#new-password"), importPassword: document.querySelector("#new-password-import"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), generationProgress: document.querySelector("#generation-progress"),
+  privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), newPassword: document.querySelector("#new-password"), importPassword: document.querySelector("#new-password-import"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), importProgress: document.querySelector("#import-progress"), generationProgress: document.querySelector("#generation-progress"),
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), changePasswordCurrent: document.querySelector("#change-password-current"), changePasswordNew: document.querySelector("#change-password-new"), changePasswordStatus: document.querySelector("#change-password-status"), walletStatus: document.querySelector("#wallet-status"),
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"),
   generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
   newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
-  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
+  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
 
 const VIEW_NAMES = ["setup", "create", "import", "unlock", "settings", "reset-confirm", "change-password", "wallet"];
@@ -328,7 +326,6 @@ function updateSignModeOptions(accountType = account?.accountType, imported = ac
   if (!isShrincs) elements.settingsSignMode.value = "default";
   elements.signModeHelp.hidden = !isShrincs;
   elements.signModeHelp.setAttribute("aria-hidden", String(!isShrincs));
-  elements.statelessSigningHint.hidden = !supportsBothModes || elements.settingsSignMode.value !== "stateless";
 }
 
 function lockWallet() {
@@ -692,6 +689,7 @@ async function enterWallet({ accountType, privateKey, publicKey, shrincsState, i
 
 async function saveWallet() {
   setStatus(elements.importStatus);
+  elements.saveWalletButton.disabled = true;
   try {
     const accountType = elements.importAccountType.value;
     const password = elements.importPassword.value;
@@ -701,6 +699,8 @@ async function saveWallet() {
     let secretKey;
     let shrincsState;
     if (accountType === "shrincs") {
+      elements.importProgress.hidden = false;
+      await nextPaint();
       const seed = normalizePrivateKey(privateKey, accountType);
       await shrincsInitialization;
       const keypair = keypairFromSeed(ParamsType.B, bytes.bytify(seed));
@@ -719,6 +719,10 @@ async function saveWallet() {
     setStatus(elements.importStatus, t("accountImported"), "success");
     await enterWallet({ accountType, privateKey: accountType === "shrincs" ? secretKey : privateKey, publicKey, shrincsState, imported: true });
   } catch (error) { setStatus(elements.importStatus, error.message, "error"); }
+  finally {
+    elements.importProgress.hidden = true;
+    elements.saveWalletButton.disabled = false;
+  }
 }
 
 async function generateWallet() {
