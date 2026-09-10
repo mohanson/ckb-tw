@@ -184,6 +184,8 @@ translations["zh-CN"].explorerLink = "在区块浏览器中查看";
 translations["en-US"].explorerLink = "View in block explorer";
 translations["zh-CN"].statelessSigningHint = "无状态签名使用更大的签名, 并会产生更高的交易手续费.";
 translations["en-US"].statelessSigningHint = "Stateless signing uses larger signatures and costs more transaction fees.";
+translations["zh-CN"].signModeHelp = "导入的 SHRINCS 账户不能使用有状态签名, 以避免签名状态在多台设备之间不同步而带来安全风险。新生成的账户应优先使用有状态签名, 因为签名更小、手续费更低。";
+translations["en-US"].signModeHelp = "Imported SHRINCS accounts cannot use stateful signing, because an unsynchronized state across devices could create a security risk. For newly generated accounts, stateful signing is preferred because its signatures are smaller and fees are lower.";
 translations["zh-CN"].shrincsImportSigningHint = "SHRINCS 导入账户只能使用无状态签名.";
 translations["en-US"].shrincsImportSigningHint = "Imported SHRINCS accounts can only use stateless signing.";
 translations["zh-CN"].newAccountTitle = "生成随机账户";
@@ -238,6 +240,7 @@ function applyTranslations() {
   document.querySelectorAll("[data-i18n]").forEach((element) => { element.textContent = t(element.dataset.i18n); });
   document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => { element.placeholder = t(element.dataset.i18nPlaceholder); });
   document.querySelectorAll("[data-i18n-aria]").forEach((element) => { element.setAttribute("aria-label", t(element.dataset.i18nAria)); });
+  elements.signModeHelp?.setAttribute("data-tooltip", t("signModeHelp"));
   elements.settingsButton?.setAttribute("aria-label", t("settingsTitle"));
   elements.settingsButton?.setAttribute("title", t("settingsTitle"));
   updateSetupAccountType();
@@ -271,7 +274,7 @@ const elements = {
   generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
   newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
-  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
+  settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), statelessSigningHint: document.querySelector("#stateless-signing-hint"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
 
 const VIEW_NAMES = ["setup", "create", "import", "unlock", "settings", "reset-confirm", "change-password", "wallet"];
@@ -311,6 +314,8 @@ function updateSignModeOptions(accountType = account?.accountType, imported = ac
   elements.settingsSignMode.querySelector('option[value="stateful"]').hidden = !isShrincs || Boolean(imported);
   elements.settingsSignMode.querySelector('option[value="stateless"]').hidden = !isShrincs;
   if (!isShrincs) elements.settingsSignMode.value = "default";
+  elements.signModeHelp.hidden = !isShrincs;
+  elements.signModeHelp.setAttribute("aria-hidden", String(!isShrincs));
   elements.statelessSigningHint.hidden = !supportsBothModes || elements.settingsSignMode.value !== "stateless";
 }
 

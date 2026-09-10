@@ -56,6 +56,10 @@
     .balance small { color:var(--muted); font-size:13px; font-weight:600; }
     .row { display:flex; justify-content:space-between; align-items:center; gap:12px; }
     .row button { padding:6px 9px; font-size:11px; white-space:nowrap; }
+    .setting-label { display:flex; align-items:center; gap:5px; }
+    .info-tooltip { position:relative; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border:1px solid var(--muted); border-radius:50%; color:var(--muted); font-size:11px; font-weight:700; line-height:1; cursor:help; }
+    .info-tooltip::after { position:absolute; z-index:2; top:calc(100% + 7px); left:0; width:250px; padding:8px 10px; border:1px solid var(--line); border-radius:4px; background:var(--ink); color:#fff; content:attr(data-tooltip); font-size:11px; font-weight:400; line-height:1.45; opacity:0; pointer-events:none; transform:translateY(-3px); transition:opacity .15s ease,transform .15s ease; white-space:pre-line; }
+    .info-tooltip:hover::after, .info-tooltip:focus-visible::after { opacity:1; transform:translateY(0); }
     .status { min-height:19px; margin:12px 1px 0; color:var(--muted); font-size:12px; }
     .status.error { color:#a33c2c; }
     .status.success { color:var(--mint-dark); }
@@ -110,7 +114,7 @@
       <button id="settings-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
       <h2 data-i18n="settingsTitle">Settings</h2>
       <div class="setting-row"><label for="language-select" data-i18n="languageLabel">Language</label><select id="language-select"><option value="en-US" data-i18n="english">English</option><option value="zh-CN" data-i18n="chinese">中文</option></select></div>
-      <div class="setting-row"><label for="settings-sign-mode" data-i18n="signModeLabel">Signing mode</label><select id="settings-sign-mode"><option value="default" data-i18n="defaultOption">Default</option><option value="stateful" data-i18n="statefulOption">stateful</option><option value="stateless" data-i18n="statelessOption">stateless</option></select></div>
+      <div class="setting-row"><label class="setting-label" for="settings-sign-mode"><span data-i18n="signModeLabel">Signing mode</span><span id="sign-mode-help" class="info-tooltip" role="img" tabindex="0" aria-hidden="true" hidden>?</span></label><select id="settings-sign-mode"><option value="default" data-i18n="defaultOption">Default</option><option value="stateful" data-i18n="statefulOption">stateful</option><option value="stateless" data-i18n="statelessOption">stateless</option></select></div>
       <p id="stateless-signing-hint" class="hint" data-i18n="statelessSigningHint" hidden>Stateless signing uses larger signatures and costs more transaction fees.</p>
       <div class="actions"><button id="export-settings-button" class="secondary" type="button" data-i18n="exportButton">Export key backup</button><button id="settings-lock-button" class="danger" type="button" data-i18n="lockButton">Lock</button></div>
       <div class="actions"><button id="settings-change-password-button" class="secondary" type="button" data-i18n="changePasswordTitle">Change password</button></div>
