@@ -91,7 +91,7 @@
       <select id="setup-account-type"><option value="secp256k1">secp256k1</option><option value="shrincs">shrincs</option></select>
       <label for="new-password" data-i18n="passwordLabel">Protection password</label><input id="new-password" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
       <div class="actions"><button id="generate-button" type="button" data-i18n="generateButton">Generate account</button></div><p id="create-status" class="status" role="status" aria-live="polite"></p>
-      <progress id="generation-progress" class="signing-progress" data-i18n-aria="generationProgress" aria-label="Account generation progress" hidden></progress>
+      <div id="generation-progress" class="signing-progress transaction-progress" data-i18n-aria="generationProgress" role="progressbar" aria-label="Account generation progress" hidden></div>
     </section>
     <section id="import-view" class="card" hidden>
       <button id="import-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
