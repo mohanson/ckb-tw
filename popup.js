@@ -290,7 +290,6 @@ const ACCOUNT_TYPES = {
       const address = await signer.getRecommendedAddress();
       return { address };
     },
-    canBroadcast: true,
   },
   shrincs: {
     createAccount(seed, publicKey) {
@@ -298,7 +297,6 @@ const ACCOUNT_TYPES = {
       const lock = { codeHash: SHRINCS_SCRIPT.codeHash, hashType: SHRINCS_SCRIPT.hashType, args: publicKey };
       return { address: ccc.Address.fromScript(lock, cccClient).toString(), publicKey, lock };
     },
-    canBroadcast: true,
   },
 };
 
@@ -309,7 +307,7 @@ const elements = {
   privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), setupPassword: document.querySelector("#setup-password"), setupPasswordConfirm: document.querySelector("#setup-password-confirm"), setupPasswordStatus: document.querySelector("#set-password-status"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), importProgress: document.querySelector("#import-progress"), generationProgress: document.querySelector("#generation-progress"),
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), changePasswordCurrent: document.querySelector("#change-password-current"), changePasswordNew: document.querySelector("#change-password-new"), changePasswordStatus: document.querySelector("#change-password-status"), walletStatus: document.querySelector("#wallet-status"),
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"),
-  generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
+  generateButton: document.querySelector("#generate-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
   newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), welcomeStartButton: document.querySelector("#welcome-start-button"), setPasswordBackButton: document.querySelector("#set-password-back-button"), setPasswordButton: document.querySelector("#set-password-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
   settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsCreateAccountButton: document.querySelector("#settings-create-account-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), switchAccountButton: document.querySelector("#switch-account-button"), switchAccountBackButton: document.querySelector("#switch-account-back-button"), accountList: document.querySelector("#account-list"), accountListStatus: document.querySelector("#account-list-status"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
@@ -349,7 +347,6 @@ function showView(view) {
 
 function updateSignModeOptions(accountType = account?.accountType, imported = account?.imported) {
   const isShrincs = accountType === "shrincs";
-  const supportsBothModes = isShrincs && !imported;
   elements.settingsSignMode.querySelector('option[value="default"]').hidden = isShrincs;
   elements.settingsSignMode.querySelector('option[value="stateful"]').hidden = !isShrincs || Boolean(imported);
   elements.settingsSignMode.querySelector('option[value="stateless"]').hidden = !isShrincs;
@@ -458,10 +455,6 @@ function incrementShrincsState(state) {
   const view = new DataView(next.buffer);
   view.setUint32(0, view.getUint32(0, true) + 1, true);
   return next;
-}
-
-function isShrincsLock(lock) {
-  return lock.codeHash === SHRINCS_SCRIPT.codeHash && lock.hashType === SHRINCS_SCRIPT.hashType;
 }
 
 function addShrincsCellDep(transaction) {
@@ -675,7 +668,7 @@ async function changeWalletPassword() {
     if (newPassword.length < 8) throw new Error(t("passwordShort"));
     const { vault } = await chrome.storage.local.get("vault");
     if (!vault) throw new Error(t("missingVault"));
-    const decrypted = await decryptPrivateKey(vault, currentPassword);
+    await decryptPrivateKey(vault, currentPassword);
     const accounts = await getStoredAccounts();
     const updatedAccounts = [];
     for (const storedAccount of accounts) {
@@ -737,7 +730,7 @@ async function signShrincsMessage(message) {
     const q = stateCounter(stateBytes);
     if (q >= SHRINCS_MAX_STATEFUL_SIGNATURES) throw new Error(t("stateExhausted"));
     const reservedState = { mode: "stateful", q: q + 1, data: bytes.hexify(incrementShrincsState(stateBytes)) };
-    await updateStoredAccount({ ...vault, version: 4, shrincsState: reservedState });
+    await updateStoredAccount({ ...vault, version: VAULT_VERSION, shrincsState: reservedState });
     account.shrincsState = reservedState;
     const result = signStateful(ParamsType.B, messageBytes, secretKey, stateBytes);
     const nextState = stateFromStatefulSignResult(result);
@@ -792,10 +785,12 @@ async function refreshBalance() {
 }
 
 // 进入钱包视图(生成/导入后直接进入, 或解锁后进入). privateKey 为内存中用于签名的密钥.
-async function enterWallet({ accountType, privateKey, publicKey, shrincsState, imported, expectedAddress }) {
+async function enterWallet({ accountType, privateKey, publicKey, shrincsState, imported, expectedAddress, preparedKey = null }) {
   const restoredAccount = await createAccount(privateKey, accountType, publicKey);
   if (expectedAddress && restoredAccount.address !== expectedAddress) throw new Error(t("addressMismatch"));
   privateKeyInMemory = privateKey;
+  shrincsPreparedKeyInMemory = preparedKey;
+  shrincsPreparedKeyPromise = null;
   account = { ...restoredAccount, accountType, shrincsState: accountType === "shrincs" ? shrincsState : undefined, imported };
   elements.address.textContent = account.address;
   elements.accountType.textContent = accountType;
@@ -901,13 +896,12 @@ async function unlockWallet() {
     const { privateKey: seed, shrincsSecretKey, shrincsPreparedKey: preparedKey, encryptionKey } = await decryptPrivateKey(vault, elements.unlockPassword.value);
     walletPassword = elements.unlockPassword.value;
     vaultEncryptionKey = encryptionKey;
-    shrincsPreparedKeyInMemory = preparedKey;
     let privateKey = seed;
     if (accountType === "shrincs") {
       privateKey = shrincsSecretKey;
     }
     elements.unlockPassword.value = "";
-    await enterWallet({ accountType, privateKey, publicKey: vault.publicKey, shrincsState: vault.shrincsState, imported: Boolean(vault.imported), expectedAddress: vault.address });
+    await enterWallet({ accountType, privateKey, publicKey: vault.publicKey, shrincsState: vault.shrincsState, imported: Boolean(vault.imported), expectedAddress: vault.address, preparedKey });
   } catch (error) { setStatus(elements.unlockStatus, error.message, "error"); }
   finally { elements.unlockButton.disabled = false; }
 }
@@ -1069,6 +1063,12 @@ function showWalletPanel(panel) {
   if (history) loadTransactionHistory();
 }
 
+async function persistShrincsSignMode(mode) {
+  const { vault } = await chrome.storage.local.get("vault");
+  if (!vault || !account?.shrincsState) throw new Error(t("missingData"));
+  await updateStoredAccount({ ...vault, version: VAULT_VERSION, shrincsState: { ...account.shrincsState, mode } });
+}
+
 async function openAccountSwitcher() {
   const accounts = await getStoredAccounts();
   elements.accountList.replaceChildren();
@@ -1099,10 +1099,9 @@ async function switchAccount(storedAccount) {
     if (!walletPassword) throw new Error(t("walletLocked"));
     const decrypted = await decryptPrivateKey(storedAccount, walletPassword);
     vaultEncryptionKey = decrypted.encryptionKey;
-    shrincsPreparedKeyInMemory = decrypted.shrincsPreparedKey;
     const privateKey = storedAccount.accountType === "shrincs" ? decrypted.shrincsSecretKey : decrypted.privateKey;
     await saveAccounts(await getStoredAccounts(), storedAccount);
-    await enterWallet({ accountType: storedAccount.accountType || DEFAULT_ACCOUNT_TYPE, privateKey, publicKey: storedAccount.publicKey, shrincsState: storedAccount.shrincsState, imported: Boolean(storedAccount.imported), expectedAddress: storedAccount.address });
+    await enterWallet({ accountType: storedAccount.accountType || DEFAULT_ACCOUNT_TYPE, privateKey, publicKey: storedAccount.publicKey, shrincsState: storedAccount.shrincsState, imported: Boolean(storedAccount.imported), expectedAddress: storedAccount.address, preparedKey: decrypted.shrincsPreparedKey });
   } catch (error) {
     setStatus(elements.accountListStatus, t("accountSwitchError", { error: error.message }), "error");
     elements.accountList.querySelectorAll("button").forEach((button) => { button.disabled = false; });
@@ -1148,6 +1147,7 @@ elements.settingsSignMode.addEventListener("change", () => {
     return;
   }
   account.shrincsState.mode = elements.settingsSignMode.value;
+  persistShrincsSignMode(account.shrincsState.mode).catch((error) => setStatus(elements.walletStatus, t("accountSwitchError", { error: error.message }), "error"));
   updateSignModeOptions(account.accountType, account.imported);
 });
 elements.changePasswordButton.addEventListener("click", changeWalletPassword);
@@ -1167,13 +1167,11 @@ elements.resetConfirmButton.addEventListener("click", async () => {
   } else {
     await chrome.storage.local.remove(["vault", "accounts"]);
   }
-  account = null;
-  walletPassword = null;
+  lockWallet();
   updateDeleteAccountButton(remainingAccounts.length > 0);
   updateSignModeOptions();
   elements.unlockPassword.value = "";
   elements.privateKey.value = "";
-  showView("unlock");
 });
 
 (async () => {
