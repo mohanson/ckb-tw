@@ -24,6 +24,8 @@ const MIN_TRANSFER_CKB = 61n;
 const FEE_RATE = 1000n;
 const DEFAULT_ACCOUNT_TYPE = "secp256k1";
 const VAULT_VERSION = 6;
+const LOGIN_SESSION_KEY = "walletLoginSession";
+const LOGIN_SESSION_TTL = 60 * 60 * 1000;
 const SHRINCS_MAX_STATEFUL_SIGNATURES = 142;
 const SHRINCS_WOTS_SIGNATURE_SIZE = 292;
 const SHRINCS_STATELESS_SIGNATURE_SIZE = 2568;
@@ -355,6 +357,23 @@ function updateDeleteAccountButton(hasWalletData) {
   elements.deleteAccountButton.disabled = !hasWalletData;
 }
 
+async function saveLoginSession(password) {
+  await chrome.storage.session.set({ [LOGIN_SESSION_KEY]: { password, unlockedAt: Date.now() } });
+}
+
+async function getLoginSessionPassword() {
+  const { [LOGIN_SESSION_KEY]: session } = await chrome.storage.session.get(LOGIN_SESSION_KEY);
+  if (!session || typeof session.password !== "string" || !Number.isFinite(session.unlockedAt) || Date.now() - session.unlockedAt >= LOGIN_SESSION_TTL) {
+    if (session) await chrome.storage.session.remove(LOGIN_SESSION_KEY);
+    return null;
+  }
+  return session.password;
+}
+
+async function clearLoginSession() {
+  await chrome.storage.session.remove(LOGIN_SESSION_KEY);
+}
+
 function openAccountCreation(returnView) {
   accountCreationReturnView = returnView;
   elements.setupBackButton.hidden = returnView === "setup";
@@ -368,6 +387,7 @@ function lockWallet() {
   vaultEncryptionKey = null;
   walletPassword = null;
   account = null;
+  clearLoginSession().catch(() => {});
   elements.balance.textContent = "-- CKB";
   updateSignModeOptions();
   showView("unlock");
@@ -388,6 +408,7 @@ async function confirmWalletPassword() {
   try {
     const walletCredential = await createWalletCredential(password);
     await chrome.storage.local.set({ walletCredential });
+    await saveLoginSession(password);
     walletPassword = password;
     elements.setupPassword.value = "";
     elements.setupPasswordConfirm.value = "";
@@ -684,6 +705,7 @@ async function changeWalletPassword() {
     await chrome.storage.local.set({ accounts: updatedAccounts, vault: updatedVault, walletCredential });
     vaultEncryptionKey = await deriveEncryptionKey(newPassword, decodeBase64(updatedVault.salt), ["encrypt", "decrypt"]);
     walletPassword = newPassword;
+    await saveLoginSession(newPassword);
     elements.changePasswordCurrent.value = "";
     elements.changePasswordNew.value = "";
     setStatus(elements.changePasswordStatus, t("passwordChanged"), "success");
@@ -874,23 +896,25 @@ async function generateWallet() {
   }
 }
 
-async function unlockWallet() {
+async function unlockWallet(password = elements.unlockPassword.value, silent = false) {
   setStatus(elements.unlockStatus);
   elements.unlockButton.disabled = true;
   try {
     const { vault, walletCredential } = await chrome.storage.local.get(["vault", "walletCredential"]);
     if (!vault && !walletCredential) throw new Error(t("missingVault"));
     if (!vault) {
-      await verifyWalletCredential(walletCredential, elements.unlockPassword.value);
-      walletPassword = elements.unlockPassword.value;
+      await verifyWalletCredential(walletCredential, password);
+      walletPassword = password;
+      await saveLoginSession(password);
       elements.unlockPassword.value = "";
       showView("setup");
-      return;
+      return true;
     }
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
-    setStatus(elements.unlockStatus, t("verifyingPassword"));
-    const { privateKey: seed, shrincsSecretKey, shrincsPreparedKey: preparedKey, encryptionKey } = await decryptPrivateKey(vault, elements.unlockPassword.value);
-    walletPassword = elements.unlockPassword.value;
+    if (!silent) setStatus(elements.unlockStatus, t("verifyingPassword"));
+    const { privateKey: seed, shrincsSecretKey, shrincsPreparedKey: preparedKey, encryptionKey } = await decryptPrivateKey(vault, password);
+    walletPassword = password;
+    await saveLoginSession(password);
     vaultEncryptionKey = encryptionKey;
     let privateKey = seed;
     if (accountType === "shrincs") {
@@ -898,7 +922,12 @@ async function unlockWallet() {
     }
     elements.unlockPassword.value = "";
     await enterWallet({ accountType, privateKey, publicKey: vault.publicKey, shrincsState: vault.shrincsState, imported: Boolean(vault.imported), expectedAddress: vault.address, preparedKey });
-  } catch (error) { setStatus(elements.unlockStatus, error.message, "error"); }
+    return true;
+  } catch (error) {
+    if (silent) await clearLoginSession();
+    setStatus(elements.unlockStatus, error.message, "error");
+    return false;
+  }
   finally { elements.unlockButton.disabled = false; }
 }
 
@@ -1160,6 +1189,7 @@ elements.resetConfirmButton.addEventListener("click", async () => {
   const preservedPassword = walletPassword;
   lockWallet();
   walletPassword = preservedPassword;
+  if (preservedPassword) await saveLoginSession(preservedPassword);
   updateDeleteAccountButton(remainingAccounts.length > 0);
   updateSignModeOptions();
   elements.unlockPassword.value = "";
@@ -1180,5 +1210,11 @@ elements.resetConfirmButton.addEventListener("click", async () => {
   updateSignModeOptions();
   updateDeleteAccountButton(Boolean(vault || (Array.isArray(accounts) && accounts.length > 0)));
   const { walletCredential } = await chrome.storage.local.get("walletCredential");
-  showView(vault || walletCredential ? "unlock" : "welcome");
+  if (!vault && !walletCredential) {
+    showView("welcome");
+    return;
+  }
+  const sessionPassword = await getLoginSessionPassword();
+  if (sessionPassword && await unlockWallet(sessionPassword, true)) return;
+  showView("unlock");
 })();
