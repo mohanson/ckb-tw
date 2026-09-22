@@ -242,8 +242,6 @@ translations["zh-CN"].deleteAccountHint = "删除本地保存的账户和私钥.
 translations["en-US"].deleteAccountHint = "Delete the locally stored account and private key. This cannot be undone.";
 translations["zh-CN"].deleteAccountConfirm = "确认删除账户";
 translations["en-US"].deleteAccountConfirm = "Delete account";
-translations["zh-CN"].deleteAccountCancel = "取消";
-translations["en-US"].deleteAccountCancel = "Cancel";
 translations["zh-CN"].createAccountButton = "创建账户";
 translations["en-US"].createAccountButton = "Create account";
 translations["zh-CN"].switchAccountTitle = "切换账户";
@@ -1167,11 +1165,19 @@ elements.resetConfirmButton.addEventListener("click", async () => {
   } else {
     await chrome.storage.local.remove(["vault", "accounts"]);
   }
+  const preservedPassword = walletPassword;
   lockWallet();
+  walletPassword = preservedPassword;
   updateDeleteAccountButton(remainingAccounts.length > 0);
   updateSignModeOptions();
   elements.unlockPassword.value = "";
   elements.privateKey.value = "";
+  if (remainingAccounts.length > 0) {
+    await openAccountSwitcher();
+  } else {
+    elements.setupBackButton.hidden = true;
+    showView("setup");
+  }
 });
 
 (async () => {
