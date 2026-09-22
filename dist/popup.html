@@ -37,7 +37,7 @@
     .choice-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
     .choice { min-height:92px; text-align:left; background:rgba(114,173,237,.07); color:var(--ink); border:1px solid rgba(159,198,255,.18); box-shadow:none; }
     .choice strong, .choice span { display:block; }
-    .choice span { margin-top:5px; color:var(--muted); font-size:11px; font-weight:400; }
+    .choice span { overflow-wrap:anywhere; margin-top:5px; color:var(--muted); font-size:11px; font-weight:400; }
     .choice:hover { border-color:var(--blue); background:rgba(75,152,255,.16); }
     .back-link { padding:0; border:0; background:transparent; color:var(--muted); font-size:12px; box-shadow:none; }
     .back-link:hover { background:transparent; color:var(--blue-bright); box-shadow:none; }
@@ -75,12 +75,13 @@
     @keyframes transaction-progress-sweep { from { transform:translateX(0); } to { transform:translateX(385%); } }
     [hidden] { display:none !important; }
   </style>
-  <script type="module" crossorigin src="/assets/popup-cYnflNRm.js"></script>
+  <script type="module" crossorigin src="/assets/popup-ifcN--1n.js"></script>
 </head>
 <body>
   <main>
     <header><h1 data-i18n="appTitle">CKB Testnet Wallet</h1><div class="header-actions"><span class="network" data-i18n="network">TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="Settings" title="Settings">⚙</button></div></header>
     <section id="setup-view" class="card">
+      <button id="setup-back-button" class="back-link" type="button" data-i18n="backButton" hidden>Back</button>
       <h2 data-i18n="setupTitle">Create or Import Account</h2>
       <p class="hint" data-i18n="setupHint">Your private key is stored encrypted in this browser. Back it up separately; it cannot be recovered without the password.</p>
       <div class="choice-grid"><button id="new-account-button" class="choice" type="button"><strong data-i18n="newAccountTitle">Generate account</strong><span data-i18n="newAccountHint">Create a new secure account</span></button><button id="show-import-button" class="choice" type="button"><strong data-i18n="importTitle">Import account</strong><span data-i18n="importHint">Restore with a private key</span></button></div>
@@ -133,7 +134,7 @@
       <div class="setting-row"><label for="language-select" data-i18n="languageLabel">Language</label><select id="language-select"><option value="en-US" data-i18n="english">English</option><option value="zh-CN" data-i18n="chinese">中文</option></select></div>
       <div class="setting-row"><label class="setting-label" for="settings-sign-mode"><span data-i18n="signModeLabel">Signing mode</span><span id="sign-mode-help" class="info-tooltip" role="img" tabindex="0" aria-hidden="true" hidden>?</span></label><select id="settings-sign-mode"><option value="default" data-i18n="defaultOption">Default</option><option value="stateful" data-i18n="statefulOption">stateful</option><option value="stateless" data-i18n="statelessOption">stateless</option></select></div>
       <div class="actions"><button id="export-settings-button" class="secondary" type="button" data-i18n="exportButton">Export key backup</button><button id="settings-lock-button" class="danger" type="button" data-i18n="lockButton">Lock</button></div>
-      <div class="actions"><button id="settings-change-password-button" class="secondary" type="button" data-i18n="changePasswordTitle">Change password</button></div>
+      <div class="actions"><button id="settings-create-account-button" class="secondary" type="button" data-i18n="createAccountButton">Create account</button><button id="settings-change-password-button" class="secondary" type="button" data-i18n="changePasswordTitle">Change password</button></div>
       <div class="actions"><button id="delete-account-button" class="danger" type="button" data-i18n="deleteAccountTitle" disabled>Delete account</button></div>
     </section>
     <section id="change-password-view" class="card" hidden>
@@ -152,9 +153,15 @@
       <p class="hint" data-i18n="deleteAccountHint">Delete the locally stored account and private key. This cannot be undone.</p>
       <div class="actions"><button id="reset-cancel-button" class="secondary" type="button" data-i18n="deleteAccountCancel">Cancel</button><button id="reset-confirm-button" class="danger" type="button" data-i18n="deleteAccountConfirm">Delete account</button></div>
     </section>
+    <section id="switch-account-view" class="card" hidden>
+      <button id="switch-account-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
+      <h2 data-i18n="switchAccountTitle">Switch account</h2>
+      <div id="account-list" class="choice-grid"></div>
+      <p id="account-list-status" class="status" role="status" aria-live="polite"></p>
+    </section>
     <section id="wallet-view" hidden>
       <div class="card">
-        <div class="row"><strong><span data-i18n="myAddress">My address</span> <span id="account-type" class="account-type"></span></strong><button id="copy-address-button" class="secondary" type="button" data-i18n="copyButton">Copy</button></div>
+        <div class="row"><strong><span data-i18n="myAddress">My address</span> <span id="account-type" class="account-type"></span></strong><div class="row"><button id="switch-account-button" class="secondary" type="button" data-i18n="switchAccountButton">Switch</button><button id="copy-address-button" class="secondary" type="button" data-i18n="copyButton">Copy</button></div></div>
         <p id="address" class="address"></p>
       </div>
       <div class="card"><div class="row"><strong data-i18n="availableBalance">Available balance</strong><button id="refresh-button" class="secondary" type="button" data-i18n="refreshButton">Refresh</button></div><p id="balance" class="balance">-- <small>CKB</small></p></div>
