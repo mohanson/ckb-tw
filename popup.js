@@ -104,8 +104,6 @@ translations["zh-CN"].copyButton = "复制";
 translations["en-US"].copyButton = "Copy";
 translations["zh-CN"].exportButton = "导出私钥备份";
 translations["en-US"].exportButton = "Export key backup";
-translations["zh-CN"].exportPasswordPrompt = "请输入钱包密码以确认导出: ";
-translations["en-US"].exportPasswordPrompt = "Enter your wallet password to confirm export: ";
 translations["zh-CN"].availableBalance = "可用余额";
 translations["en-US"].availableBalance = "Available balance";
 translations["zh-CN"].refreshButton = "刷新";
@@ -948,12 +946,6 @@ async function copyAddress() {
 
 async function exportWallet() {
   if (!privateKeyInMemory || !account) throw new Error(t("walletLocked"));
-  const password = window.prompt(t("exportPasswordPrompt"));
-  if (password === null) return;
-
-  const { vault } = await chrome.storage.local.get("vault");
-  if (!vault) throw new Error(t("missingVault"));
-  await decryptPrivateKey(vault, password);
 
   const backup = account.accountType === "shrincs"
     ? {
