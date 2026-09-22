@@ -2,9 +2,9 @@ import pyckb
 
 pyckb.config.current = pyckb.config.testnet
 
-acc1 = pyckb.wallet.Wallet(1)
+acc1 = pyckb.wallet.Wallet(0x0000000000000000000000000000000000000000000000000000000000000001)
 # ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqt4z78ng4yutl5u6xsv27ht6q08mhujf8s2r0n40
-acc2 = pyckb.wallet.Wallet(2)
+acc2 = pyckb.wallet.Wallet(0x0000000000000000000000000000000000000000000000000000000000000002)
 # ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqdrcaufs8qeu8wvvy0myyedek4vqad9qeq3gc4cf
 
 acc3_seed = 0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001

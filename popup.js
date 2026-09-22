@@ -58,6 +58,22 @@ translations["zh-CN"].passwordLabel = "保护密码";
 translations["en-US"].passwordLabel = "Protection password";
 translations["zh-CN"].passwordPlaceholder = "至少 8 位";
 translations["en-US"].passwordPlaceholder = "At least 8 characters";
+translations["zh-CN"].welcomeTitle = "欢迎使用";
+translations["en-US"].welcomeTitle = "Welcome";
+translations["zh-CN"].welcomeHint = "欢迎使用 CKB 钱包. 设置密码后即可开始使用.";
+translations["en-US"].welcomeHint = "Welcome to your CKB wallet. Set a password to get started.";
+translations["zh-CN"].startButton = "开始使用";
+translations["en-US"].startButton = "Get started";
+translations["zh-CN"].setPasswordTitle = "设置钱包密码";
+translations["en-US"].setPasswordTitle = "Set wallet password";
+translations["zh-CN"].setPasswordHint = "此密码用于保护钱包, 且无法找回.";
+translations["en-US"].setPasswordHint = "This password protects your wallet and cannot be recovered.";
+translations["zh-CN"].confirmPasswordLabel = "再次输入密码";
+translations["en-US"].confirmPasswordLabel = "Confirm password";
+translations["zh-CN"].confirmButton = "确定";
+translations["en-US"].confirmButton = "Confirm";
+translations["zh-CN"].passwordMismatch = "两次输入的密码不一致.";
+translations["en-US"].passwordMismatch = "The passwords do not match.";
 translations["zh-CN"].generateButton = "随机生成账户";
 translations["en-US"].generateButton = "Generate account";
 translations["zh-CN"].importSaveButton = "导入并保存";
@@ -134,6 +150,8 @@ translations["zh-CN"].missingVault = "未找到钱包数据.";
 translations["en-US"].missingVault = "Wallet data not found.";
 translations["zh-CN"].wrongPassword = "密码不正确或钱包数据已损坏.";
 translations["en-US"].wrongPassword = "Incorrect password or corrupted wallet data.";
+translations["zh-CN"].passwordSaved = "密码已保存, 请选择账户操作.";
+translations["en-US"].passwordSaved = "Password saved. Choose an account action.";
 translations["zh-CN"].balanceQuery = "正在查询测试网余额...";
 translations["en-US"].balanceQuery = "Querying testnet balance...";
 translations["zh-CN"].balanceUpdated = "余额已更新.";
@@ -277,23 +295,24 @@ const ACCOUNT_TYPES = {
 globalThis.Buffer ??= Buffer;
 
 const elements = {
-  setupView: document.querySelector("#setup-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), resetConfirmView: document.querySelector("#reset-confirm-view"), changePasswordView: document.querySelector("#change-password-view"), walletView: document.querySelector("#wallet-view"),
-  privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), newPassword: document.querySelector("#new-password"), importPassword: document.querySelector("#new-password-import"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), importProgress: document.querySelector("#import-progress"), generationProgress: document.querySelector("#generation-progress"),
+  setupView: document.querySelector("#setup-view"), welcomeView: document.querySelector("#welcome-view"), setPasswordView: document.querySelector("#set-password-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), resetConfirmView: document.querySelector("#reset-confirm-view"), changePasswordView: document.querySelector("#change-password-view"), walletView: document.querySelector("#wallet-view"),
+  privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), setupPassword: document.querySelector("#setup-password"), setupPasswordConfirm: document.querySelector("#setup-password-confirm"), setupPasswordStatus: document.querySelector("#set-password-status"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), importProgress: document.querySelector("#import-progress"), generationProgress: document.querySelector("#generation-progress"),
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), changePasswordCurrent: document.querySelector("#change-password-current"), changePasswordNew: document.querySelector("#change-password-new"), changePasswordStatus: document.querySelector("#change-password-status"), walletStatus: document.querySelector("#wallet-status"),
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"),
   generateButton: document.querySelector("#generate-button"), showImportButton: document.querySelector("#show-import-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
-  newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
+  newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), welcomeStartButton: document.querySelector("#welcome-start-button"), setPasswordBackButton: document.querySelector("#set-password-back-button"), setPasswordButton: document.querySelector("#set-password-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
   settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
 
-const VIEW_NAMES = ["setup", "create", "import", "unlock", "settings", "reset-confirm", "change-password", "wallet"];
+const VIEW_NAMES = ["setup", "welcome", "set-password", "create", "import", "unlock", "settings", "reset-confirm", "change-password", "wallet"];
 
 let account = null;
 let privateKeyInMemory = null;
 let shrincsPreparedKeyInMemory = null;
 let shrincsPreparedKeyPromise = null;
 let vaultEncryptionKey = null;
+let walletPassword = null;
 const shrincsInitialization = initShrincs().then(() => initThreadPool(Math.min(navigator.hardwareConcurrency || 1, 8)));
 const cccClient = new ccc.ClientPublicTestnet({ url: RPC_URL });
 const bytes = {
@@ -328,15 +347,46 @@ function updateSignModeOptions(accountType = account?.accountType, imported = ac
   elements.signModeHelp.setAttribute("aria-hidden", String(!isShrincs));
 }
 
+function updateDeleteAccountButton(hasWalletData) {
+  elements.deleteAccountButton.disabled = !hasWalletData;
+}
+
 function lockWallet() {
   privateKeyInMemory = null;
   shrincsPreparedKeyInMemory = null;
   shrincsPreparedKeyPromise = null;
   vaultEncryptionKey = null;
+  walletPassword = null;
   account = null;
   elements.balance.textContent = "-- CKB";
   updateSignModeOptions();
   showView("unlock");
+}
+
+async function confirmWalletPassword() {
+  setStatus(elements.setupPasswordStatus);
+  const password = elements.setupPassword.value;
+  if (password.length < 8) {
+    setStatus(elements.setupPasswordStatus, t("passwordShort"), "error");
+    return;
+  }
+  if (password !== elements.setupPasswordConfirm.value) {
+    setStatus(elements.setupPasswordStatus, t("passwordMismatch"), "error");
+    return;
+  }
+  elements.setPasswordButton.disabled = true;
+  try {
+    const walletCredential = await createWalletCredential(password);
+    await chrome.storage.local.set({ walletCredential });
+    walletPassword = password;
+    elements.setupPassword.value = "";
+    elements.setupPasswordConfirm.value = "";
+    showView("setup");
+  } catch (error) {
+    setStatus(elements.setupPasswordStatus, error.message, "error");
+  } finally {
+    elements.setPasswordButton.disabled = false;
+  }
 }
 
 function openSettings() {
@@ -522,6 +572,23 @@ async function encryptVaultPayload(payload, key) {
   return { iv: encodeBase64(iv), cipherText: encodeBase64(cipherText) };
 }
 
+async function createWalletCredential(password) {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const key = await deriveEncryptionKey(password, salt, ["encrypt"]);
+  const encrypted = await encryptVaultPayload({ purpose: "wallet-password" }, key);
+  return { version: VAULT_VERSION, salt: encodeBase64(salt), ...encrypted };
+}
+
+async function verifyWalletCredential(credential, password) {
+  try {
+    const key = await deriveEncryptionKey(password, decodeBase64(credential.salt), ["decrypt"]);
+    const payload = await decryptVaultPayload(credential, key);
+    if (payload.purpose !== "wallet-password") throw new Error();
+  } catch {
+    throw new Error(t("wrongPassword"));
+  }
+}
+
 async function decryptVaultPayload(vault, key) {
   const plainText = await crypto.subtle.decrypt({ name: "AES-GCM", iv: decodeBase64(vault.iv) }, key, decodeBase64(vault.cipherText));
   return JSON.parse(new TextDecoder().decode(plainText));
@@ -574,8 +641,10 @@ async function changeWalletPassword() {
       shrincsPreparedKey: decrypted.shrincsPreparedKey ? encodeBase64(decrypted.shrincsPreparedKey) : undefined,
     };
     const encrypted = await encryptVaultPayload(payload, key);
-    await chrome.storage.local.set({ vault: { ...vault, version: VAULT_VERSION, salt: encodeBase64(salt), ...encrypted } });
+    const walletCredential = await createWalletCredential(newPassword);
+    await chrome.storage.local.set({ vault: { ...vault, version: VAULT_VERSION, salt: encodeBase64(salt), ...encrypted }, walletCredential });
     vaultEncryptionKey = key;
+    walletPassword = newPassword;
     elements.changePasswordCurrent.value = "";
     elements.changePasswordNew.value = "";
     setStatus(elements.changePasswordStatus, t("passwordChanged"), "success");
@@ -692,8 +761,8 @@ async function saveWallet() {
   elements.saveWalletButton.disabled = true;
   try {
     const accountType = elements.importAccountType.value;
-    const password = elements.importPassword.value;
-    if (password.length < 8) throw new Error(t("passwordShort"));
+    if (!walletPassword) throw new Error(t("passwordShort"));
+    const password = walletPassword;
     let privateKey = elements.privateKey.value;
     let publicKey;
     let secretKey;
@@ -714,8 +783,8 @@ async function saveWallet() {
     }
     const vault = await encryptPrivateKey(privateKey, password, accountType, publicKey, shrincsState, true, secretKey);
     await chrome.storage.local.set({ vault });
+    updateDeleteAccountButton(true);
     elements.privateKey.value = "";
-    elements.newPassword.value = "";
     setStatus(elements.importStatus, t("accountImported"), "success");
     await enterWallet({ accountType, privateKey: accountType === "shrincs" ? secretKey : privateKey, publicKey, shrincsState, imported: true });
   } catch (error) { setStatus(elements.importStatus, error.message, "error"); }
@@ -730,8 +799,8 @@ async function generateWallet() {
   elements.generateButton.disabled = true;
   try {
     const accountType = elements.setupAccountType.value;
-    const password = elements.newPassword.value;
-    if (password.length < 8) throw new Error(t("passwordShort"));
+    if (!walletPassword) throw new Error(t("passwordShort"));
+    const password = walletPassword;
     let privateKey;
     let publicKey;
     let secretKey;
@@ -752,7 +821,7 @@ async function generateWallet() {
     }
     const vault = await encryptPrivateKey(privateKey, password, accountType, publicKey, shrincsState, false, secretKey);
     await chrome.storage.local.set({ vault });
-    elements.newPassword.value = "";
+    updateDeleteAccountButton(true);
     setStatus(elements.createStatus, t("accountGenerated"), "success");
     await enterWallet({ accountType, privateKey: accountType === "shrincs" ? secretKey : privateKey, publicKey, shrincsState, imported: false });
   } catch (error) {
@@ -767,11 +836,19 @@ async function unlockWallet() {
   setStatus(elements.unlockStatus);
   elements.unlockButton.disabled = true;
   try {
-    const { vault } = await chrome.storage.local.get("vault");
-    if (!vault) throw new Error(t("missingVault"));
+    const { vault, walletCredential } = await chrome.storage.local.get(["vault", "walletCredential"]);
+    if (!vault && !walletCredential) throw new Error(t("missingVault"));
+    if (!vault) {
+      await verifyWalletCredential(walletCredential, elements.unlockPassword.value);
+      walletPassword = elements.unlockPassword.value;
+      elements.unlockPassword.value = "";
+      showView("setup");
+      return;
+    }
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
     setStatus(elements.unlockStatus, t("verifyingPassword"));
     const { privateKey: seed, shrincsSecretKey, shrincsPreparedKey: preparedKey, encryptionKey } = await decryptPrivateKey(vault, elements.unlockPassword.value);
+    walletPassword = elements.unlockPassword.value;
     vaultEncryptionKey = encryptionKey;
     shrincsPreparedKeyInMemory = preparedKey;
     let privateKey = seed;
@@ -942,6 +1019,9 @@ function showWalletPanel(panel) {
 }
 
 elements.generateButton.addEventListener("click", generateWallet);
+elements.welcomeStartButton.addEventListener("click", () => showView("set-password"));
+elements.setPasswordBackButton.addEventListener("click", () => showView("welcome"));
+elements.setPasswordButton.addEventListener("click", confirmWalletPassword);
 elements.newAccountButton.addEventListener("click", () => showView("create"));
 elements.showImportButton.addEventListener("click", () => showView("import"));
 elements.createBackButton.addEventListener("click", () => showView("setup"));
@@ -986,11 +1066,12 @@ elements.languageSelect.addEventListener("change", async () => {
 elements.resetConfirmButton.addEventListener("click", async () => {
   await chrome.storage.local.remove("vault");
   account = null;
+  walletPassword = null;
+  updateDeleteAccountButton(false);
   updateSignModeOptions();
   elements.unlockPassword.value = "";
   elements.privateKey.value = "";
-  elements.importPassword.value = "";
-  showView("setup");
+  showView("unlock");
 });
 
 (async () => {
@@ -999,5 +1080,7 @@ elements.resetConfirmButton.addEventListener("click", async () => {
   elements.languageSelect.value = language;
   applyTranslations();
   updateSignModeOptions();
-  showView(vault ? "unlock" : "setup");
+  updateDeleteAccountButton(Boolean(vault));
+  const { walletCredential } = await chrome.storage.local.get("walletCredential");
+  showView(vault || walletCredential ? "unlock" : "welcome");
 })();

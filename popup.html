@@ -85,12 +85,27 @@
       <div class="choice-grid"><button id="new-account-button" class="choice" type="button"><strong data-i18n="newAccountTitle">Generate account</strong><span data-i18n="newAccountHint">Create a new secure account</span></button><button id="show-import-button" class="choice" type="button"><strong data-i18n="importTitle">Import account</strong><span data-i18n="importHint">Restore with a private key</span></button></div>
       <p id="setup-status" class="status" role="status" aria-live="polite"></p>
     </section>
+    <section id="welcome-view" class="card" hidden>
+      <h2 data-i18n="welcomeTitle">Welcome</h2>
+      <p class="hint" data-i18n="welcomeHint">Welcome to your CKB wallet. Set a password to get started.</p>
+      <div class="actions"><button id="welcome-start-button" type="button" data-i18n="startButton">Get started</button></div>
+    </section>
+    <section id="set-password-view" class="card" hidden>
+      <button id="set-password-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
+      <h2 data-i18n="setPasswordTitle">Set wallet password</h2>
+      <p class="hint" data-i18n="setPasswordHint">This password protects your wallet and cannot be recovered.</p>
+      <label for="setup-password" data-i18n="passwordLabel">Protection password</label>
+      <input id="setup-password" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
+      <label for="setup-password-confirm" data-i18n="confirmPasswordLabel">Confirm password</label>
+      <input id="setup-password-confirm" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
+      <div class="actions"><button id="set-password-button" type="button" data-i18n="confirmButton">Confirm</button></div>
+      <p id="set-password-status" class="status" role="status" aria-live="polite"></p>
+    </section>
     <section id="create-view" class="card" hidden>
       <button id="create-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
       <h2 data-i18n="newAccountTitle">Generate account</h2>
       <label for="setup-account-type" data-i18n="accountTypeLabel">Account type</label>
       <select id="setup-account-type"><option value="secp256k1">secp256k1</option><option value="shrincs">shrincs</option></select>
-      <label for="new-password" data-i18n="passwordLabel">Protection password</label><input id="new-password" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
       <div class="actions"><button id="generate-button" type="button" data-i18n="generateButton">Generate account</button></div><p id="create-status" class="status" role="status" aria-live="polite"></p>
       <div id="generation-progress" class="signing-progress transaction-progress" data-i18n-aria="generationProgress" role="progressbar" aria-label="Account generation progress" hidden></div>
     </section>
@@ -101,7 +116,6 @@
       <select id="setup-account-type-import"><option value="secp256k1">secp256k1</option><option value="shrincs">shrincs</option></select>
       <p id="import-signing-hint" class="warning" data-i18n="shrincsImportSigningHint" hidden>Imported SHRINCS accounts can only use stateless signing.</p>
       <label id="private-key-label" for="private-key" data-i18n="privateKeyLabel">Private key (32-byte hex)</label><textarea id="private-key" autocomplete="off" spellcheck="false" placeholder="0x..."></textarea>
-      <label for="new-password-import" data-i18n="passwordLabel">Protection password</label><input id="new-password-import" type="password" autocomplete="new-password" data-i18n-placeholder="passwordPlaceholder" placeholder="At least 8 characters">
       <div class="actions"><button id="save-wallet-button" type="button" data-i18n="importSaveButton">Import and save</button></div><p id="import-status" class="status" role="status" aria-live="polite"></p>
       <div id="import-progress" class="signing-progress transaction-progress" data-i18n-aria="generationProgress" role="progressbar" aria-label="Account import progress" hidden></div>
     </section>
@@ -119,7 +133,7 @@
       <div class="setting-row"><label class="setting-label" for="settings-sign-mode"><span data-i18n="signModeLabel">Signing mode</span><span id="sign-mode-help" class="info-tooltip" role="img" tabindex="0" aria-hidden="true" hidden>?</span></label><select id="settings-sign-mode"><option value="default" data-i18n="defaultOption">Default</option><option value="stateful" data-i18n="statefulOption">stateful</option><option value="stateless" data-i18n="statelessOption">stateless</option></select></div>
       <div class="actions"><button id="export-settings-button" class="secondary" type="button" data-i18n="exportButton">Export key backup</button><button id="settings-lock-button" class="danger" type="button" data-i18n="lockButton">Lock</button></div>
       <div class="actions"><button id="settings-change-password-button" class="secondary" type="button" data-i18n="changePasswordTitle">Change password</button></div>
-      <div class="actions"><button id="delete-account-button" class="danger" type="button" data-i18n="deleteAccountTitle">Delete account</button></div>
+      <div class="actions"><button id="delete-account-button" class="danger" type="button" data-i18n="deleteAccountTitle" disabled>Delete account</button></div>
     </section>
     <section id="change-password-view" class="card" hidden>
       <button id="change-password-cancel-button" class="back-link" type="button" data-i18n="backButton">Back</button>
