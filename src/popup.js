@@ -16,7 +16,7 @@ import initShrincs, {
   stateCounter,
   stateFromStatefulSignResult,
   verify,
-} from "./shrincs-wasm/pkg/shrincs.js";
+} from "../shrincs-wasm/pkg/shrincs.js";
 
 const RPC_URL = "https://testnet.ckb.dev/rpc";
 const SHANNONS_PER_CKB = 100000000n;
@@ -262,6 +262,34 @@ translations["zh-CN"].newPasswordLabel = "新密码";
 translations["en-US"].newPasswordLabel = "New password";
 translations["zh-CN"].changePasswordButton = "确认修改";
 translations["en-US"].changePasswordButton = "Change password";
+translations["zh-CN"].providerConfirmTitle = "确认网页请求";
+translations["en-US"].providerConfirmTitle = "Confirm wallet request";
+translations["zh-CN"].providerConfirmHint = "请检查请求内容, 确认后钱包才会签名.";
+translations["en-US"].providerConfirmHint = "Review this request before the wallet signs anything.";
+translations["zh-CN"].providerOriginLabel = "网站";
+translations["en-US"].providerOriginLabel = "Website";
+translations["zh-CN"].providerFromLabel = "发送账户";
+translations["en-US"].providerFromLabel = "From";
+translations["zh-CN"].providerToLabel = "接收账户";
+translations["en-US"].providerToLabel = "To";
+translations["zh-CN"].providerAmountLabel = "金额";
+translations["en-US"].providerAmountLabel = "Amount";
+translations["zh-CN"].providerSummaryLabel = "资产变化";
+translations["en-US"].providerSummaryLabel = "Asset movement";
+translations["zh-CN"].providerAddressLabel = "地址";
+translations["en-US"].providerAddressLabel = "Address";
+translations["zh-CN"].providerSpentLabel = "花费";
+translations["en-US"].providerSpentLabel = "Spent";
+translations["zh-CN"].providerReceivedLabel = "接收";
+translations["en-US"].providerReceivedLabel = "Received";
+translations["zh-CN"].providerRejectButton = "拒绝";
+translations["en-US"].providerRejectButton = "Reject";
+translations["zh-CN"].providerConfirmButton = "确认并签名";
+translations["en-US"].providerConfirmButton = "Confirm and sign";
+translations["zh-CN"].providerRequestError = "签名请求失败: {error}";
+translations["en-US"].providerRequestError = "Signing request failed: {error}";
+translations["zh-CN"].providerNoOwnedInput = "交易不包含当前钱包账户的输入, 无法签名.";
+translations["en-US"].providerNoOwnedInput = "The transaction has no input owned by the active wallet.";
 translations["zh-CN"].passwordChanged = "密码修改成功.";
 translations["en-US"].passwordChanged = "Password changed successfully.";
 translations["zh-CN"].passwordChangeError = "密码修改失败: {error}";
@@ -304,14 +332,14 @@ const elements = {
   setupView: document.querySelector("#setup-view"), setupBackButton: document.querySelector("#setup-back-button"), welcomeView: document.querySelector("#welcome-view"), setPasswordView: document.querySelector("#set-password-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), resetConfirmView: document.querySelector("#reset-confirm-view"), switchAccountView: document.querySelector("#switch-account-view"), changePasswordView: document.querySelector("#change-password-view"), walletView: document.querySelector("#wallet-view"),
   privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), setupPassword: document.querySelector("#setup-password"), setupPasswordConfirm: document.querySelector("#setup-password-confirm"), setupPasswordStatus: document.querySelector("#set-password-status"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), importProgress: document.querySelector("#import-progress"), generationProgress: document.querySelector("#generation-progress"),
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), changePasswordCurrent: document.querySelector("#change-password-current"), changePasswordNew: document.querySelector("#change-password-new"), changePasswordStatus: document.querySelector("#change-password-status"), walletStatus: document.querySelector("#wallet-status"),
-  address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"),
+  address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"), providerConfirmView: document.querySelector("#provider-confirm-view"), providerRequestOrigin: document.querySelector("#provider-request-origin"), providerRequestSummary: document.querySelector("#provider-request-summary"), providerConfirmButton: document.querySelector("#provider-confirm-button"), providerRejectButton: document.querySelector("#provider-reject-button"), providerConfirmStatus: document.querySelector("#provider-confirm-status"),
   generateButton: document.querySelector("#generate-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
   copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
   newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), welcomeStartButton: document.querySelector("#welcome-start-button"), setPasswordBackButton: document.querySelector("#set-password-back-button"), setPasswordButton: document.querySelector("#set-password-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
   settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsCreateAccountButton: document.querySelector("#settings-create-account-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), switchAccountButton: document.querySelector("#switch-account-button"), switchAccountBackButton: document.querySelector("#switch-account-back-button"), accountList: document.querySelector("#account-list"), accountListStatus: document.querySelector("#account-list-status"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
 
-const VIEW_NAMES = ["setup", "welcome", "set-password", "create", "import", "unlock", "settings", "reset-confirm", "switch-account", "change-password", "wallet"];
+const VIEW_NAMES = ["setup", "welcome", "set-password", "create", "import", "unlock", "provider-confirm", "settings", "reset-confirm", "switch-account", "change-password", "wallet"];
 
 let account = null;
 let privateKeyInMemory = null;
@@ -320,6 +348,8 @@ let shrincsPreparedKeyPromise = null;
 let vaultEncryptionKey = null;
 let walletPassword = null;
 let accountCreationReturnView = "setup";
+let providerRequestId = new URLSearchParams(location.search).get("providerRequest");
+let providerRequest = null;
 const shrincsInitialization = initShrincs().then(() => initThreadPool(Math.min(navigator.hardwareConcurrency || 1, 8)));
 const cccClient = new ccc.ClientPublicTestnet({ url: RPC_URL });
 const bytes = {
@@ -766,6 +796,13 @@ async function signShrincsMessage(message) {
   return bytes.hexify(signature);
 }
 
+function serializableCkbValue(value) {
+  if (typeof value === "bigint") return `0x${value.toString(16)}`;
+  if (Array.isArray(value)) return value.map(serializableCkbValue);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, nested]) => [key, serializableCkbValue(nested)]));
+  return value;
+}
+
 function parseCkbAmount(value) {
   const match = value.trim().match(/^(\d+)(?:\.(\d{1,8}))?$/);
   if (!match) throw new Error(t("invalidAmount"));
@@ -773,6 +810,67 @@ function parseCkbAmount(value) {
   const amount = BigInt(match[1]) * SHANNONS_PER_CKB + BigInt(fraction);
   if (amount < MIN_TRANSFER_CKB * SHANNONS_PER_CKB) throw new Error(t("amountTooSmall"));
   return amount;
+}
+
+async function buildAndSignTransfer(recipient, amount) {
+  const recipientAddress = await ccc.Address.fromString(recipient, cccClient);
+  let sealed;
+  if (account.accountType === "shrincs") {
+    sealed = await buildShrincsTransaction(recipientAddress, amount);
+  } else {
+    const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKeyInMemory);
+    const transaction = ccc.Transaction.from({ outputs: [{ capacity: amount, lock: recipientAddress.script }], outputsData: ["0x"] });
+    await transaction.completeFeeBy(signer, FEE_RATE);
+    sealed = await signer.signTransaction(transaction);
+  }
+  return serializableCkbValue(sealed);
+}
+
+async function signProviderTransaction(transactionJson) {
+  const transaction = ccc.Transaction.from(transactionJson);
+  if (!privateKeyInMemory || !account) throw new Error(t("walletLocked"));
+  if (account.accountType === "shrincs") {
+    throw new Error("Full transaction signing for SHRINCS accounts is not supported by this provider yet.");
+  }
+  const signerScript = (await ccc.Address.fromString(account.address, cccClient)).script;
+  let ownsInput = false;
+  let ownedInputIndex;
+  for (const input of transaction.inputs) {
+    const cell = await input.getCell(cccClient);
+    if (sameScript(cell.cellOutput.lock, signerScript)) {
+      ownsInput = true;
+      ownedInputIndex = transaction.inputs.indexOf(input);
+      break;
+    }
+  }
+  if (!ownsInput) throw new Error(t("providerNoOwnedInput"));
+  const witness = transaction.getWitnessArgs(ownedInputIndex) ?? ccc.WitnessArgs.from({});
+  if (!witness.lock) witness.lock = `0x${"00".repeat(65)}`;
+  transaction.setWitnessArgs(ownedInputIndex, witness);
+  const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKeyInMemory);
+  const signed = await signer.signOnlyTransaction(transaction);
+  return JSON.parse(signed.stringify());
+}
+
+function addSummaryAmount(summary, address, field, amount) {
+  const entry = summary.get(address) || { spent: 0n, received: 0n };
+  entry[field] += amount;
+  summary.set(address, entry);
+}
+
+async function summarizeProviderTransaction(transactionJson) {
+  const transaction = ccc.Transaction.from(transactionJson);
+  const summary = new Map();
+  for (const input of transaction.inputs) {
+    const cell = await input.getCell(cccClient);
+    const address = ccc.Address.fromScript(cell.cellOutput.lock, cccClient).toString();
+    addSummaryAmount(summary, address, "spent", BigInt(cell.cellOutput.capacity));
+  }
+  for (const output of transaction.outputs) {
+    const address = ccc.Address.fromScript(output.lock, cccClient).toString();
+    addSummaryAmount(summary, address, "received", BigInt(output.capacity));
+  }
+  return [...summary.entries()].map(([address, values]) => ({ address, ...values, spent: values.spent.toString(), received: values.received.toString() }));
 }
 
 function formatCkb(capacity) {
@@ -794,7 +892,10 @@ async function refreshBalance() {
   setStatus(elements.walletStatus, t("balanceQuery"));
   try {
     const { script } = await ccc.Address.fromString(account.address, cccClient);
-    const capacity = BigInt((await cccClient.getBalance([script])).toString());
+    let capacity = 0n;
+    for await (const cell of cccClient.findCellsByLock(script, null, true)) {
+      capacity += BigInt(cell.cellOutput.capacity);
+    }
     elements.balance.innerHTML = `${formatCkb(capacity)} <small>CKB</small>`;
     setStatus(elements.walletStatus, t("balanceUpdated"), "success");
   } catch (error) {
@@ -816,8 +917,11 @@ async function enterWallet({ accountType, privateKey, publicKey, shrincsState, i
   elements.settingsSignMode.value = accountType === "shrincs" ? currentShrincsSignMode() : "default";
   elements.settingsSignMode.disabled = false;
   updateDeleteAccountButton(true);
-  showView("wallet");
-  await refreshBalance();
+  const confirmingProviderRequest = Boolean(providerRequestId && providerRequest);
+  showView(confirmingProviderRequest ? "provider-confirm" : "wallet");
+  const balanceRefresh = refreshBalance();
+  if (confirmingProviderRequest) balanceRefresh.catch(() => {});
+  else await balanceRefresh;
 }
 
 async function saveWallet() {
@@ -939,17 +1043,8 @@ async function sendTransfer(event) {
   try {
     const recipient = elements.recipient.value.trim();
     if (!recipient.startsWith("ckt1")) throw new Error(t("invalidAddress"));
-    const recipientAddress = await ccc.Address.fromString(recipient, cccClient);
     const amount = parseCkbAmount(elements.amount.value);
-    let sealed;
-    if (account.accountType === "shrincs") {
-      sealed = await buildShrincsTransaction(recipientAddress, amount);
-    } else {
-      const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKeyInMemory);
-      const transaction = ccc.Transaction.from({ outputs: [{ capacity: amount, lock: recipientAddress.script }], outputsData: ["0x"] });
-      await transaction.completeFeeBy(signer, FEE_RATE);
-      sealed = await signer.signTransaction(transaction);
-    }
+    const sealed = await buildAndSignTransfer(recipient, amount);
     transactionSigned = true;
     setStatus(elements.walletStatus, t("broadcasting"));
     const transactionHash = await cccClient.sendTransaction(sealed);
@@ -966,6 +1061,65 @@ async function sendTransfer(event) {
     elements.signingProgress.hidden = true;
     elements.sendButton.disabled = false;
   }
+}
+
+async function loadProviderRequest() {
+  if (!providerRequestId) return false;
+  const response = await chrome.runtime.sendMessage({ type: "provider-get-request", requestId: providerRequestId });
+  if (response?.error) throw new Error(response.error.message);
+  providerRequest = response.result;
+  if (providerRequest.method !== "ckb_signTransaction") throw new Error("Unsupported provider method.");
+  const request = providerRequest.params?.[0];
+  if (!request || typeof request !== "object" || Array.isArray(request)) throw new Error("A JSON transaction is required.");
+  elements.providerRequestOrigin.textContent = providerRequest.origin || "Unknown website";
+  elements.providerRequestSummary.textContent = "Loading transaction details…";
+  elements.providerConfirmButton.disabled = false;
+  elements.providerRejectButton.disabled = false;
+  summarizeProviderTransaction(request).then((summary) => {
+  elements.providerRequestSummary.replaceChildren(...summary.map(({ address, spent, received }) => {
+    const row = document.createElement("div");
+    row.className = "request-summary-row";
+    const addressElement = document.createElement("span");
+    addressElement.className = "request-summary-address";
+    addressElement.textContent = address;
+    const spentElement = document.createElement("span");
+    spentElement.className = "request-summary-amount";
+    spentElement.textContent = `${formatCkb(BigInt(spent))} CKB`;
+    const receivedElement = document.createElement("span");
+    receivedElement.className = "request-summary-amount";
+    receivedElement.textContent = `${formatCkb(BigInt(received))} CKB`;
+    row.append(addressElement, spentElement, receivedElement);
+    return row;
+  }));
+  }).catch((error) => {
+    elements.providerRequestSummary.textContent = `Unable to load transaction details: ${error.message}`;
+  });
+  return true;
+}
+
+async function completeProviderRequest() {
+  elements.providerConfirmButton.disabled = true;
+  elements.providerRejectButton.disabled = true;
+  setStatus(elements.providerConfirmStatus, t("buildingTransaction"));
+  try {
+    if (!account || !privateKeyInMemory) throw new Error(t("walletLocked"));
+    const request = providerRequest.params?.[0];
+    const sealed = await signProviderTransaction(request);
+    const response = await chrome.runtime.sendMessage({ type: "provider-confirmation", requestId: providerRequestId, approved: true, result: sealed });
+    if (response?.error) throw new Error(response.error.message);
+    window.close();
+  } catch (error) {
+    setStatus(elements.providerConfirmStatus, t("providerRequestError", { error: error.message }), "error");
+    elements.providerConfirmButton.disabled = false;
+    elements.providerRejectButton.disabled = false;
+  }
+}
+
+async function rejectProviderRequest() {
+  elements.providerConfirmButton.disabled = true;
+  elements.providerRejectButton.disabled = true;
+  await chrome.runtime.sendMessage({ type: "provider-confirmation", requestId: providerRequestId, approved: false });
+  window.close();
 }
 
 async function copyAddress() {
@@ -1142,9 +1296,14 @@ elements.importAccountType.addEventListener("change", () => {
   updateSetupAccountType();
 });
 elements.saveWalletButton.addEventListener("click", saveWallet);
-elements.unlockButton.addEventListener("click", unlockWallet);
+elements.unlockButton.addEventListener("click", async () => {
+  const unlocked = await unlockWallet();
+  if (unlocked && providerRequest) showView("provider-confirm");
+});
 elements.refreshButton.addEventListener("click", refreshBalance);
 elements.transferForm.addEventListener("submit", sendTransfer);
+elements.providerConfirmButton.addEventListener("click", completeProviderRequest);
+elements.providerRejectButton.addEventListener("click", rejectProviderRequest);
 elements.copyAddressButton.addEventListener("click", () => copyAddress().catch(() => setStatus(elements.walletStatus, t("copyError"), "error")));
 elements.exportButton.addEventListener("click", () => exportWallet().catch((error) => setStatus(elements.walletStatus, t("exportError", { error: error.message }), "error")));
 elements.settingsButton.addEventListener("click", openSettings);
@@ -1203,11 +1362,26 @@ elements.resetConfirmButton.addEventListener("click", async () => {
 });
 
 (async () => {
+  if (providerRequestId) {
+    showView("provider-confirm");
+    elements.providerConfirmButton.disabled = true;
+    elements.providerRejectButton.disabled = true;
+    setStatus(elements.providerConfirmStatus, "Loading signing request…");
+  }
   const { vault, accounts, language: storedLanguage } = await chrome.storage.local.get(["vault", "accounts", "language"]);
   language = storedLanguage === "zh-CN" ? "zh-CN" : "en-US";
   elements.languageSelect.value = language;
   applyTranslations();
   updateSignModeOptions();
+  if (providerRequestId) {
+    try {
+      await loadProviderRequest();
+    } catch (error) {
+      setStatus(elements.providerConfirmStatus, t("providerRequestError", { error: error.message }), "error");
+      showView("provider-confirm");
+      return;
+    }
+  }
   updateDeleteAccountButton(Boolean(vault || (Array.isArray(accounts) && accounts.length > 0)));
   const { walletCredential } = await chrome.storage.local.get("walletCredential");
   if (!vault && !walletCredential) {
@@ -1215,6 +1389,9 @@ elements.resetConfirmButton.addEventListener("click", async () => {
     return;
   }
   const sessionPassword = await getLoginSessionPassword();
-  if (sessionPassword && await unlockWallet(sessionPassword, true)) return;
+  if (sessionPassword && await unlockWallet(sessionPassword, true)) {
+    if (providerRequest) showView("provider-confirm");
+    return;
+  }
   showView("unlock");
 })();

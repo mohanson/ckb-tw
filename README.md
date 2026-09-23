@@ -16,7 +16,7 @@ In Chrome, enable **Developer Mode** by toggling the switch in the top right cor
 
 # Install (Chrome Web Store)
 
-TODO: Add link to Chrome Web Store.
+See it on the [Chrome Web Store](https://chromewebstore.google.com/detail/ckb-testnet-wallet-beta/nghimcjehoahofjcapbgcgfbbebobdgb).
 
 # Test account
 

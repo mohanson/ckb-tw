@@ -15,8 +15,25 @@
   "side_panel": {
     "default_path": "popup.html"
   },
-  "permissions": ["storage", "sidePanel"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": ["storage", "sidePanel", "windows"],
   "host_permissions": ["https://testnet.ckb.dev/*"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["provider-page.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "cross_origin_opener_policy": {
     "value": "same-origin"
   },
