@@ -18,7 +18,114 @@ import initShrincs, {
   verify,
 } from "../shrincs-wasm/pkg/shrincs.js";
 
-const RPC_URL = "https://testnet.ckb.dev/rpc";
+
+let config = {
+  current: {},
+  develop: {
+    hrp: "ckt",
+    rpc: "http://127.0.0.1:8114",
+    script: {
+      dao: {
+        codeHash: "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+        hashType: "type",
+        cellDep: {
+          outPoint: {
+            txHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+            index: "0x2",
+          },
+          depType: "code",
+        }
+      },
+      secp256k1: {
+        codeHash: "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+        hashType: "type",
+        cellDep: {
+          outPoint: { txHash: "0x0000000000000000000000000000000000000000000000000000000000000000", index: "0x0" },
+          depType: "depGroup",
+        }
+      },
+      shrincs: {
+        codeHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        hashType: "type",
+        cellDep: {
+          outPoint: { txHash: "0x0000000000000000000000000000000000000000000000000000000000000000", index: "0x0" },
+          depType: "code",
+        },
+      }
+    }
+  },
+  testnet: {
+    hrp: "ckt",
+    rpc: "https://testnet.ckb.dev/rpc",
+    script: {
+      dao: {
+        codeHash: "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+        hashType: "type",
+        cellDep: {
+          outPoint: {
+            txHash: "0x8f8c79eb6671709633fe6a46de93c0fedc9c1b8a6527a18d3983879542635c9f",
+            index: "0x2",
+          },
+          depType: "code",
+        }
+      },
+      secp256k1: {
+        codeHash: "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+        hashType: "type",
+        cellDep: {
+          outPoint: { txHash: "0xf8de3bb47d055cdf460d93a2a6e1b05f7432f9777c8c474abf4eec1d4aee5d37", index: "0x0" },
+          depType: "depGroup",
+        }
+      },
+      shrincs: {
+        codeHash: "0x387496fafe46562bb3bb2fa4446f1fc1054ba2f1b4df229a88056d5422a196ac",
+        hashType: "type",
+        cellDep: {
+          outPoint: { txHash: "0x3216d00b72e8229d7dbb46a93ea47bd0c650f2bdae42be2f92837328413da48e", index: "0x0" },
+          depType: "code",
+        },
+      }
+    }
+  },
+  switchDevelop: async function () {
+    const httpret = await fetch(config.develop.rpc, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "get_block_by_number", params: ["0x0"] }),
+    });
+    const payload = await httpret.json();
+    if (!httpret.ok || payload.error) {
+      throw new Error(payload.error?.message);
+    }
+    config.develop.script.dao.cellDep.outPoint.txHash = payload.result?.transactions?.[0]?.hash;
+    config.develop.script.secp256k1.cellDep.outPoint.txHash = payload.result?.transactions?.[1]?.hash;
+    config.current = config.develop;
+  },
+  switchTestnet: async function () {
+    config.current = config.testnet;
+  },
+}
+await config.switchTestnet();
+
+let client = new ccc.ClientPublicTestnet({ url: config.testnet.rpc });
+client.switchCurrent = async function () {
+  scripts = structuredClone(client.scripts);
+  scripts.Dao = {
+    ...scripts.Dao,
+    codeHash: config.develop.script.dao.codeHash,
+    hashType: config.develop.script.dao.hashType,
+    cellDeps: [{ cellDep: config.develop.script.dao.cellDep }],
+  };
+  scripts.Secp256k1Blake160 = {
+    ...scripts.Secp256k1Blake160,
+    codeHash: config.develop.script.secp256k1.codeHash,
+    hashType: config.develop.script.secp256k1.hashType,
+    cellDeps: [{ cellDep: config.develop.script.secp256k1.cellDep }],
+  };
+  client = new ccc.ClientPublicTestnet({ url: config.develop.rpc, scripts: scripts });
+};
+
+
 const SHANNONS_PER_CKB = 100000000n;
 const MIN_TRANSFER_CKB = 61n;
 const FEE_RATE = 1000n;
@@ -29,14 +136,6 @@ const LOGIN_SESSION_TTL = 60 * 60 * 1000;
 const SHRINCS_MAX_STATEFUL_SIGNATURES = 142;
 const SHRINCS_WOTS_SIGNATURE_SIZE = 292;
 const SHRINCS_STATELESS_SIGNATURE_SIZE = 2568;
-const SHRINCS_SCRIPT = {
-  codeHash: "0x387496fafe46562bb3bb2fa4446f1fc1054ba2f1b4df229a88056d5422a196ac",
-  hashType: "type",
-  cellDep: {
-    outPoint: { txHash: "0x3216d00b72e8229d7dbb46a93ea47bd0c650f2bdae42be2f92837328413da48e", index: "0x0" },
-    depType: "code",
-  },
-};
 const translations = { "zh-CN": {}, "en-US": {} };
 translations["zh-CN"].appTitle = "CKB Testnet Wallet";
 translations["en-US"].appTitle = "CKB Testnet Wallet";
@@ -312,7 +411,7 @@ function applyTranslations() {
 const ACCOUNT_TYPES = {
   secp256k1: {
     async createAccount(privateKey) {
-      const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKey);
+      const signer = new ccc.SignerCkbPrivateKey(client, privateKey);
       const address = await signer.getRecommendedAddress();
       return { address };
     },
@@ -320,8 +419,9 @@ const ACCOUNT_TYPES = {
   shrincs: {
     createAccount(seed, publicKey) {
       if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(t("invalidShrincsPublicKey"));
-      const lock = { codeHash: SHRINCS_SCRIPT.codeHash, hashType: SHRINCS_SCRIPT.hashType, args: publicKey };
-      return { address: ccc.Address.fromScript(lock, cccClient).toString(), publicKey, lock };
+      const { codeHash, hashType } = config.current.script.shrincs;
+      const lock = { codeHash, hashType, args: publicKey };
+      return { address: ccc.Address.fromScript(lock, client).toString(), publicKey, lock };
     },
   },
 };
@@ -351,7 +451,6 @@ let accountCreationReturnView = "setup";
 let providerRequestId = new URLSearchParams(location.search).get("providerRequest");
 let providerRequest = null;
 const shrincsInitialization = initShrincs().then(() => initThreadPool(Math.min(navigator.hardwareConcurrency || 1, 8)));
-const cccClient = new ccc.ClientPublicTestnet({ url: RPC_URL });
 const bytes = {
   bytify: (value) => new Uint8Array(ccc.bytesFrom(value)),
   hexify: (value) => ccc.hexFrom(value),
@@ -417,7 +516,7 @@ function lockWallet() {
   vaultEncryptionKey = null;
   walletPassword = null;
   account = null;
-  clearLoginSession().catch(() => {});
+  clearLoginSession().catch(() => { });
   elements.balance.textContent = "-- CKB";
   updateSignModeOptions();
   showView("unlock");
@@ -505,7 +604,7 @@ function incrementShrincsState(state) {
 }
 
 function addShrincsCellDep(transaction) {
-  transaction.addCellDeps(SHRINCS_SCRIPT.cellDep);
+  transaction.addCellDeps(config.current.script.shrincs.cellDep);
   return transaction;
 }
 
@@ -579,14 +678,14 @@ function shrincsSigningMessage(transaction, inputCells, firstIndex) {
 }
 
 async function buildShrincsTransaction(recipient, amount) {
-  const sender = (await ccc.Address.fromString(account.address, cccClient)).script;
-  const signer = new ccc.SignerCkbScriptReadonly(cccClient, sender);
+  const sender = (await ccc.Address.fromString(account.address, client)).script;
+  const signer = new ccc.SignerCkbScriptReadonly(client, sender);
   const transaction = ccc.Transaction.from({ outputs: [{ capacity: amount, lock: recipient.script }], outputsData: ["0x"] });
   addShrincsCellDep(transaction);
   const placeholder = `0x${"00".repeat(shrincsSignaturePlaceholderSize())}`;
   const inputCells = [];
   let inputCapacity = 0n;
-  for await (const cell of cccClient.findCellsByLock(sender, null, true)) {
+  for await (const cell of client.findCellsByLock(sender, null, true)) {
     inputCells.push(cell);
     inputCapacity += BigInt(cell.cellOutput.capacity);
     transaction.addInput(cell);
@@ -606,7 +705,7 @@ function generatePrivateKey() {
   while (true) {
     const bytes = crypto.getRandomValues(new Uint8Array(32));
     const key = `0x${Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")}`;
-    try { new ccc.SignerCkbPrivateKey(cccClient, key); return key; } catch { /* Reject the invalid secp256k1 scalar edge case. */ }
+    try { new ccc.SignerCkbPrivateKey(client, key); return key; } catch { /* Reject the invalid secp256k1 scalar edge case. */ }
   }
 }
 
@@ -813,12 +912,12 @@ function parseCkbAmount(value) {
 }
 
 async function buildAndSignTransfer(recipient, amount) {
-  const recipientAddress = await ccc.Address.fromString(recipient, cccClient);
+  const recipientAddress = await ccc.Address.fromString(recipient, client);
   let sealed;
   if (account.accountType === "shrincs") {
     sealed = await buildShrincsTransaction(recipientAddress, amount);
   } else {
-    const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKeyInMemory);
+    const signer = new ccc.SignerCkbPrivateKey(client, privateKeyInMemory);
     const transaction = ccc.Transaction.from({ outputs: [{ capacity: amount, lock: recipientAddress.script }], outputsData: ["0x"] });
     await transaction.completeFeeBy(signer, FEE_RATE);
     sealed = await signer.signTransaction(transaction);
@@ -832,11 +931,11 @@ async function signProviderTransaction(transactionJson) {
   if (account.accountType === "shrincs") {
     throw new Error("Full transaction signing for SHRINCS accounts is not supported by this provider yet.");
   }
-  const signerScript = (await ccc.Address.fromString(account.address, cccClient)).script;
+  const signerScript = (await ccc.Address.fromString(account.address, client)).script;
   let ownsInput = false;
   let ownedInputIndex;
   for (const input of transaction.inputs) {
-    const cell = await input.getCell(cccClient);
+    const cell = await input.getCell(client);
     if (sameScript(cell.cellOutput.lock, signerScript)) {
       ownsInput = true;
       ownedInputIndex = transaction.inputs.indexOf(input);
@@ -847,7 +946,7 @@ async function signProviderTransaction(transactionJson) {
   const witness = transaction.getWitnessArgs(ownedInputIndex) ?? ccc.WitnessArgs.from({});
   if (!witness.lock) witness.lock = `0x${"00".repeat(65)}`;
   transaction.setWitnessArgs(ownedInputIndex, witness);
-  const signer = new ccc.SignerCkbPrivateKey(cccClient, privateKeyInMemory);
+  const signer = new ccc.SignerCkbPrivateKey(client, privateKeyInMemory);
   const signed = await signer.signOnlyTransaction(transaction);
   return JSON.parse(signed.stringify());
 }
@@ -862,12 +961,12 @@ async function summarizeProviderTransaction(transactionJson) {
   const transaction = ccc.Transaction.from(transactionJson);
   const summary = new Map();
   for (const input of transaction.inputs) {
-    const cell = await input.getCell(cccClient);
-    const address = ccc.Address.fromScript(cell.cellOutput.lock, cccClient).toString();
+    const cell = await input.getCell(client);
+    const address = ccc.Address.fromScript(cell.cellOutput.lock, client).toString();
     addSummaryAmount(summary, address, "spent", BigInt(cell.cellOutput.capacity));
   }
   for (const output of transaction.outputs) {
-    const address = ccc.Address.fromScript(output.lock, cccClient).toString();
+    const address = ccc.Address.fromScript(output.lock, client).toString();
     addSummaryAmount(summary, address, "received", BigInt(output.capacity));
   }
   return [...summary.entries()].map(([address, values]) => ({ address, ...values, spent: values.spent.toString(), received: values.received.toString() }));
@@ -891,8 +990,8 @@ async function refreshBalance() {
   elements.refreshButton.disabled = true;
   setStatus(elements.walletStatus, t("balanceQuery"));
   try {
-    const { script } = await ccc.Address.fromString(account.address, cccClient);
-    const capacity = BigInt(await cccClient.getBalance([script]));
+    const { script } = await ccc.Address.fromString(account.address, client);
+    const capacity = BigInt(await client.getBalance([script]));
     elements.balance.innerHTML = `${formatCkb(capacity)} <small>CKB</small>`;
     setStatus(elements.walletStatus, t("balanceUpdated"), "success");
   } catch (error) {
@@ -917,7 +1016,7 @@ async function enterWallet({ accountType, privateKey, publicKey, shrincsState, i
   const confirmingProviderRequest = Boolean(providerRequestId && providerRequest);
   showView(confirmingProviderRequest ? "provider-confirm" : "wallet");
   const balanceRefresh = refreshBalance();
-  if (confirmingProviderRequest) balanceRefresh.catch(() => {});
+  if (confirmingProviderRequest) balanceRefresh.catch(() => { });
   else await balanceRefresh;
 }
 
@@ -1039,12 +1138,12 @@ async function sendTransfer(event) {
   let transactionSigned = false;
   try {
     const recipient = elements.recipient.value.trim();
-    if (!recipient.startsWith("ckt1")) throw new Error(t("invalidAddress"));
+    if (!recipient.startsWith(`${config.current.hrp}1`)) throw new Error(t("invalidAddress"));
     const amount = parseCkbAmount(elements.amount.value);
     const sealed = await buildAndSignTransfer(recipient, amount);
     transactionSigned = true;
     setStatus(elements.walletStatus, t("broadcasting"));
-    const transactionHash = await cccClient.sendTransaction(sealed);
+    const transactionHash = await client.sendTransaction(sealed);
     await recordTransaction(transactionHash, amount);
     elements.amount.value = "";
     await refreshBalance();
@@ -1073,21 +1172,21 @@ async function loadProviderRequest() {
   elements.providerConfirmButton.disabled = false;
   elements.providerRejectButton.disabled = false;
   summarizeProviderTransaction(request).then((summary) => {
-  elements.providerRequestSummary.replaceChildren(...summary.map(({ address, spent, received }) => {
-    const row = document.createElement("div");
-    row.className = "request-summary-row";
-    const addressElement = document.createElement("span");
-    addressElement.className = "request-summary-address";
-    addressElement.textContent = address;
-    const spentElement = document.createElement("span");
-    spentElement.className = "request-summary-amount";
-    spentElement.textContent = `${formatCkb(BigInt(spent))} CKB`;
-    const receivedElement = document.createElement("span");
-    receivedElement.className = "request-summary-amount";
-    receivedElement.textContent = `${formatCkb(BigInt(received))} CKB`;
-    row.append(addressElement, spentElement, receivedElement);
-    return row;
-  }));
+    elements.providerRequestSummary.replaceChildren(...summary.map(({ address, spent, received }) => {
+      const row = document.createElement("div");
+      row.className = "request-summary-row";
+      const addressElement = document.createElement("span");
+      addressElement.className = "request-summary-address";
+      addressElement.textContent = address;
+      const spentElement = document.createElement("span");
+      spentElement.className = "request-summary-amount";
+      spentElement.textContent = `${formatCkb(BigInt(spent))} CKB`;
+      const receivedElement = document.createElement("span");
+      receivedElement.className = "request-summary-amount";
+      receivedElement.textContent = `${formatCkb(BigInt(received))} CKB`;
+      row.append(addressElement, spentElement, receivedElement);
+      return row;
+    }));
   }).catch((error) => {
     elements.providerRequestSummary.textContent = `Unable to load transaction details: ${error.message}`;
   });
@@ -1197,7 +1296,7 @@ async function loadTransactionHistory() {
     const updatedRecords = await Promise.all(records.map(async (record) => {
       if (record.status === "completed") return record;
       try {
-        const transaction = await cccClient.getTransaction(record.hash);
+        const transaction = await client.getTransaction(record.hash);
         const transactionStatus = transaction?.status;
         return transactionStatus === "committed" ? { ...record, status: "completed" } : record;
       } catch {
