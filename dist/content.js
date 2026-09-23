@@ -24,7 +24,7 @@ window.addEventListener("message", (event) => {
   if (event.source !== window || event.data?.source !== PROVIDER_SOURCE || event.data.direction !== "page-to-extension") return;
   const { requestId, method, params } = event.data;
   if (!requestId || typeof method !== "string") return;
-  const messageType = method === "ckb_accounts" || method === "ckb_requestAccounts" ? "provider-account-request" : "provider-request";
+  const messageType = method === "ckb_requestAccounts" ? "provider-account-request" : "provider-request";
   chrome.runtime.sendMessage({ type: messageType, requestId, method, params }).then((response) => {
     window.postMessage({ source: PROVIDER_SOURCE, direction: "extension-to-page", requestId, ...response }, "*");
   }).catch((error) => {

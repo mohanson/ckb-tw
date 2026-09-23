@@ -28,5 +28,5 @@
     if (event.data.error) pending.reject(Object.assign(new Error(event.data.error.message), { code: event.data.error.code }));
     else pending.resolve(event.data.result);
   });
-  Object.defineProperty(window, "ckbWallet", { value: provider, configurable: false, enumerable: false, writable: false });
+  Object.defineProperty(window, "ckb", { value: provider, configurable: false, enumerable: false, writable: false });
 })();

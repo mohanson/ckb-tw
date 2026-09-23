@@ -892,10 +892,7 @@ async function refreshBalance() {
   setStatus(elements.walletStatus, t("balanceQuery"));
   try {
     const { script } = await ccc.Address.fromString(account.address, cccClient);
-    let capacity = 0n;
-    for await (const cell of cccClient.findCellsByLock(script, null, true)) {
-      capacity += BigInt(cell.cellOutput.capacity);
-    }
+    const capacity = BigInt(await cccClient.getBalance([script]));
     elements.balance.innerHTML = `${formatCkb(capacity)} <small>CKB</small>`;
     setStatus(elements.walletStatus, t("balanceUpdated"), "success");
   } catch (error) {
