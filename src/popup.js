@@ -191,6 +191,26 @@ translations["zh-CN"].unlockButton = "解锁";
 translations["en-US"].unlockButton = "Unlock";
 translations["zh-CN"].settingsTitle = "设置";
 translations["en-US"].settingsTitle = "Settings";
+translations["zh-CN"].networkLabel = "网络";
+translations["en-US"].networkLabel = "Network";
+translations["zh-CN"].switchNetworkButton = "切换网络";
+translations["en-US"].switchNetworkButton = "Switch network";
+translations["zh-CN"].networkSettingsTitle = "切换网络";
+translations["en-US"].networkSettingsTitle = "Switch network";
+translations["zh-CN"].testnetOption = "测试网";
+translations["en-US"].testnetOption = "Testnet";
+translations["zh-CN"].devnetOption = "开发网";
+translations["en-US"].devnetOption = "Develop";
+translations["zh-CN"].rpcUrlLabel = "RPC 地址";
+translations["en-US"].rpcUrlLabel = "RPC URL";
+translations["zh-CN"].applyNetworkButton = "应用网络";
+translations["en-US"].applyNetworkButton = "Apply network";
+translations["zh-CN"].networkChanged = "网络已切换";
+translations["en-US"].networkChanged = "Network switched";
+translations["zh-CN"].networkChangeError = "网络切换失败: {error}";
+translations["en-US"].networkChangeError = "Unable to switch network: {error}";
+translations["zh-CN"].networkPermissionDenied = "未授予该 RPC 地址的访问权限.";
+translations["en-US"].networkPermissionDenied = "Permission for this RPC origin was not granted.";
 translations["zh-CN"].languageLabel = "语言";
 translations["en-US"].languageLabel = "Language";
 translations["zh-CN"].chinese = "中文";
@@ -429,6 +449,7 @@ const ACCOUNT_TYPES = {
 globalThis.Buffer ??= Buffer;
 
 const elements = {
+  networkView: document.querySelector("#network-view"), networkBadge: document.querySelector("#network-badge"), networkSettingsButton: document.querySelector("#network-settings-button"), networkBackButton: document.querySelector("#network-back-button"), networkSelect: document.querySelector("#network-select"), devnetRpcField: document.querySelector("#devnet-rpc-field"), devnetRpcUrl: document.querySelector("#devnet-rpc-url"), networkApplyButton: document.querySelector("#network-apply-button"), networkStatus: document.querySelector("#network-status"),
   setupView: document.querySelector("#setup-view"), setupBackButton: document.querySelector("#setup-back-button"), welcomeView: document.querySelector("#welcome-view"), setPasswordView: document.querySelector("#set-password-view"), createView: document.querySelector("#create-view"), importView: document.querySelector("#import-view"), unlockView: document.querySelector("#unlock-view"), settingsView: document.querySelector("#settings-view"), resetConfirmView: document.querySelector("#reset-confirm-view"), switchAccountView: document.querySelector("#switch-account-view"), changePasswordView: document.querySelector("#change-password-view"), walletView: document.querySelector("#wallet-view"),
   privateKey: document.querySelector("#private-key"), privateKeyLabel: document.querySelector("#private-key-label"), setupAccountType: document.querySelector("#setup-account-type"), importAccountType: document.querySelector("#setup-account-type-import"), setupPassword: document.querySelector("#setup-password"), setupPasswordConfirm: document.querySelector("#setup-password-confirm"), setupPasswordStatus: document.querySelector("#set-password-status"), setupStatus: document.querySelector("#setup-status"), createStatus: document.querySelector("#create-status"), importStatus: document.querySelector("#import-status"), importProgress: document.querySelector("#import-progress"), generationProgress: document.querySelector("#generation-progress"),
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), changePasswordCurrent: document.querySelector("#change-password-current"), changePasswordNew: document.querySelector("#change-password-new"), changePasswordStatus: document.querySelector("#change-password-status"), walletStatus: document.querySelector("#wallet-status"),
@@ -439,7 +460,7 @@ const elements = {
   settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsCreateAccountButton: document.querySelector("#settings-create-account-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), switchAccountButton: document.querySelector("#switch-account-button"), switchAccountBackButton: document.querySelector("#switch-account-back-button"), accountList: document.querySelector("#account-list"), accountListStatus: document.querySelector("#account-list-status"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
 
-const VIEW_NAMES = ["setup", "welcome", "set-password", "create", "import", "unlock", "provider-confirm", "settings", "reset-confirm", "switch-account", "change-password", "wallet"];
+const VIEW_NAMES = ["setup", "welcome", "set-password", "create", "import", "unlock", "provider-confirm", "settings", "network", "reset-confirm", "switch-account", "change-password", "wallet"];
 
 let account = null;
 let privateKeyInMemory = null;
@@ -469,6 +490,105 @@ function showView(view) {
   for (const name of VIEW_NAMES) {
     const elementName = name.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase()) + "View";
     elements[elementName].hidden = name !== view;
+  }
+}
+
+function updateNetworkForm() {
+  elements.devnetRpcField.hidden = elements.networkSelect.value !== "devnet";
+}
+
+function updateNetworkBadge(network) {
+  elements.networkBadge.textContent = network === "devnet" ? "DEVNET" : "TESTNET";
+}
+
+function getDevnetRpcPermissionPattern(rpc) {
+  const url = new URL(rpc);
+  if (!/^https?:$/.test(url.protocol) || url.username || url.password) {
+    throw new Error("Enter a valid HTTP or HTTPS RPC URL without credentials.");
+  }
+  return `${url.origin}/*`;
+}
+
+async function applyNetworkSelection({ requestPermission = true, persist = true } = {}) {
+  const networkName = elements.networkSelect.value;
+  const previousClient = client;
+  const previousNetwork = config.current;
+  const previousDevnetRpc = config.develop.rpc;
+  const previousDaoTxHash = config.develop.script.dao.cellDep.outPoint.txHash;
+  const previousSecpTxHash = config.develop.script.secp256k1.cellDep.outPoint.txHash;
+  let nextClient;
+
+  try {
+    if (networkName === "testnet") {
+      await config.switchTestnet();
+      nextClient = new ccc.ClientPublicTestnet({ url: config.testnet.rpc });
+    } else {
+      const rpc = elements.devnetRpcUrl.value.trim();
+      const originPattern = getDevnetRpcPermissionPattern(rpc);
+      const originPermission = { origins: [originPattern] };
+      const permitted = requestPermission
+        ? await chrome.permissions.request(originPermission)
+        : await chrome.permissions.contains(originPermission);
+      if (!permitted) throw new Error(t("networkPermissionDenied"));
+
+      config.develop.rpc = rpc;
+      await config.switchDevelop();
+      const daoTxHash = config.develop.script.dao.cellDep.outPoint.txHash;
+      const secpTxHash = config.develop.script.secp256k1.cellDep.outPoint.txHash;
+      const validHash = (hash) => typeof hash === "string" && /^0x[0-9a-f]{64}$/i.test(hash);
+      if (!validHash(daoTxHash) || !validHash(secpTxHash)) {
+        throw new Error("The Devnet RPC returned invalid genesis dependency hashes.");
+      }
+
+      const scripts = structuredClone(previousClient.scripts);
+      scripts.Dao = {
+        ...scripts.Dao,
+        codeHash: config.develop.script.dao.codeHash,
+        hashType: config.develop.script.dao.hashType,
+        cellDeps: [{ cellDep: config.develop.script.dao.cellDep }],
+      };
+      scripts.Secp256k1Blake160 = {
+        ...scripts.Secp256k1Blake160,
+        codeHash: config.develop.script.secp256k1.codeHash,
+        hashType: config.develop.script.secp256k1.hashType,
+        cellDeps: [{ cellDep: config.develop.script.secp256k1.cellDep }],
+      };
+      nextClient = new ccc.ClientPublicTestnet({ url: rpc, scripts });
+    }
+
+    client = nextClient;
+    if (persist) await chrome.storage.local.set({ selectedNetwork: networkName, devnetRpc: elements.devnetRpcUrl.value.trim() });
+    updateNetworkBadge(networkName);
+    setStatus(elements.networkStatus, t("networkChanged"), "success");
+  } catch (error) {
+    client = previousClient;
+    config.current = previousNetwork;
+    config.develop.rpc = previousDevnetRpc;
+    config.develop.script.dao.cellDep.outPoint.txHash = previousDaoTxHash;
+    config.develop.script.secp256k1.cellDep.outPoint.txHash = previousSecpTxHash;
+    throw error;
+  }
+}
+
+async function restoreNetworkPreference() {
+  const { selectedNetwork, devnetRpc } = await chrome.storage.local.get(["selectedNetwork", "devnetRpc"]);
+  elements.devnetRpcUrl.value = typeof devnetRpc === "string" && devnetRpc ? devnetRpc : config.develop.rpc;
+  elements.networkSelect.value = selectedNetwork === "devnet" ? "devnet" : "testnet";
+  updateNetworkForm();
+  if (selectedNetwork !== "devnet") {
+    updateNetworkBadge("testnet");
+    return;
+  }
+
+  try {
+    const originPattern = getDevnetRpcPermissionPattern(elements.devnetRpcUrl.value.trim());
+    const permitted = await chrome.permissions.contains({ origins: [originPattern] });
+    if (!permitted) throw new Error("Devnet RPC origin permission is not available.");
+    await applyNetworkSelection({ requestPermission: false, persist: false });
+  } catch {
+    elements.networkSelect.value = "testnet";
+    updateNetworkForm();
+    updateNetworkBadge("testnet");
   }
 }
 
@@ -1404,6 +1524,26 @@ elements.copyAddressButton.addEventListener("click", () => copyAddress().catch((
 elements.exportButton.addEventListener("click", () => exportWallet().catch((error) => setStatus(elements.walletStatus, t("exportError", { error: error.message }), "error")));
 elements.settingsButton.addEventListener("click", openSettings);
 elements.settingsBackButton.addEventListener("click", () => showView(viewBeforeSettings));
+elements.networkSettingsButton.addEventListener("click", () => {
+  elements.networkSelect.value = config.current === config.develop ? "devnet" : "testnet";
+  if (!elements.devnetRpcUrl.value) elements.devnetRpcUrl.value = config.develop.rpc;
+  updateNetworkForm();
+  setStatus(elements.networkStatus);
+  showView("network");
+});
+elements.networkBackButton.addEventListener("click", () => showView("settings"));
+elements.networkSelect.addEventListener("change", updateNetworkForm);
+elements.networkApplyButton.addEventListener("click", async () => {
+  elements.networkApplyButton.disabled = true;
+  setStatus(elements.networkStatus);
+  try {
+    await applyNetworkSelection();
+  } catch (error) {
+    setStatus(elements.networkStatus, t("networkChangeError", { error: error.message }), "error");
+  } finally {
+    elements.networkApplyButton.disabled = false;
+  }
+});
 elements.settingsLockButton.addEventListener("click", lockWallet);
 elements.settingsCreateAccountButton.addEventListener("click", () => openAccountCreation("settings"));
 elements.settingsChangePasswordButton.addEventListener("click", () => showView("change-password"));
@@ -1469,6 +1609,7 @@ elements.resetConfirmButton.addEventListener("click", async () => {
   elements.languageSelect.value = language;
   applyTranslations();
   updateSignModeOptions();
+  await restoreNetworkPreference();
   if (providerRequestId) {
     try {
       await loadProviderRequest();

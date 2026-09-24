@@ -24,6 +24,8 @@
     .hint { margin:0 0 15px; color:var(--muted); font-size:12px; }
     label { display:block; margin:12px 0 5px; color:#bdd2e9; font-weight:650; font-size:12px; }
     input, textarea, select { width:100%; border:1px solid rgba(155,197,240,.22); border-radius:11px; background:rgba(1,10,25,.5); color:var(--ink); padding:10px; font:12px/1.35 ui-monospace,"Cascadia Code",monospace; outline:none; }
+    select { appearance:none; color-scheme:dark; padding-right:34px; background-image:linear-gradient(45deg,transparent 50%,var(--blue-bright) 50%),linear-gradient(135deg,var(--blue-bright) 50%,transparent 50%); background-repeat:no-repeat; background-position:calc(100% - 16px) 50%,calc(100% - 12px) 50%; background-size:4px 4px; font:13px/1.35 "Avenir Next","Noto Sans SC",sans-serif; }
+    select option { background:#08172f; color:var(--ink); }
     input:focus, textarea:focus, select:focus { border-color:var(--blue); box-shadow:0 0 0 3px rgba(101,184,255,.14),0 0 24px rgba(57,143,255,.16); }
     textarea { resize:vertical; min-height:72px; }
     button { border:1px solid rgba(172,220,255,.18); border-radius:11px; padding:10px 12px; background:linear-gradient(135deg,#54aaff,#3477ea); color:#fff; cursor:pointer; font:600 13px "Avenir Next","Noto Sans SC",sans-serif; box-shadow:0 7px 18px rgba(19,96,218,.24); transition:transform .16s ease,box-shadow .16s ease,background .16s ease; }
@@ -89,7 +91,7 @@
 </head>
 <body>
   <main>
-    <header><h1 data-i18n="appTitle">CKB Testnet Wallet</h1><div class="header-actions"><span class="network" data-i18n="network">TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="Settings" title="Settings">⚙</button></div></header>
+    <header><h1 data-i18n="appTitle">CKB Testnet Wallet</h1><div class="header-actions"><span id="network-badge" class="network">TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="Settings" title="Settings">⚙</button></div></header>
     <section id="setup-view" class="card">
       <button id="setup-back-button" class="back-link" type="button" data-i18n="backButton" hidden>Back</button>
       <h2 data-i18n="setupTitle">Create or Import Account</h2>
@@ -149,11 +151,24 @@
     <section id="settings-view" class="card" hidden>
       <button id="settings-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
       <h2 data-i18n="settingsTitle">Settings</h2>
+      <div class="setting-row"><span data-i18n="networkLabel">Network</span><div class="actions"><button id="network-settings-button" class="secondary" type="button" data-i18n="switchNetworkButton">Switch network</button></div></div>
       <div class="setting-row"><label for="language-select" data-i18n="languageLabel">Language</label><select id="language-select"><option value="en-US" data-i18n="english">English</option><option value="zh-CN" data-i18n="chinese">中文</option></select></div>
       <div class="setting-row"><label class="setting-label" for="settings-sign-mode"><span data-i18n="signModeLabel">Signing mode</span><span id="sign-mode-help" class="info-tooltip" role="img" tabindex="0" aria-hidden="true" hidden>?</span></label><select id="settings-sign-mode"><option value="default" data-i18n="defaultOption">Default</option><option value="stateful" data-i18n="statefulOption">stateful</option><option value="stateless" data-i18n="statelessOption">stateless</option></select></div>
       <div class="actions"><button id="export-settings-button" class="secondary" type="button" data-i18n="exportButton">Export key backup</button><button id="settings-lock-button" class="danger" type="button" data-i18n="lockButton">Lock</button></div>
       <div class="actions"><button id="settings-create-account-button" class="secondary" type="button" data-i18n="createAccountButton">Create account</button><button id="settings-change-password-button" class="secondary" type="button" data-i18n="changePasswordTitle">Change password</button></div>
       <div class="actions"><button id="delete-account-button" class="danger" type="button" data-i18n="deleteAccountTitle" disabled>Delete account</button></div>
+    </section>
+    <section id="network-view" class="card" hidden>
+      <button id="network-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
+      <h2 data-i18n="networkSettingsTitle">Switch network</h2>
+      <label for="network-select" data-i18n="networkLabel">Network</label>
+      <select id="network-select"><option value="devnet" data-i18n="devnetOption">Local Devnet</option><option value="testnet" data-i18n="testnetOption" selected>Testnet</option></select>
+      <div id="devnet-rpc-field" hidden>
+        <label for="devnet-rpc-url" data-i18n="rpcUrlLabel">RPC URL</label>
+        <input id="devnet-rpc-url" type="url" inputmode="url" placeholder="http://127.0.0.1:8114" autocomplete="url">
+      </div>
+      <div class="actions"><button id="network-apply-button" type="button" data-i18n="applyNetworkButton">Apply network</button></div>
+      <p id="network-status" class="status" role="status" aria-live="polite"></p>
     </section>
     <section id="change-password-view" class="card" hidden>
       <button id="change-password-cancel-button" class="back-link" type="button" data-i18n="backButton">Back</button>
