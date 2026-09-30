@@ -73,9 +73,11 @@
     .request-origin { overflow-wrap:anywhere; color:var(--blue-bright); font:12px/1.4 ui-monospace,"Cascadia Code",monospace; }
     .request-value { overflow-wrap:anywhere; margin:5px 0 0; color:var(--ink); font:12px/1.45 ui-monospace,"Cascadia Code",monospace; }
     .request-summary { display:grid; gap:8px; margin-top:8px; }
-    .request-summary-row { display:grid; grid-template-columns:minmax(0,1fr) auto auto; gap:8px; align-items:start; padding:9px 0; border-top:1px solid var(--line); }
+    .request-summary-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:start; padding:9px 0; border-top:1px solid var(--line); }
     .request-summary-address { overflow-wrap:anywhere; color:var(--ink); font:11px/1.4 ui-monospace,"Cascadia Code",monospace; }
     .request-summary-amount { color:var(--blue-bright); font-size:11px; text-align:right; white-space:nowrap; }
+    .request-summary-amount.increase { color:var(--cyan); }
+    .request-summary-amount.decrease { color:var(--danger); }
     .account-type { padding:2px 6px; font:11px ui-monospace,"Cascadia Code",monospace; letter-spacing:0; }
     .signing-progress { width:100%; height:5px; margin-top:8px; }
     .transaction-progress { position:relative; overflow:hidden; border-radius:999px; background:rgba(107,161,221,.18); }
@@ -92,7 +94,7 @@
 <body>
   <main>
     <header><h1 data-i18n="appTitle">CKB Testnet Wallet</h1><div class="header-actions"><span id="network-badge" class="network">TESTNET</span><button id="settings-button" class="secondary settings-button" type="button" aria-label="Settings" title="Settings">⚙</button></div></header>
-    <section id="setup-view" class="card">
+    <section id="setup-view" class="card" hidden>
       <button id="setup-back-button" class="back-link" type="button" data-i18n="backButton" hidden>Back</button>
       <h2 data-i18n="setupTitle">Create or Import Account</h2>
       <p class="hint" data-i18n="setupHint">Your private key is stored encrypted in this browser. Back it up separately; it cannot be recovered without the password.</p>
@@ -105,7 +107,7 @@
       <div class="actions"><button id="welcome-start-button" type="button" data-i18n="startButton">Get started</button></div>
     </section>
     <section id="set-password-view" class="card" hidden>
-      <button id="set-password-back-button" class="back-link" type="button" data-i18n="backButton">Back</button>
+      <button id="set-password-back-button" class="back-link" type="button" data-i18n="backButton" hidden>Back</button>
       <h2 data-i18n="setPasswordTitle">Set wallet password</h2>
       <p class="hint" data-i18n="setPasswordHint">This password protects your wallet and cannot be recovered.</p>
       <label for="setup-password" data-i18n="passwordLabel">Protection password</label>
@@ -144,7 +146,7 @@
       <h2 data-i18n="providerConfirmTitle">Confirm wallet request</h2>
       <p class="hint" data-i18n="providerConfirmHint">Review this request before the wallet signs anything.</p>
       <div class="setting-row"><strong data-i18n="providerOriginLabel">Website</strong><p id="provider-request-origin" class="request-origin"></p></div>
-      <div class="setting-row"><strong data-i18n="providerSummaryLabel">Asset movement</strong><div class="request-summary"><div class="request-summary-row"><strong data-i18n="providerAddressLabel">Address</strong><strong data-i18n="providerSpentLabel">Spent</strong><strong data-i18n="providerReceivedLabel">Received</strong></div><div id="provider-request-summary"></div></div></div>
+      <div class="setting-row"><strong data-i18n="providerSummaryLabel">Asset movement</strong><div class="request-summary"><div class="request-summary-row"><strong data-i18n="providerAddressLabel">Address</strong><strong data-i18n="providerNetChangeLabel">Net change</strong></div><div id="provider-request-summary"></div></div></div>
       <div class="actions"><button id="provider-reject-button" class="danger" type="button" data-i18n="providerRejectButton">Reject</button><button id="provider-confirm-button" type="button" data-i18n="providerConfirmButton">Confirm and sign</button></div>
       <p id="provider-confirm-status" class="status" role="status" aria-live="polite"></p>
     </section>

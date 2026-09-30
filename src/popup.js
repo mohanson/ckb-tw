@@ -397,10 +397,8 @@ translations["zh-CN"].providerSummaryLabel = "资产变化";
 translations["en-US"].providerSummaryLabel = "Asset movement";
 translations["zh-CN"].providerAddressLabel = "地址";
 translations["en-US"].providerAddressLabel = "Address";
-translations["zh-CN"].providerSpentLabel = "花费";
-translations["en-US"].providerSpentLabel = "Spent";
-translations["zh-CN"].providerReceivedLabel = "接收";
-translations["en-US"].providerReceivedLabel = "Received";
+translations["zh-CN"].providerNetChangeLabel = "净变化";
+translations["en-US"].providerNetChangeLabel = "Net change";
 translations["zh-CN"].providerRejectButton = "拒绝";
 translations["en-US"].providerRejectButton = "Reject";
 translations["zh-CN"].providerConfirmButton = "确认并签名";
@@ -1089,7 +1087,9 @@ async function summarizeProviderTransaction(transactionJson) {
     const address = ccc.Address.fromScript(output.lock, client).toString();
     addSummaryAmount(summary, address, "received", BigInt(output.capacity));
   }
-  return [...summary.entries()].map(([address, values]) => ({ address, ...values, spent: values.spent.toString(), received: values.received.toString() }));
+  return [...summary.entries()]
+    .map(([address, values]) => ({ address, netChange: values.received - values.spent }))
+    .filter(({ netChange }) => netChange !== 0n);
 }
 
 function formatCkb(capacity) {
@@ -1292,19 +1292,17 @@ async function loadProviderRequest() {
   elements.providerConfirmButton.disabled = false;
   elements.providerRejectButton.disabled = false;
   summarizeProviderTransaction(request).then((summary) => {
-    elements.providerRequestSummary.replaceChildren(...summary.map(({ address, spent, received }) => {
+    elements.providerRequestSummary.replaceChildren(...summary.map(({ address, netChange }) => {
       const row = document.createElement("div");
       row.className = "request-summary-row";
       const addressElement = document.createElement("span");
       addressElement.className = "request-summary-address";
       addressElement.textContent = address;
-      const spentElement = document.createElement("span");
-      spentElement.className = "request-summary-amount";
-      spentElement.textContent = `${formatCkb(BigInt(spent))} CKB`;
-      const receivedElement = document.createElement("span");
-      receivedElement.className = "request-summary-amount";
-      receivedElement.textContent = `${formatCkb(BigInt(received))} CKB`;
-      row.append(addressElement, spentElement, receivedElement);
+      const netChangeElement = document.createElement("span");
+      netChangeElement.className = `request-summary-amount ${netChange > 0n ? "increase" : "decrease"}`;
+      const sign = netChange > 0n ? "+" : "-";
+      netChangeElement.textContent = `${sign}${formatCkb(netChange > 0n ? netChange : -netChange)} CKB`;
+      row.append(addressElement, netChangeElement);
       return row;
     }));
   }).catch((error) => {
@@ -1622,7 +1620,7 @@ elements.resetConfirmButton.addEventListener("click", async () => {
   updateDeleteAccountButton(Boolean(vault || (Array.isArray(accounts) && accounts.length > 0)));
   const { walletCredential } = await chrome.storage.local.get("walletCredential");
   if (!vault && !walletCredential) {
-    showView("welcome");
+    showView("set-password");
     return;
   }
   const sessionPassword = await getLoginSessionPassword();
