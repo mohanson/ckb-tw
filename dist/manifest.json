@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CKB Testnet Wallet BETA",
-  "version": "1.1",
+  "version": "1.2",
   "description": "CKB Testnet Wallet. This extension is currently in the Beta testing phase.",
   "icons": {
     "128": "logo_128.png"
@@ -19,20 +19,37 @@
     "service_worker": "background.js",
     "type": "module"
   },
-  "permissions": ["storage", "sidePanel", "windows"],
-  "host_permissions": ["https://testnet.ckb.dev/*"],
-  "optional_host_permissions": ["http://*/*", "https://*/*"],
+  "permissions": [
+    "storage",
+    "sidePanel",
+    "windows"
+  ],
+  "host_permissions": [
+    "https://testnet.ckb.dev/*"
+  ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["provider-page.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "provider-page.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "cross_origin_opener_policy": {
