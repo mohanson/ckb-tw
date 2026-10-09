@@ -14,8 +14,17 @@ function senderOrigin(sender) {
 }
 
 async function getActiveAddress() {
-  const stored = await chrome.storage.local.get(["vault", "accounts"]);
-  return stored.vault?.address || (Array.isArray(stored.accounts) ? stored.accounts[0]?.address : null);
+  const stored = await chrome.storage.local.get(["vault", "accounts", "selectedNetwork", "providerAddress", "providerAddressAccount"]);
+  const vault = stored.vault || (Array.isArray(stored.accounts) ? stored.accounts[0] : null);
+  if (!vault?.address) return null;
+  if (["mainnet", "devnet"].includes(stored.selectedNetwork) && vault.accountType === "shrincs") {
+    throw new Error("SHRINCS is only supported on Testnet.");
+  }
+  const address = stored.providerAddressAccount === vault.address && stored.providerAddress
+    ? stored.providerAddress : vault.address;
+  const prefix = stored.selectedNetwork === "mainnet" ? "ckb1" : "ckt1";
+  if (!address.startsWith(prefix)) throw new Error("Open and unlock the wallet on the selected network first.");
+  return address;
 }
 
 async function openSigningRequest(request, sendResponse) {

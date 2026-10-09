@@ -21,11 +21,11 @@
   },
   "permissions": [
     "storage",
-    "sidePanel",
-    "windows"
+    "sidePanel"
   ],
   "host_permissions": [
-    "https://testnet.ckb.dev/*"
+    "https://mainnet.ckbapp.dev/*",
+    "https://testnet.ckbapp.dev/*"
   ],
   "optional_host_permissions": [
     "http://*/*",

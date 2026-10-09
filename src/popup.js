@@ -54,9 +54,42 @@ let config = {
       }
     }
   },
+  mainnet: {
+    hrp: "ckb",
+    rpc: "https://mainnet.ckbapp.dev",
+    script: {
+      dao: {
+        codeHash: "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
+        hashType: "type",
+        cellDep: {
+          outPoint: {
+            txHash: "0xe2fb199810d49a4d8beec56718ba2593b665db9d52299a0f9e6e75416d73ff5c",
+            index: "0x2",
+          },
+          depType: "code",
+        }
+      },
+      secp256k1: {
+        codeHash: "0x9bd7e06f3ecf4be0f2fcd2188b23f1b9fcc88e5d4b65a8637b17723bbda3cce8",
+        hashType: "type",
+        cellDep: {
+          outPoint: { txHash: "0x71a7ba8fc96349fea0ed3a5c47992e3b4084b031a42264a018e0072e8172e46c", index: "0x0" },
+          depType: "depGroup",
+        }
+      },
+      shrincs: {
+        codeHash: "0x0000000000000000000000000000000000000000000000000000000000000000",
+        hashType: "type",
+        cellDep: {
+          outPoint: { txHash: "0x0000000000000000000000000000000000000000000000000000000000000000", index: "0x0" },
+          depType: "code",
+        },
+      }
+    }
+  },
   testnet: {
     hrp: "ckt",
-    rpc: "https://testnet.ckb.dev/rpc",
+    rpc: "https://testnet.ckbapp.dev",
     script: {
       dao: {
         codeHash: "0x82d76d1b75fe2fd9a27dfbaa65a039221a380d76c926f378d3f81cf3e7e13f2e",
@@ -100,6 +133,9 @@ let config = {
     config.develop.script.dao.cellDep.outPoint.txHash = payload.result?.transactions?.[0]?.hash;
     config.develop.script.secp256k1.cellDep.outPoint.txHash = payload.result?.transactions?.[1]?.hash;
     config.current = config.develop;
+  },
+  switchMainnet: async function () {
+    config.current = config.mainnet;
   },
   switchTestnet: async function () {
     config.current = config.testnet;
@@ -199,6 +235,10 @@ translations["zh-CN"].networkSettingsTitle = "切换网络";
 translations["en-US"].networkSettingsTitle = "Switch network";
 translations["zh-CN"].testnetOption = "测试网";
 translations["en-US"].testnetOption = "Testnet";
+translations["zh-CN"].mainnetOption = "主网";
+translations["en-US"].mainnetOption = "Mainnet";
+translations["zh-CN"].shrincsTestnetOnly = "SHRINCS 仅支持测试网, 主网和本地开发网请使用 secp256k1 账户.";
+translations["en-US"].shrincsTestnetOnly = "SHRINCS is only supported on Testnet. Use a secp256k1 account on Mainnet or local Devnet.";
 translations["zh-CN"].devnetOption = "开发网";
 translations["en-US"].devnetOption = "Develop";
 translations["zh-CN"].rpcUrlLabel = "RPC 地址";
@@ -231,8 +271,8 @@ translations["zh-CN"].refreshButton = "刷新";
 translations["en-US"].refreshButton = "Refresh";
 translations["zh-CN"].sendTitle = "发送 CKB";
 translations["en-US"].sendTitle = "Send CKB";
-translations["zh-CN"].recipientLabel = "收款测试网地址";
-translations["en-US"].recipientLabel = "Testnet recipient address";
+translations["zh-CN"].recipientLabel = "收款地址";
+translations["en-US"].recipientLabel = "Recipient address";
 translations["zh-CN"].recipientPlaceholder = "ckt1...";
 translations["en-US"].recipientPlaceholder = "ckt1...";
 translations["zh-CN"].amountLabel = "金额(CKB)";
@@ -271,8 +311,8 @@ translations["zh-CN"].wrongPassword = "密码不正确或钱包数据已损坏."
 translations["en-US"].wrongPassword = "Incorrect password or corrupted wallet data.";
 translations["zh-CN"].passwordSaved = "密码已保存, 请选择账户操作.";
 translations["en-US"].passwordSaved = "Password saved. Choose an account action.";
-translations["zh-CN"].balanceQuery = "正在查询测试网余额...";
-translations["en-US"].balanceQuery = "Querying testnet balance...";
+translations["zh-CN"].balanceQuery = "正在查询余额...";
+translations["en-US"].balanceQuery = "Querying balance...";
 translations["zh-CN"].balanceUpdated = "余额已更新.";
 translations["en-US"].balanceUpdated = "Balance updated.";
 translations["zh-CN"].balanceError = "无法查询余额: {error}";
@@ -299,8 +339,8 @@ translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成, 但测试网�
 translations["en-US"].shrincsRejected = "SHRINCS signing completed, but the testnet rejected the zero-placeholder script transaction: {error}";
 translations["zh-CN"].shrincsRejected = "SHRINCS 签名已完成, 但测试网拒绝了交易: {error}";
 translations["en-US"].shrincsRejected = "SHRINCS signing completed, but the testnet rejected the transaction: {error}";
-translations["zh-CN"].invalidAddress = "请输入 CKB 测试网地址(ckt1...).";
-translations["en-US"].invalidAddress = "Enter a CKB testnet address (ckt1...).";
+translations["zh-CN"].invalidAddress = "请输入当前网络的 CKB 地址.";
+translations["en-US"].invalidAddress = "Enter a CKB address for the current network.";
 translations["zh-CN"].invalidShrincsPublicKey = "SHRINCS 公钥必须是 32 字节十六进制字符.";
 translations["en-US"].invalidShrincsPublicKey = "SHRINCS public key must be 32-byte hexadecimal.";
 translations["zh-CN"].invalidAmount = "请输入最多 8 位小数的有效 CKB 金额.";
@@ -424,6 +464,7 @@ function applyTranslations() {
   elements.signModeHelp?.setAttribute("data-tooltip", t("signModeHelp"));
   elements.settingsButton?.setAttribute("aria-label", t("settingsTitle"));
   elements.settingsButton?.setAttribute("title", t("settingsTitle"));
+  elements.recipient.placeholder = `${config.current.hrp}1...`;
   updateSetupAccountType();
 }
 const ACCOUNT_TYPES = {
@@ -436,6 +477,7 @@ const ACCOUNT_TYPES = {
   },
   shrincs: {
     createAccount(seed, publicKey) {
+      if (config.current !== config.testnet) throw new Error(t("shrincsTestnetOnly"));
       if (!/^0x[0-9a-f]{64}$/.test(publicKey || "")) throw new Error(t("invalidShrincsPublicKey"));
       const { codeHash, hashType } = config.current.script.shrincs;
       const lock = { codeHash, hashType, args: publicKey };
@@ -469,6 +511,9 @@ let walletPassword = null;
 let accountCreationReturnView = "setup";
 let providerRequestId = new URLSearchParams(location.search).get("providerRequest");
 let providerRequest = null;
+let providerSummaryContext = null;
+let walletOperationInProgress = false;
+let walletLockVersion = 0;
 const shrincsInitialization = initShrincs().then(() => initThreadPool(Math.min(navigator.hardwareConcurrency || 1, 8)));
 const bytes = {
   bytify: (value) => new Uint8Array(ccc.bytesFrom(value)),
@@ -496,7 +541,7 @@ function updateNetworkForm() {
 }
 
 function updateNetworkBadge(network) {
-  elements.networkBadge.textContent = network === "devnet" ? "DEVNET" : "TESTNET";
+  elements.networkBadge.textContent = network.toUpperCase();
 }
 
 function getDevnetRpcPermissionPattern(rpc) {
@@ -508,6 +553,7 @@ function getDevnetRpcPermissionPattern(rpc) {
 }
 
 async function applyNetworkSelection({ requestPermission = true, persist = true } = {}) {
+  if (walletOperationInProgress || providerRequest) throw new Error("Finish or reject the signing request before switching networks.");
   const networkName = elements.networkSelect.value;
   const previousClient = client;
   const previousNetwork = config.current;
@@ -517,7 +563,13 @@ async function applyNetworkSelection({ requestPermission = true, persist = true 
   let nextClient;
 
   try {
-    if (networkName === "testnet") {
+    if (networkName !== "testnet" && account?.accountType === "shrincs") {
+      throw new Error(t("shrincsTestnetOnly"));
+    }
+    if (networkName === "mainnet") {
+      await config.switchMainnet();
+      nextClient = new ccc.ClientPublicMainnet({ url: config.mainnet.rpc });
+    } else if (networkName === "testnet") {
       await config.switchTestnet();
       nextClient = new ccc.ClientPublicTestnet({ url: config.testnet.rpc });
     } else {
@@ -538,7 +590,7 @@ async function applyNetworkSelection({ requestPermission = true, persist = true 
         throw new Error("The Devnet RPC returned invalid genesis dependency hashes.");
       }
 
-      const scripts = structuredClone(previousClient.scripts);
+      const scripts = structuredClone(new ccc.ClientPublicTestnet().scripts);
       scripts.Dao = {
         ...scripts.Dao,
         codeHash: config.develop.script.dao.codeHash,
@@ -555,7 +607,21 @@ async function applyNetworkSelection({ requestPermission = true, persist = true 
     }
 
     client = nextClient;
-    if (persist) await chrome.storage.local.set({ selectedNetwork: networkName, devnetRpc: elements.devnetRpcUrl.value.trim() });
+    const nextAccount = account ? await createAccount(privateKeyInMemory, account.accountType, account.publicKey) : null;
+    if (persist) {
+      const { vault } = await chrome.storage.local.get("vault");
+      await chrome.storage.local.set({ selectedNetwork: networkName, devnetRpc: elements.devnetRpcUrl.value.trim(), providerAddress: nextAccount?.address || null, providerAddressAccount: vault?.address || null });
+    }
+    if (nextAccount) {
+      Object.assign(account, nextAccount);
+      elements.address.textContent = account.address;
+      elements.balance.textContent = "-- CKB";
+      elements.recipient.value = "";
+      elements.historyList.replaceChildren();
+      refreshBalance();
+    }
+    updateSetupAccountType();
+    elements.recipient.placeholder = `${config.current.hrp}1...`;
     updateNetworkBadge(networkName);
     setStatus(elements.networkStatus, t("networkChanged"), "success");
   } catch (error) {
@@ -571,8 +637,12 @@ async function applyNetworkSelection({ requestPermission = true, persist = true 
 async function restoreNetworkPreference() {
   const { selectedNetwork, devnetRpc } = await chrome.storage.local.get(["selectedNetwork", "devnetRpc"]);
   elements.devnetRpcUrl.value = typeof devnetRpc === "string" && devnetRpc ? devnetRpc : config.develop.rpc;
-  elements.networkSelect.value = selectedNetwork === "devnet" ? "devnet" : "testnet";
+  elements.networkSelect.value = ["devnet", "mainnet"].includes(selectedNetwork) ? selectedNetwork : "testnet";
   updateNetworkForm();
+  if (selectedNetwork === "mainnet") {
+    await applyNetworkSelection({ requestPermission: false, persist: false });
+    return;
+  }
   if (selectedNetwork !== "devnet") {
     updateNetworkBadge("testnet");
     return;
@@ -622,23 +692,36 @@ async function clearLoginSession() {
 }
 
 function openAccountCreation(returnView) {
+  if (walletOperationInProgress) {
+    setStatus(elements.walletStatus, "Wait for signing to finish before creating an account.", "error");
+    return;
+  }
   accountCreationReturnView = returnView;
   elements.setupBackButton.hidden = returnView === "setup";
   showView("setup");
 }
 
-function lockWallet() {
+function lockWallet({ clearSession = true } = {}) {
+  walletLockVersion += 1;
   privateKeyInMemory = null;
   shrincsPreparedKeyInMemory = null;
   shrincsPreparedKeyPromise = null;
   vaultEncryptionKey = null;
   walletPassword = null;
   account = null;
-  clearLoginSession().catch(() => { });
+  if (clearSession) clearLoginSession().catch(() => { });
+  elements.providerConfirmButton.disabled = true;
   elements.balance.textContent = "-- CKB";
   updateSignModeOptions();
   showView("unlock");
 }
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  const change = changes[LOGIN_SESSION_KEY];
+  if (areaName === "session" && change && change.newValue?.password !== change.oldValue?.password && change.newValue?.password !== walletPassword) {
+    lockWallet({ clearSession: false });
+  }
+});
 
 async function confirmWalletPassword() {
   setStatus(elements.setupPasswordStatus);
@@ -711,7 +794,7 @@ function currentShrincsSignMode() {
 
 function shrincsSignaturePlaceholderSize() {
   const mode = account?.imported ? "stateless" : currentShrincsSignMode();
-  return mode === "stateful" ? shrincsStatefulSignatureSize((account?.shrincsState?.q ?? 0) + 1) : SHRINCS_STATELESS_SIGNATURE_SIZE;
+  return mode === "stateful" ? shrincsStatefulSignatureSize(SHRINCS_MAX_STATEFUL_SIGNATURES) : SHRINCS_STATELESS_SIGNATURE_SIZE;
 }
 
 function incrementShrincsState(state) {
@@ -722,6 +805,7 @@ function incrementShrincsState(state) {
 }
 
 function addShrincsCellDep(transaction) {
+  if (config.current !== config.testnet) throw new Error(t("shrincsTestnetOnly"));
   transaction.addCellDeps(config.current.script.shrincs.cellDep);
   return transaction;
 }
@@ -803,7 +887,14 @@ async function buildShrincsTransaction(recipient, amount) {
   const placeholder = `0x${"00".repeat(shrincsSignaturePlaceholderSize())}`;
   const inputCells = [];
   let inputCapacity = 0n;
-  for await (const cell of client.findCellsByLock(sender, null, true)) {
+  for await (const cell of client.findCells({
+    script: sender,
+    scriptType: "lock",
+    scriptSearchMode: "exact",
+    filter: { scriptLenRange: [0, 1], outputDataLenRange: [0, 1] },
+    withData: true,
+  })) {
+    if (cell.cellOutput.type || cell.outputData !== "0x") continue;
     inputCells.push(cell);
     inputCapacity += BigInt(cell.cellOutput.capacity);
     transaction.addInput(cell);
@@ -879,13 +970,19 @@ async function getStoredAccounts() {
 }
 
 async function saveAccounts(accounts, activeVault) {
-  await chrome.storage.local.set({ accounts, vault: activeVault });
+  const vault = accounts.find((entry) => accountIdentifier(entry) === accountIdentifier(activeVault)) || activeVault;
+  await chrome.storage.local.set({ accounts, vault });
 }
 
 async function saveNewAccount(vault) {
-  const accounts = await getStoredAccounts();
-  const updatedAccounts = [...accounts.filter((entry) => accountIdentifier(entry) !== accountIdentifier(vault)), vault];
-  await saveAccounts(updatedAccounts, vault);
+  await navigator.locks.request("ckb-wallet-storage", async () => {
+    const accounts = await getStoredAccounts();
+    if (vault.accountType === "shrincs" && accounts.some((entry) => entry.publicKey === vault.publicKey)) {
+      throw new Error("This SHRINCS account already exists. Switch to it instead of importing it again.");
+    }
+    const updatedAccounts = [...accounts.filter((entry) => accountIdentifier(entry) !== accountIdentifier(vault)), vault];
+    await saveAccounts(updatedAccounts, vault);
+  });
 }
 
 async function updateStoredAccount(updatedVault) {
@@ -904,12 +1001,15 @@ async function encryptPrivateKey(privateKey, password, accountType, publicKey, s
 }
 
 async function persistShrincsPreparedKey(preparedKey) {
-  if (!vaultEncryptionKey) throw new Error(t("notEnoughKey"));
-  const { vault } = await chrome.storage.local.get("vault");
-  if (!vault) throw new Error(t("missingVault"));
-  const { privateKey, shrincsSecretKey } = await decryptVaultPayload(vault, vaultEncryptionKey);
-  const encrypted = await encryptVaultPayload({ privateKey, shrincsSecretKey, shrincsPreparedKey: encodeBase64(preparedKey) }, vaultEncryptionKey);
-  await updateStoredAccount({ ...vault, version: VAULT_VERSION, ...encrypted });
+  const expectedAccount = account;
+  await navigator.locks.request("ckb-wallet-storage", async () => {
+    if (!vaultEncryptionKey) throw new Error(t("notEnoughKey"));
+    const vault = await getActiveShrincsVault(expectedAccount);
+    const { privateKey, shrincsSecretKey } = await decryptVaultPayload(vault, vaultEncryptionKey);
+    const encrypted = await encryptVaultPayload({ privateKey, shrincsSecretKey, shrincsPreparedKey: encodeBase64(preparedKey) }, vaultEncryptionKey);
+    if (account !== expectedAccount) throw new Error(t("walletLocked"));
+    await updateStoredAccount({ ...vault, version: VAULT_VERSION, ...encrypted });
+  });
 }
 
 async function decryptPrivateKey(vault, password) {
@@ -924,6 +1024,14 @@ async function decryptPrivateKey(vault, password) {
 }
 
 async function changeWalletPassword() {
+  if (walletOperationInProgress) {
+    setStatus(elements.changePasswordStatus, "Wait for signing to finish before changing the password.", "error");
+    return;
+  }
+  return navigator.locks.request("ckb-wallet-storage", changeWalletPasswordUnlocked);
+}
+
+async function changeWalletPasswordUnlocked() {
   setStatus(elements.changePasswordStatus);
   elements.changePasswordButton.disabled = true;
   try {
@@ -980,23 +1088,43 @@ async function ensureShrincsPreparedKey() {
   return shrincsPreparedKeyPromise;
 }
 
-async function signShrincsMessage(message) {
-  await shrincsInitialization;
-  const messageBytes = bytes.bytify(message);
-  const secretKey = bytes.bytify(privateKeyInMemory);
+async function getActiveShrincsVault(expectedAccount) {
   const { vault } = await chrome.storage.local.get("vault");
-  if (!vault || vault.accountType !== "shrincs") throw new Error(t("missingData"));
-  const mode = currentShrincsSignMode();
-  let signature;
-  if (mode === "stateful") {
+  if (!expectedAccount || account !== expectedAccount || vault?.accountType !== "shrincs" || vault.publicKey !== expectedAccount.publicKey) {
+    throw new Error("The active account changed. Unlock the selected account and retry.");
+  }
+  return vault;
+}
+
+async function reserveShrincsState(expectedAccount) {
+  return navigator.locks.request("ckb-wallet-storage", async () => {
+    const vault = await getActiveShrincsVault(expectedAccount);
     const state = vault.shrincsState;
-    if (!state || state.mode !== "stateful" || !state.data) throw new Error(t("noState"));
+    if (vault.imported || !state || state.mode !== "stateful" || !state.data) throw new Error(t("noState"));
     const stateBytes = bytes.bytify(state.data);
     const q = stateCounter(stateBytes);
     if (q >= SHRINCS_MAX_STATEFUL_SIGNATURES) throw new Error(t("stateExhausted"));
     const reservedState = { mode: "stateful", q: q + 1, data: bytes.hexify(incrementShrincsState(stateBytes)) };
     await updateStoredAccount({ ...vault, version: VAULT_VERSION, shrincsState: reservedState });
-    account.shrincsState = reservedState;
+    expectedAccount.shrincsState = reservedState;
+    return { stateBytes, reservedState };
+  });
+}
+
+async function signShrincsMessage(message) {
+  if (config.current !== config.testnet) throw new Error(t("shrincsTestnetOnly"));
+  const signingAccount = account;
+  const signingClient = client;
+  const signingKey = privateKeyInMemory;
+  await shrincsInitialization;
+  const messageBytes = bytes.bytify(message);
+  const secretKey = bytes.bytify(signingKey);
+  await getActiveShrincsVault(signingAccount);
+  const mode = currentShrincsSignMode();
+  let signature;
+  if (mode === "stateful") {
+    const { stateBytes, reservedState } = await reserveShrincsState(signingAccount);
+    if (account !== signingAccount || client !== signingClient || privateKeyInMemory !== signingKey) throw new Error(t("walletLocked"));
     const result = signStateful(ParamsType.B, messageBytes, secretKey, stateBytes);
     const nextState = stateFromStatefulSignResult(result);
     if (stateCounter(nextState) !== reservedState.q) throw new Error(t("stateMismatch"));
@@ -1006,9 +1134,10 @@ async function signShrincsMessage(message) {
     setStatus(elements.walletStatus, t("fastSigning"), "");
     elements.signingProgress.hidden = false;
     await nextPaint();
+    if (account !== signingAccount || client !== signingClient || privateKeyInMemory !== signingKey) throw new Error(t("walletLocked"));
     signature = signStatelessWithPrepare(ParamsType.B, messageBytes, secretKey, preparedKey);
   }
-  const publicKey = bytes.bytify(account.publicKey);
+  const publicKey = bytes.bytify(signingAccount.publicKey);
   if (!verify(ParamsType.B, messageBytes, signature, publicKey)) throw new Error(t("verifyFailed"));
   return bytes.hexify(signature);
 }
@@ -1030,7 +1159,11 @@ function parseCkbAmount(value) {
 }
 
 async function buildAndSignTransfer(recipient, amount) {
+  const signingAccount = account;
+  const signingClient = client;
+  const signingKey = privateKeyInMemory;
   const recipientAddress = await ccc.Address.fromString(recipient, client);
+  assertWalletContext(signingAccount, signingClient, signingKey);
   let sealed;
   if (account.accountType === "shrincs") {
     sealed = await buildShrincsTransaction(recipientAddress, amount);
@@ -1038,13 +1171,30 @@ async function buildAndSignTransfer(recipient, amount) {
     const signer = new ccc.SignerCkbPrivateKey(client, privateKeyInMemory);
     const transaction = ccc.Transaction.from({ outputs: [{ capacity: amount, lock: recipientAddress.script }], outputsData: ["0x"] });
     await transaction.completeFeeBy(signer, FEE_RATE);
+    assertWalletContext(signingAccount, signingClient, signingKey);
     sealed = await signer.signTransaction(transaction);
   }
   return serializableCkbValue(sealed);
 }
 
-async function signProviderTransaction(transactionJson) {
+async function resolveProviderTransaction(transactionJson) {
   const transaction = ccc.Transaction.from(transactionJson);
+  for (const input of transaction.inputs) {
+    input.cellOutput = undefined;
+    input.outputData = undefined;
+    const cell = await input.getCell(client);
+    if (cell.cellOutput.type || cell.outputData !== "0x") {
+      throw new Error("Provider signing currently supports plain CKB cells only.");
+    }
+  }
+  if (transaction.outputs.some((output, index) => output.type || transaction.outputsData[index] !== "0x")) {
+    throw new Error("Provider signing currently supports plain CKB cells only.");
+  }
+  return transaction;
+}
+
+async function signProviderTransaction(transactionJson) {
+  const transaction = await resolveProviderTransaction(transactionJson);
   if (!privateKeyInMemory || !account) throw new Error(t("walletLocked"));
   if (account.accountType === "shrincs") {
     throw new Error("Full transaction signing for SHRINCS accounts is not supported by this provider yet.");
@@ -1076,7 +1226,7 @@ function addSummaryAmount(summary, address, field, amount) {
 }
 
 async function summarizeProviderTransaction(transactionJson) {
-  const transaction = ccc.Transaction.from(transactionJson);
+  const transaction = await resolveProviderTransaction(transactionJson);
   const summary = new Map();
   for (const input of transaction.inputs) {
     const cell = await input.getCell(client);
@@ -1121,8 +1271,17 @@ async function refreshBalance() {
 
 // 进入钱包视图(生成/导入后直接进入, 或解锁后进入). privateKey 为内存中用于签名的密钥.
 async function enterWallet({ accountType, privateKey, publicKey, shrincsState, imported, expectedAddress, preparedKey = null }) {
+  const lockVersion = walletLockVersion;
   const restoredAccount = await createAccount(privateKey, accountType, publicKey);
-  if (expectedAddress && restoredAccount.address !== expectedAddress) throw new Error(t("addressMismatch"));
+  if (expectedAddress) {
+    const storedClient = expectedAddress.startsWith("ckb1") ? new ccc.ClientPublicMainnet() : new ccc.ClientPublicTestnet();
+    const expectedScript = (await ccc.Address.fromString(expectedAddress, storedClient)).script;
+    const restoredScript = (await ccc.Address.fromString(restoredAccount.address, client)).script;
+    if (!sameScript(expectedScript, restoredScript)) throw new Error(t("addressMismatch"));
+  }
+  const { vault } = await chrome.storage.local.get("vault");
+  await chrome.storage.local.set({ providerAddress: restoredAccount.address, providerAddressAccount: vault?.address || null });
+  if (walletLockVersion !== lockVersion) throw new Error(t("walletLocked"));
   privateKeyInMemory = privateKey;
   shrincsPreparedKeyInMemory = preparedKey;
   shrincsPreparedKeyPromise = null;
@@ -1134,6 +1293,7 @@ async function enterWallet({ accountType, privateKey, publicKey, shrincsState, i
   elements.settingsSignMode.disabled = false;
   updateDeleteAccountButton(true);
   const confirmingProviderRequest = Boolean(providerRequestId && providerRequest);
+  if (confirmingProviderRequest) elements.providerConfirmButton.disabled = !providerSummaryContext || providerSummaryContext.client !== client;
   showView(confirmingProviderRequest ? "provider-confirm" : "wallet");
   const balanceRefresh = refreshBalance();
   if (confirmingProviderRequest) balanceRefresh.catch(() => { });
@@ -1145,6 +1305,7 @@ async function saveWallet() {
   elements.saveWalletButton.disabled = true;
   try {
     const accountType = elements.importAccountType.value;
+    if (accountType === "shrincs" && config.current !== config.testnet) throw new Error(t("shrincsTestnetOnly"));
     if (!walletPassword) throw new Error(t("passwordShort"));
     const password = walletPassword;
     let privateKey = elements.privateKey.value;
@@ -1183,6 +1344,7 @@ async function generateWallet() {
   elements.generateButton.disabled = true;
   try {
     const accountType = elements.setupAccountType.value;
+    if (accountType === "shrincs" && config.current !== config.testnet) throw new Error(t("shrincsTestnetOnly"));
     if (!walletPassword) throw new Error(t("passwordShort"));
     const password = walletPassword;
     let privateKey;
@@ -1217,6 +1379,7 @@ async function generateWallet() {
 }
 
 async function unlockWallet(password = elements.unlockPassword.value, silent = false) {
+  const lockVersion = walletLockVersion;
   setStatus(elements.unlockStatus);
   elements.unlockButton.disabled = true;
   try {
@@ -1224,8 +1387,10 @@ async function unlockWallet(password = elements.unlockPassword.value, silent = f
     if (!vault && !walletCredential) throw new Error(t("missingVault"));
     if (!vault) {
       await verifyWalletCredential(walletCredential, password);
+      if (walletLockVersion !== lockVersion) throw new Error(t("walletLocked"));
       walletPassword = password;
       await saveLoginSession(password);
+      if (walletLockVersion !== lockVersion) throw new Error(t("walletLocked"));
       elements.unlockPassword.value = "";
       showView("setup");
       return true;
@@ -1233,8 +1398,10 @@ async function unlockWallet(password = elements.unlockPassword.value, silent = f
     const accountType = vault.accountType || DEFAULT_ACCOUNT_TYPE;
     if (!silent) setStatus(elements.unlockStatus, t("verifyingPassword"));
     const { privateKey: seed, shrincsSecretKey, shrincsPreparedKey: preparedKey, encryptionKey } = await decryptPrivateKey(vault, password);
+    if (walletLockVersion !== lockVersion) throw new Error(t("walletLocked"));
     walletPassword = password;
     await saveLoginSession(password);
+    if (walletLockVersion !== lockVersion) throw new Error(t("walletLocked"));
     vaultEncryptionKey = encryptionKey;
     let privateKey = seed;
     if (accountType === "shrincs") {
@@ -1251,8 +1418,20 @@ async function unlockWallet(password = elements.unlockPassword.value, silent = f
   finally { elements.unlockButton.disabled = false; }
 }
 
+function assertWalletContext(expectedAccount, expectedClient, expectedKey) {
+  if (!expectedAccount || account !== expectedAccount || client !== expectedClient || !expectedKey || privateKeyInMemory !== expectedKey) {
+    throw new Error("The wallet was locked or its account/network changed. Please retry.");
+  }
+}
+
 async function sendTransfer(event) {
   event.preventDefault();
+  if (walletOperationInProgress) return;
+  const signingAccount = account;
+  const signingClient = client;
+  const signingKey = privateKeyInMemory;
+  const signingAddress = account?.address;
+  walletOperationInProgress = true;
   elements.sendButton.disabled = true;
   setStatus(elements.walletStatus, t("buildingTransaction"));
   let transactionSigned = false;
@@ -1261,10 +1440,12 @@ async function sendTransfer(event) {
     if (!recipient.startsWith(`${config.current.hrp}1`)) throw new Error(t("invalidAddress"));
     const amount = parseCkbAmount(elements.amount.value);
     const sealed = await buildAndSignTransfer(recipient, amount);
+    assertWalletContext(signingAccount, signingClient, signingKey);
     transactionSigned = true;
     setStatus(elements.walletStatus, t("broadcasting"));
-    const transactionHash = await client.sendTransaction(sealed);
-    await recordTransaction(transactionHash, amount);
+    const transactionHash = await signingClient.sendTransaction(sealed);
+    await recordTransaction(transactionHash, amount, signingAddress);
+    assertWalletContext(signingAccount, signingClient, signingKey);
     elements.amount.value = "";
     await refreshBalance();
     showTransactionLink(transactionHash);
@@ -1274,6 +1455,7 @@ async function sendTransfer(event) {
       : t("transferError", { error: error.message });
     setStatus(elements.walletStatus, prefix, "error");
   } finally {
+    walletOperationInProgress = false;
     elements.signingProgress.hidden = true;
     elements.sendButton.disabled = false;
   }
@@ -1289,9 +1471,12 @@ async function loadProviderRequest() {
   if (!request || typeof request !== "object" || Array.isArray(request)) throw new Error("A JSON transaction is required.");
   elements.providerRequestOrigin.textContent = providerRequest.origin || "Unknown website";
   elements.providerRequestSummary.textContent = "Loading transaction details…";
-  elements.providerConfirmButton.disabled = false;
+  providerSummaryContext = null;
+  const summaryClient = client;
+  elements.providerConfirmButton.disabled = true;
   elements.providerRejectButton.disabled = false;
   summarizeProviderTransaction(request).then((summary) => {
+    if (client !== summaryClient) throw new Error("The network changed while loading transaction details.");
     elements.providerRequestSummary.replaceChildren(...summary.map(({ address, netChange }) => {
       const row = document.createElement("div");
       row.className = "request-summary-row";
@@ -1305,27 +1490,42 @@ async function loadProviderRequest() {
       row.append(addressElement, netChangeElement);
       return row;
     }));
+    providerSummaryContext = { client: summaryClient, transactionHash: ccc.Transaction.from(request).hash() };
+    elements.providerConfirmButton.disabled = !account || !privateKeyInMemory;
   }).catch((error) => {
+    providerSummaryContext = null;
+    elements.providerConfirmButton.disabled = true;
     elements.providerRequestSummary.textContent = `Unable to load transaction details: ${error.message}`;
   });
   return true;
 }
 
 async function completeProviderRequest() {
+  if (walletOperationInProgress) return;
+  walletOperationInProgress = true;
+  const signingAccount = account;
+  const signingClient = client;
+  const signingKey = privateKeyInMemory;
   elements.providerConfirmButton.disabled = true;
   elements.providerRejectButton.disabled = true;
   setStatus(elements.providerConfirmStatus, t("buildingTransaction"));
   try {
     if (!account || !privateKeyInMemory) throw new Error(t("walletLocked"));
     const request = providerRequest.params?.[0];
+    if (!providerSummaryContext || providerSummaryContext.client !== client || providerSummaryContext.transactionHash !== ccc.Transaction.from(request).hash()) {
+      throw new Error("Transaction details must load successfully before signing.");
+    }
     const sealed = await signProviderTransaction(request);
+    assertWalletContext(signingAccount, signingClient, signingKey);
     const response = await chrome.runtime.sendMessage({ type: "provider-confirmation", requestId: providerRequestId, approved: true, result: sealed });
     if (response?.error) throw new Error(response.error.message);
     window.close();
   } catch (error) {
     setStatus(elements.providerConfirmStatus, t("providerRequestError", { error: error.message }), "error");
-    elements.providerConfirmButton.disabled = false;
+    elements.providerConfirmButton.disabled = !providerSummaryContext || providerSummaryContext.client !== client;
     elements.providerRejectButton.disabled = false;
+  } finally {
+    walletOperationInProgress = false;
   }
 }
 
@@ -1373,6 +1573,10 @@ async function exportWallet() {
 }
 
 function updateSetupAccountType() {
+  const supportsShrincs = config.current === config.testnet;
+  elements.setupAccountType.querySelector('option[value="shrincs"]').disabled = !supportsShrincs;
+  elements.importAccountType.querySelector('option[value="shrincs"]').disabled = !supportsShrincs;
+  if (!supportsShrincs && elements.setupAccountType.value === "shrincs") elements.setupAccountType.value = "secp256k1";
   const isShrincs = elements.setupAccountType.value === "shrincs";
   elements.privateKeyLabel.textContent = isShrincs ? t("shrincsMasterSeedLabel") : t("privateKeyLabel");
   elements.importAccountType.value = elements.setupAccountType.value;
@@ -1390,7 +1594,7 @@ function renderTransactionHistory(records) {
     hash.textContent = record.hash;
     const explorerLink = document.createElement("a");
     explorerLink.className = "tx-link";
-    explorerLink.href = `https://pudge.explorer.nervos.org/transaction/${encodeURIComponent(record.hash)}`;
+    explorerLink.href = `https://${config.current === config.mainnet ? "explorer" : "pudge.explorer"}.nervos.org/transaction/${encodeURIComponent(record.hash)}`;
     explorerLink.target = "_blank";
     explorerLink.rel = "noreferrer";
     explorerLink.textContent = "↗";
@@ -1431,12 +1635,12 @@ async function loadTransactionHistory() {
   renderTransactionHistory(records);
 }
 
-async function recordTransaction(transactionHash, amount) {
+async function recordTransaction(transactionHash, amount, address = account.address) {
   const { transactionHistory = {} } = await chrome.storage.local.get("transactionHistory");
-  const records = transactionHistory[account.address] || [];
-  transactionHistory[account.address] = [{ hash: transactionHash, amount: formatCkb(amount), time: Date.now(), status: "pending" }, ...records].slice(0, 30);
+  const records = transactionHistory[address] || [];
+  transactionHistory[address] = [{ hash: transactionHash, amount: formatCkb(amount), time: Date.now(), status: "pending" }, ...records].slice(0, 30);
   await chrome.storage.local.set({ transactionHistory });
-  renderTransactionHistory(transactionHistory[account.address]);
+  if (account?.address === address) renderTransactionHistory(transactionHistory[address]);
 }
 
 function showWalletPanel(panel) {
@@ -1451,9 +1655,14 @@ function showWalletPanel(panel) {
 }
 
 async function persistShrincsSignMode(mode) {
-  const { vault } = await chrome.storage.local.get("vault");
-  if (!vault || !account?.shrincsState) throw new Error(t("missingData"));
-  await updateStoredAccount({ ...vault, version: VAULT_VERSION, shrincsState: { ...account.shrincsState, mode } });
+  const expectedAccount = account;
+  await navigator.locks.request("ckb-wallet-storage", async () => {
+    const vault = await getActiveShrincsVault(expectedAccount);
+    if (!vault.shrincsState || (vault.imported && mode !== "stateless")) throw new Error(t("missingData"));
+    const shrincsState = { ...vault.shrincsState, mode };
+    await updateStoredAccount({ ...vault, version: VAULT_VERSION, shrincsState });
+    expectedAccount.shrincsState = shrincsState;
+  });
 }
 
 async function openAccountSwitcher() {
@@ -1463,23 +1672,35 @@ async function openAccountSwitcher() {
   if (accounts.length < 2) {
     setStatus(elements.accountListStatus, t("accountListEmpty"));
   }
-  accounts.forEach((storedAccount) => {
+  for (const storedAccount of accounts) {
+    const storedClient = storedAccount.address?.startsWith("ckb1") ? new ccc.ClientPublicMainnet() : new ccc.ClientPublicTestnet();
+    const displayAddress = storedAccount.address
+      ? ccc.Address.fromScript((await ccc.Address.fromString(storedAccount.address, storedClient)).script, client).toString()
+      : storedAccount.publicKey;
     const button = document.createElement("button");
     button.className = "choice";
     button.type = "button";
-    button.disabled = accountIdentifier(storedAccount) === accountIdentifier({ address: account?.address, publicKey: account?.publicKey });
+    button.disabled = displayAddress === account?.address || (config.current !== config.testnet && storedAccount.accountType === "shrincs");
     const title = document.createElement("strong");
     title.textContent = storedAccount.accountType || DEFAULT_ACCOUNT_TYPE;
     const address = document.createElement("span");
-    address.textContent = storedAccount.address || storedAccount.publicKey;
+    address.textContent = displayAddress;
     button.append(title, address);
     button.addEventListener("click", () => switchAccount(storedAccount));
     elements.accountList.append(button);
-  });
+  }
   showView("switch-account");
 }
 
 async function switchAccount(storedAccount) {
+  if (walletOperationInProgress) {
+    setStatus(elements.accountListStatus, "Wait for signing to finish before switching accounts.", "error");
+    return;
+  }
+  return navigator.locks.request("ckb-wallet-storage", () => switchAccountUnlocked(storedAccount));
+}
+
+async function switchAccountUnlocked(storedAccount) {
   setStatus(elements.accountListStatus, t("verifyingPassword"));
   elements.accountList.querySelectorAll("button").forEach((button) => { button.disabled = true; });
   try {
@@ -1523,7 +1744,7 @@ elements.exportButton.addEventListener("click", () => exportWallet().catch((erro
 elements.settingsButton.addEventListener("click", openSettings);
 elements.settingsBackButton.addEventListener("click", () => showView(viewBeforeSettings));
 elements.networkSettingsButton.addEventListener("click", () => {
-  elements.networkSelect.value = config.current === config.develop ? "devnet" : "testnet";
+  elements.networkSelect.value = config.current === config.mainnet ? "mainnet" : config.current === config.develop ? "devnet" : "testnet";
   if (!elements.devnetRpcUrl.value) elements.devnetRpcUrl.value = config.develop.rpc;
   updateNetworkForm();
   setStatus(elements.networkStatus);
@@ -1552,6 +1773,10 @@ elements.switchAccountButton.addEventListener("click", () => openAccountSwitcher
 elements.switchAccountBackButton.addEventListener("click", () => showView("wallet"));
 elements.settingsSignMode.addEventListener("change", () => {
   if (account?.accountType !== "shrincs") return;
+  if (walletOperationInProgress) {
+    elements.settingsSignMode.value = account.shrincsState.mode;
+    return;
+  }
   if (account.imported) {
     elements.settingsSignMode.value = "stateless";
     account.shrincsState.mode = "stateless";
@@ -1571,14 +1796,15 @@ elements.languageSelect.addEventListener("change", async () => {
   applyTranslations();
 });
 elements.resetConfirmButton.addEventListener("click", async () => {
-  const { vault } = await chrome.storage.local.get("vault");
-  const accounts = await getStoredAccounts();
-  const remainingAccounts = accounts.filter((entry) => accountIdentifier(entry) !== accountIdentifier(vault || {}));
-  if (remainingAccounts.length > 0) {
-    await saveAccounts(remainingAccounts, remainingAccounts[0]);
-  } else {
-    await chrome.storage.local.remove(["vault", "accounts"]);
-  }
+  if (walletOperationInProgress) return;
+  const remainingAccounts = await navigator.locks.request("ckb-wallet-storage", async () => {
+    const { vault } = await chrome.storage.local.get("vault");
+    const accounts = await getStoredAccounts();
+    const remaining = accounts.filter((entry) => accountIdentifier(entry) !== accountIdentifier(vault || {}));
+    if (remaining.length > 0) await saveAccounts(remaining, remaining[0]);
+    else await chrome.storage.local.remove(["vault", "accounts"]);
+    return remaining;
+  });
   const preservedPassword = walletPassword;
   lockWallet();
   walletPassword = preservedPassword;

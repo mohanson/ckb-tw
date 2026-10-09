@@ -49,6 +49,8 @@ Currently supported methods:
 | `ckb_signTransaction` | Request signing of a complete transaction | `[Transaction]` | `Transaction` |
 
 - `Transaction` is a JSON object that uses the CKB/CCC camelCase field names.
+- Signing currently supports plain CKB cells only: inputs and outputs must have no type script and empty cell data.
+- The wallet resolves input cells itself; request-supplied input `cellOutput` and `outputData` are not trusted. Confirmation is enabled only after transaction details load successfully.
 
 ## Error
 
