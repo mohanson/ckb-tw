@@ -1182,13 +1182,7 @@ async function resolveProviderTransaction(transactionJson) {
   for (const input of transaction.inputs) {
     input.cellOutput = undefined;
     input.outputData = undefined;
-    const cell = await input.getCell(client);
-    if (cell.cellOutput.type || cell.outputData !== "0x") {
-      throw new Error("Provider signing currently supports plain CKB cells only.");
-    }
-  }
-  if (transaction.outputs.some((output, index) => output.type || transaction.outputsData[index] !== "0x")) {
-    throw new Error("Provider signing currently supports plain CKB cells only.");
+    await input.getCell(client);
   }
   return transaction;
 }
