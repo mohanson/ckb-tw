@@ -317,6 +317,72 @@ translations["zh-CN"].balanceUpdated = "余额已更新.";
 translations["en-US"].balanceUpdated = "Balance updated.";
 translations["zh-CN"].balanceError = "无法查询余额: {error}";
 translations["en-US"].balanceError = "Unable to query balance: {error}";
+translations["zh-CN"].daoTab = "Nervos DAO";
+translations["en-US"].daoTab = "Nervos DAO";
+translations["zh-CN"].daoTitle = "Nervos DAO";
+translations["en-US"].daoTitle = "Nervos DAO";
+translations["zh-CN"].daoHint = "存款可获得二级发行收益。取款需先预取款，再等待 180 个 epoch 的锁定期。";
+translations["en-US"].daoHint = "Deposits earn secondary issuance. Withdrawal requires a preparation transaction and a 180-epoch lock period.";
+translations["zh-CN"].daoBalanceLabel = "DAO 容量";
+translations["en-US"].daoBalanceLabel = "DAO capacity";
+translations["zh-CN"].daoDepositTitle = "存入 DAO";
+translations["en-US"].daoDepositTitle = "Deposit into DAO";
+translations["zh-CN"].daoAmountLabel = "金额 (CKB)";
+translations["en-US"].daoAmountLabel = "Amount (CKB)";
+translations["zh-CN"].daoAmountPlaceholder = "至少满足 cell 占用容量";
+translations["en-US"].daoAmountPlaceholder = "At least the occupied capacity";
+translations["zh-CN"].daoDepositButton = "存款";
+translations["en-US"].daoDepositButton = "Deposit";
+translations["zh-CN"].daoCellsTitle = "DAO cells";
+translations["en-US"].daoCellsTitle = "DAO cells";
+translations["zh-CN"].daoRefreshButton = "刷新";
+translations["en-US"].daoRefreshButton = "Refresh";
+translations["zh-CN"].daoEmpty = "当前钱包没有 DAO cell。";
+translations["en-US"].daoEmpty = "This wallet has no DAO cells.";
+translations["zh-CN"].daoDepositCell = "存款中";
+translations["en-US"].daoDepositCell = "Deposited";
+translations["zh-CN"].daoWithdrawingCell = "预取款中";
+translations["en-US"].daoWithdrawingCell = "Withdrawing";
+translations["zh-CN"].daoCountdown = "约 {days} 天 {hours} 小时后可取款";
+translations["en-US"].daoCountdown = "Estimated {days}d {hours}h until withdrawal";
+translations["zh-CN"].daoCountdownReady = "已到可取款时间";
+translations["en-US"].daoCountdownReady = "Withdrawal is available";
+translations["zh-CN"].daoCountdownWaiting = "预计时间已到，等待链上 epoch 确认";
+translations["en-US"].daoCountdownWaiting = "Estimated time reached; waiting for the on-chain epoch";
+translations["zh-CN"].daoCountdownPending = "等待预取款交易确认后计算倒计时";
+translations["en-US"].daoCountdownPending = "Countdown starts when the preparation transaction is confirmed";
+translations["zh-CN"].daoCountdownLoading = "正在计算可取款时间...";
+translations["en-US"].daoCountdownLoading = "Calculating withdrawal time...";
+translations["zh-CN"].daoCountdownError = "暂时无法计算倒计时，请刷新重试";
+translations["en-US"].daoCountdownError = "Countdown unavailable; refresh to retry";
+translations["zh-CN"].daoTipRefreshError = "无法更新链上 epoch: {error}";
+translations["en-US"].daoTipRefreshError = "Unable to refresh the on-chain epoch: {error}";
+translations["zh-CN"].daoPrepareButton = "预取款";
+translations["en-US"].daoPrepareButton = "Prepare withdrawal";
+translations["zh-CN"].daoWithdrawButton = "取款";
+translations["en-US"].daoWithdrawButton = "Withdraw";
+translations["zh-CN"].daoLoading = "正在查询 DAO cells...";
+translations["en-US"].daoLoading = "Querying DAO cells...";
+translations["zh-CN"].daoLoadError = "无法查询 DAO cells: {error}";
+translations["en-US"].daoLoadError = "Unable to query DAO cells: {error}";
+translations["zh-CN"].daoDepositMinimum = "存款金额必须至少为 {capacity} CKB，以满足该 cell 的占用容量。";
+translations["en-US"].daoDepositMinimum = "Deposit must be at least {capacity} CKB to cover this cell's occupied capacity.";
+translations["zh-CN"].daoNotReady = "尚未达到可取款 epoch {epoch}。";
+translations["en-US"].daoNotReady = "Withdrawal is not available until epoch {epoch}.";
+translations["zh-CN"].daoInvalidCell = "所选 cell 不是有效的 DAO 存款或预取款 cell。";
+translations["en-US"].daoInvalidCell = "The selected cell is not a valid DAO deposit or withdrawal cell.";
+translations["zh-CN"].daoCellSpent = "此 DAO cell 已被花费，请刷新列表。";
+translations["en-US"].daoCellSpent = "This DAO cell has already been spent. Refresh the list.";
+translations["zh-CN"].daoActionError = "DAO 操作失败: {error}";
+translations["en-US"].daoActionError = "DAO operation failed: {error}";
+translations["zh-CN"].daoBroadcasting = "正在广播 DAO 交易...";
+translations["en-US"].daoBroadcasting = "Broadcasting DAO transaction...";
+translations["zh-CN"].daoDepositSuccess = "DAO 存款交易已广播. 交易哈希: ";
+translations["en-US"].daoDepositSuccess = "DAO deposit broadcast. Transaction hash:";
+translations["zh-CN"].daoPrepareSuccess = "DAO 预取款交易已广播. 交易哈希: ";
+translations["en-US"].daoPrepareSuccess = "DAO withdrawal preparation broadcast. Transaction hash:";
+translations["zh-CN"].daoWithdrawSuccess = "DAO 取款交易已广播. 交易哈希: ";
+translations["en-US"].daoWithdrawSuccess = "DAO withdrawal broadcast. Transaction hash:";
 translations["zh-CN"].copySuccess = "地址已复制.";
 translations["en-US"].copySuccess = "Address copied.";
 translations["zh-CN"].copyError = "无法复制地址.";
@@ -495,7 +561,7 @@ const elements = {
   unlockPassword: document.querySelector("#unlock-password"), unlockStatus: document.querySelector("#unlock-status"), changePasswordCurrent: document.querySelector("#change-password-current"), changePasswordNew: document.querySelector("#change-password-new"), changePasswordStatus: document.querySelector("#change-password-status"), walletStatus: document.querySelector("#wallet-status"),
   address: document.querySelector("#address"), accountType: document.querySelector("#account-type"), balance: document.querySelector("#balance"), recipient: document.querySelector("#recipient"), amount: document.querySelector("#amount"), signingProgress: document.querySelector("#signing-progress"), providerConfirmView: document.querySelector("#provider-confirm-view"), providerRequestOrigin: document.querySelector("#provider-request-origin"), providerRequestSummary: document.querySelector("#provider-request-summary"), providerConfirmButton: document.querySelector("#provider-confirm-button"), providerRejectButton: document.querySelector("#provider-reject-button"), providerConfirmStatus: document.querySelector("#provider-confirm-status"),
   generateButton: document.querySelector("#generate-button"), saveWalletButton: document.querySelector("#save-wallet-button"), unlockButton: document.querySelector("#unlock-button"), resetConfirmButton: document.querySelector("#reset-confirm-button"), resetCancelButton: document.querySelector("#reset-cancel-button"), changePasswordButton: document.querySelector("#change-password-button"), changePasswordCancelButton: document.querySelector("#change-password-cancel-button"),
-  copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"),
+  copyAddressButton: document.querySelector("#copy-address-button"), refreshButton: document.querySelector("#refresh-button"), transferForm: document.querySelector("#transfer-form"), sendButton: document.querySelector("#send-button"), daoTab: document.querySelector("#dao-tab"), daoPanel: document.querySelector("#dao-panel"), daoRefreshButton: document.querySelector("#dao-refresh-button"), daoDepositForm: document.querySelector("#dao-deposit-form"), daoAmount: document.querySelector("#dao-amount"), daoDepositButton: document.querySelector("#dao-deposit-button"), daoCells: document.querySelector("#dao-cells"), daoBalance: document.querySelector("#dao-balance"), daoListStatus: document.querySelector("#dao-list-status"), daoStatus: document.querySelector("#dao-status"),
   newAccountButton: document.querySelector("#new-account-button"), showImportButton: document.querySelector("#show-import-button"), welcomeStartButton: document.querySelector("#welcome-start-button"), setPasswordBackButton: document.querySelector("#set-password-back-button"), setPasswordButton: document.querySelector("#set-password-button"), createBackButton: document.querySelector("#create-back-button"), importBackButton: document.querySelector("#import-back-button"),
   settingsButton: document.querySelector("#settings-button"), languageSelect: document.querySelector("#language-select"), settingsSignMode: document.querySelector("#settings-sign-mode"), signModeHelp: document.querySelector("#sign-mode-help"), importSigningHint: document.querySelector("#import-signing-hint"), settingsBackButton: document.querySelector("#settings-back-button"), exportButton: document.querySelector("#export-settings-button"), settingsLockButton: document.querySelector("#settings-lock-button"), settingsCreateAccountButton: document.querySelector("#settings-create-account-button"), settingsChangePasswordButton: document.querySelector("#settings-change-password-button"), deleteAccountButton: document.querySelector("#delete-account-button"), switchAccountButton: document.querySelector("#switch-account-button"), switchAccountBackButton: document.querySelector("#switch-account-back-button"), accountList: document.querySelector("#account-list"), accountListStatus: document.querySelector("#account-list-status"), sendTab: document.querySelector("#send-tab"), historyTab: document.querySelector("#history-tab"), historyPanel: document.querySelector("#history-panel"), historyList: document.querySelector("#transaction-history"), historyEmpty: document.querySelector("#history-empty"),
 };
@@ -514,6 +580,12 @@ let providerRequest = null;
 let providerSummaryContext = null;
 let walletOperationInProgress = false;
 let walletLockVersion = 0;
+let daoCells = [];
+let daoCountdowns = new Map();
+let daoTipHeader = null;
+let daoTipFetchedAt = 0;
+let daoCountdownTimer = null;
+let daoLoadInProgress = false;
 const shrincsInitialization = initShrincs().then(() => initThreadPool(Math.min(navigator.hardwareConcurrency || 1, 8)));
 const bytes = {
   bytify: (value) => new Uint8Array(ccc.bytesFrom(value)),
@@ -1149,12 +1221,12 @@ function serializableCkbValue(value) {
   return value;
 }
 
-function parseCkbAmount(value) {
+function parseCkbAmount(value, minimum = MIN_TRANSFER_CKB * SHANNONS_PER_CKB) {
   const match = value.trim().match(/^(\d+)(?:\.(\d{1,8}))?$/);
   if (!match) throw new Error(t("invalidAmount"));
   const fraction = (match[2] || "").padEnd(8, "0");
   const amount = BigInt(match[1]) * SHANNONS_PER_CKB + BigInt(fraction);
-  if (amount < MIN_TRANSFER_CKB * SHANNONS_PER_CKB) throw new Error(t("amountTooSmall"));
+  if (amount < minimum) throw new Error(t("amountTooSmall"));
   return amount;
 }
 
@@ -1261,6 +1333,508 @@ async function refreshBalance() {
   } catch (error) {
     setStatus(elements.walletStatus, t("balanceError", { error: error.message }), "error");
   } finally { elements.refreshButton.disabled = false; }
+}
+
+const DAO_ZERO_DATA = `0x${"00".repeat(8)}`;
+const DAO_FEE_CELL_FILTER = { scriptLenRange: [0, 1], outputDataLenRange: [0, 1] };
+
+function currentDaoScript() {
+  return ccc.Script.from({
+    codeHash: config.current.script.dao.codeHash,
+    hashType: config.current.script.dao.hashType,
+    args: "0x",
+  });
+}
+
+function uint64LeHex(value) {
+  const number = BigInt(value);
+  if (number < 0n || number > 0xffffffffffffffffn) throw new Error("Value is outside the uint64 range.");
+  return bytes.hexify(Uint8Array.from({ length: 8 }, (_, index) => Number((number >> BigInt(index * 8)) & 0xffn)));
+}
+
+function daoCellIsWithdrawal(cell) {
+  return cell.outputData.toLowerCase() !== DAO_ZERO_DATA;
+}
+
+function daoCellKey(cell) {
+  return `${cell.outPoint.txHash}:${cell.outPoint.index}`;
+}
+
+function readUint64Le(value) {
+  const data = bytes.bytify(value);
+  if (data.length !== 8) throw new Error("DAO cell data must contain an 8-byte block number.");
+  let number = 0n;
+  for (let index = data.length - 1; index >= 0; index -= 1) number = (number << 8n) | BigInt(data[index]);
+  return number;
+}
+
+function updateDaoCountdowns() {
+  const countdownElements = elements.daoCells.querySelectorAll("[data-dao-countdown-key]");
+  for (const countdown of countdownElements) {
+    const entry = daoCountdowns.get(countdown.dataset.daoCountdownKey);
+    countdown.title = entry?.error || "";
+    if (!entry || entry.status === "loading") {
+      countdown.textContent = t("daoCountdownLoading");
+    } else if (entry.status === "pending") {
+      countdown.textContent = t("daoCountdownPending");
+    } else if (entry.status === "error") {
+      countdown.textContent = t("daoCountdownError");
+    } else if (daoTipHeader?.epoch.ge(entry.claimEpoch)) {
+      countdown.textContent = t("daoCountdownReady");
+    } else {
+      const remainingMs = entry.claimTime - BigInt(Date.now());
+      if (remainingMs <= 0n) {
+        countdown.textContent = t("daoCountdownWaiting");
+      } else {
+        const remainingHours = Number((remainingMs + 3_600_000n - 1n) / 3_600_000n);
+        const days = Math.floor(remainingHours / 24);
+        const hours = remainingHours % 24;
+        countdown.textContent = t("daoCountdown", { days, hours });
+      }
+    }
+  }
+}
+
+async function refreshDaoTipHeader() {
+  const expectedClient = client;
+  try {
+    const tipHeader = await expectedClient.getTipHeader();
+    if (client !== expectedClient) return;
+    daoTipHeader = tipHeader;
+    daoTipFetchedAt = Date.now();
+    updateDaoCountdowns();
+    setStatus(elements.daoListStatus);
+  } catch (error) {
+    setStatus(elements.daoListStatus, t("daoTipRefreshError", { error: error.message }), "error");
+  }
+}
+
+function renderDaoCells() {
+  elements.daoCells.replaceChildren();
+  let totalCapacity = 0n;
+  daoCells.forEach((cell, index) => {
+    totalCapacity += BigInt(cell.cellOutput.capacity);
+    const isWithdrawal = daoCellIsWithdrawal(cell);
+    const item = document.createElement("article");
+    item.className = "dao-cell";
+    const row = document.createElement("div");
+    row.className = "row";
+    const state = document.createElement("strong");
+    state.textContent = t(isWithdrawal ? "daoWithdrawingCell" : "daoDepositCell");
+    const capacity = document.createElement("strong");
+    capacity.textContent = `${formatCkb(BigInt(cell.cellOutput.capacity))} CKB`;
+    row.append(state, capacity);
+    const outPoint = document.createElement("p");
+    outPoint.className = "dao-cell-meta";
+    outPoint.textContent = `${cell.outPoint.txHash}:${cell.outPoint.index}`;
+    if (isWithdrawal) {
+      const countdown = document.createElement("p");
+      countdown.className = "dao-cell-countdown";
+      countdown.dataset.daoCountdownKey = daoCellKey(cell);
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.append(countdown);
+      const action = document.createElement("button");
+      action.type = "button";
+      action.className = "secondary";
+      action.dataset.daoAction = "withdraw";
+      action.dataset.daoIndex = String(index);
+      action.disabled = walletOperationInProgress;
+      action.textContent = t("daoWithdrawButton");
+      actions.append(action);
+      item.append(row, outPoint, actions);
+      elements.daoCells.append(item);
+      return;
+    }
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const action = document.createElement("button");
+    action.type = "button";
+    action.className = "secondary";
+    action.dataset.daoAction = "prepare";
+    action.dataset.daoIndex = String(index);
+    action.disabled = walletOperationInProgress;
+    action.textContent = t("daoPrepareButton");
+    actions.append(action);
+    item.append(row, outPoint, actions);
+    elements.daoCells.append(item);
+  });
+  elements.daoBalance.innerHTML = `${formatCkb(totalCapacity)} <small>CKB</small>`;
+  if (daoCells.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty-state";
+    empty.textContent = t("daoEmpty");
+    elements.daoCells.append(empty);
+  }
+  updateDaoCountdowns();
+}
+
+async function mapWithConcurrency(values, concurrency, mapper) {
+  const results = new Array(values.length);
+  let nextIndex = 0;
+  await Promise.all(Array.from({ length: Math.min(concurrency, values.length) }, async () => {
+    while (nextIndex < values.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await mapper(values[index]);
+    }
+  }));
+  return results;
+}
+
+async function loadDaoCountdowns(cells, expectedClient) {
+  const withdrawals = cells.filter(daoCellIsWithdrawal);
+  daoCountdowns = new Map(withdrawals.map((cell) => [daoCellKey(cell), { status: "loading" }]));
+  if (withdrawals.length === 0) {
+    daoTipHeader = null;
+    daoTipFetchedAt = 0;
+    return;
+  }
+
+  const depositNumbers = new Map();
+  const transactionHashes = new Set();
+  for (const cell of withdrawals) {
+    try {
+      depositNumbers.set(daoCellKey(cell), readUint64Le(cell.outputData).toString());
+      transactionHashes.add(cell.outPoint.txHash);
+    } catch (error) {
+      daoCountdowns.set(daoCellKey(cell), { status: "error", error: error.message });
+    }
+  }
+  if (transactionHashes.size === 0) {
+    daoTipHeader = null;
+    daoTipFetchedAt = 0;
+    return;
+  }
+
+  const transactionResults = new Map();
+  await mapWithConcurrency([...transactionHashes], 6, async (transactionHash) => {
+    try {
+      transactionResults.set(transactionHash, { value: await expectedClient.getTransactionWithHeader(transactionHash) });
+    } catch (error) {
+      transactionResults.set(transactionHash, { error: error.message });
+    }
+  });
+
+  const depositBlockNumbers = [...new Set(depositNumbers.values())];
+  const depositHeaders = new Map();
+  await mapWithConcurrency(depositBlockNumbers, 6, async (number) => {
+    try {
+      const header = await expectedClient.getHeaderByNumber(BigInt(number));
+      depositHeaders.set(number, header ? { value: header } : { error: "Deposit block header was not found." });
+    } catch (error) {
+      depositHeaders.set(number, { error: error.message });
+    }
+  });
+
+  try {
+    daoTipHeader = await expectedClient.getTipHeader();
+    daoTipFetchedAt = Date.now();
+  } catch (error) {
+    daoTipHeader = null;
+    daoTipFetchedAt = 0;
+    for (const cell of withdrawals) {
+      daoCountdowns.set(daoCellKey(cell), { status: "error", error: error.message });
+    }
+    return;
+  }
+
+  for (const cell of withdrawals) {
+    const key = daoCellKey(cell);
+    const depositNumber = depositNumbers.get(key);
+    if (depositNumber === undefined) continue;
+    const transactionResult = transactionResults.get(cell.outPoint.txHash);
+    if (transactionResult?.error) {
+      daoCountdowns.set(key, { status: "error", error: transactionResult.error });
+      continue;
+    }
+    const transactionInfo = transactionResult?.value;
+    if (!transactionInfo || transactionInfo.transaction.status !== "committed") {
+      daoCountdowns.set(key, { status: "pending" });
+      continue;
+    }
+    if (!transactionInfo.header) {
+      daoCountdowns.set(key, { status: "error", error: "Withdrawal preparation block header is unavailable." });
+      continue;
+    }
+    const depositHeader = depositHeaders.get(depositNumber);
+    if (!depositHeader?.value) {
+      daoCountdowns.set(key, { status: "error", error: depositHeader?.error || "Deposit block header is unavailable." });
+      continue;
+    }
+    try {
+      const claimEpoch = ccc.calcDaoClaimEpoch(depositHeader.value, transactionInfo.header);
+      daoCountdowns.set(key, {
+        status: "ready",
+        claimEpoch,
+        claimTime: claimEpoch.toUnix(daoTipHeader),
+      });
+    } catch (error) {
+      daoCountdowns.set(key, { status: "error", error: error.message });
+    }
+  }
+}
+
+async function loadDaoCells() {
+  const expectedAccount = account;
+  const expectedClient = client;
+  if (!expectedAccount || !privateKeyInMemory || daoLoadInProgress) return;
+  daoLoadInProgress = true;
+  elements.daoRefreshButton.disabled = true;
+  setStatus(elements.daoListStatus, t("daoLoading"));
+  try {
+    const { script: ownerLock } = await ccc.Address.fromString(expectedAccount.address, expectedClient);
+    const cells = [];
+    const daoScript = currentDaoScript();
+    for await (const cell of expectedClient.findCells({
+      script: ownerLock,
+      scriptType: "lock",
+      scriptSearchMode: "exact",
+      filter: { script: daoScript, outputDataLenRange: [8, 9] },
+      withData: true,
+    }, "desc", 50)) {
+      cells.push(cell);
+    }
+    if (account !== expectedAccount || client !== expectedClient) return;
+    daoCells = cells;
+    daoCountdowns = new Map(cells
+      .filter(daoCellIsWithdrawal)
+      .map((cell) => [daoCellKey(cell), { status: "loading" }]));
+    daoTipHeader = null;
+    daoTipFetchedAt = 0;
+    renderDaoCells();
+    await loadDaoCountdowns(cells, expectedClient);
+    if (account !== expectedAccount || client !== expectedClient) return;
+    renderDaoCells();
+    setStatus(elements.daoListStatus);
+  } catch (error) {
+    if (account === expectedAccount && client === expectedClient) {
+      setStatus(elements.daoListStatus, t("daoLoadError", { error: error.message }), "error");
+    }
+  } finally {
+    daoLoadInProgress = false;
+    elements.daoRefreshButton.disabled = walletOperationInProgress;
+  }
+}
+
+function daoCellInput(cell, since = 0n) {
+  return {
+    previousOutput: cell.outPoint,
+    since,
+    cellOutput: cell.cellOutput,
+    outputData: cell.outputData,
+  };
+}
+
+function addDaoCellDep(transaction) {
+  transaction.addCellDeps(config.current.script.dao.cellDep);
+}
+
+async function buildDaoDepositTransaction(amount, ownerLock) {
+  const daoScript = currentDaoScript();
+  const output = ccc.CellOutput.from({ capacity: amount, lock: ownerLock, type: daoScript });
+  const minimumCapacity = BigInt(output.occupiedSize + 8) * SHANNONS_PER_CKB;
+  if (amount < minimumCapacity) {
+    throw new Error(t("daoDepositMinimum", { capacity: formatCkb(minimumCapacity) }));
+  }
+  const transaction = ccc.Transaction.from({
+    outputs: [output],
+    outputsData: [DAO_ZERO_DATA],
+  });
+  addDaoCellDep(transaction);
+  return transaction;
+}
+
+async function buildDaoPrepareTransaction(cell, ownerLock) {
+  const daoInfo = await cell.getNervosDaoInfo(client);
+  if (!daoInfo.depositHeader || daoInfo.withdrawHeader) throw new Error(t("daoInvalidCell"));
+  const transaction = ccc.Transaction.from({
+    headerDeps: [daoInfo.depositHeader.hash],
+    inputs: [daoCellInput(cell)],
+    outputs: [cell.cellOutput],
+    outputsData: [uint64LeHex(daoInfo.depositHeader.number)],
+  });
+  addDaoCellDep(transaction);
+  return transaction;
+}
+
+async function buildDaoWithdrawTransaction(cell, ownerLock) {
+  const daoInfo = await cell.getNervosDaoInfo(client);
+  if (!daoInfo.depositHeader || !daoInfo.withdrawHeader) throw new Error(t("daoInvalidCell"));
+  const claimEpoch = ccc.calcDaoClaimEpoch(daoInfo.depositHeader, daoInfo.withdrawHeader);
+  const tipHeader = await client.getTipHeader();
+  if (tipHeader.epoch.lt(claimEpoch)) {
+    const epochText = claimEpoch.numerator === 0n
+      ? claimEpoch.integer.toString()
+      : `${claimEpoch.integer}+${claimEpoch.numerator}/${claimEpoch.denominator}`;
+    throw new Error(t("daoNotReady", { epoch: epochText }));
+  }
+  const transaction = ccc.Transaction.from({
+    headerDeps: [daoInfo.depositHeader.hash, daoInfo.withdrawHeader.hash],
+    inputs: [daoCellInput(cell, ccc.Since.from({
+      relative: "absolute",
+      metric: "epoch",
+      value: claimEpoch.toNum(),
+    }).toNum())],
+    outputs: [{
+      capacity: BigInt(cell.cellOutput.capacity),
+      lock: ownerLock,
+    }],
+    outputsData: ["0x"],
+  });
+  transaction.setWitnessArgs(0, { inputType: uint64LeHex(0n) });
+  addDaoCellDep(transaction);
+  return transaction;
+}
+
+function setShrincsDaoWitnessPlaceholders(transaction, ownerLock) {
+  const firstIndex = transaction.inputs.findIndex((input) => input.cellOutput && sameScript(input.cellOutput.lock, ownerLock));
+  if (firstIndex < 0) return -1;
+  const placeholder = `0x${"00".repeat(shrincsSignaturePlaceholderSize())}`;
+  for (let index = 0; index < transaction.inputs.length; index += 1) {
+    const witness = transaction.getWitnessArgs(index);
+    if (index === firstIndex) {
+      transaction.setWitnessArgs(index, {
+        lock: placeholder,
+        inputType: witness?.inputType,
+        outputType: witness?.outputType,
+      });
+    } else if (witness) {
+      transaction.setWitnessArgs(index, { inputType: witness.inputType, outputType: witness.outputType });
+    } else {
+      transaction.setWitness(index, "0x");
+    }
+  }
+  return firstIndex;
+}
+
+async function signDaoTransaction(transaction, ownerLock, action, expectedAccount, expectedClient, expectedKey) {
+  if (expectedAccount.accountType === "shrincs") {
+    addShrincsCellDep(transaction);
+    const signer = new ccc.SignerCkbScriptReadonly(expectedClient, ownerLock);
+    let transactionToSign = transaction;
+    let feeCompletedFromDaoProfit = false;
+    if (action === "withdraw") {
+      const daoProfit = BigInt(await transaction.inputs[0].getExtraCapacity(expectedClient));
+      const profitFundedTransaction = transaction.clone();
+      setShrincsDaoWitnessPlaceholders(profitFundedTransaction, ownerLock);
+      try {
+        await profitFundedTransaction.completeFeeChangeToOutput(
+          signer, 0, FEE_RATE, DAO_FEE_CELL_FILTER, { shouldAddInputs: false },
+        );
+        transactionToSign = profitFundedTransaction;
+        feeCompletedFromDaoProfit = true;
+      } catch (error) {
+        if (!(error instanceof ccc.ErrorTransactionInsufficientCapacity)) throw error;
+        transaction.outputs[0].capacity = BigInt(transaction.outputs[0].capacity) + daoProfit;
+      }
+    }
+    if (!feeCompletedFromDaoProfit) {
+      let inputCount = -1;
+      for (let attempt = 0; attempt < 8; attempt += 1) {
+        if (transactionToSign.inputs.length > 0) setShrincsDaoWitnessPlaceholders(transactionToSign, ownerLock);
+        inputCount = transactionToSign.inputs.length;
+        await transactionToSign.completeFeeBy(signer, FEE_RATE, DAO_FEE_CELL_FILTER, { shouldAddInputs: true });
+        if (transactionToSign.inputs.length === inputCount) break;
+        if (attempt === 7) throw new Error("Unable to settle DAO transaction fees with the selected cells.");
+      }
+    }
+    assertWalletContext(expectedAccount, expectedClient, expectedKey);
+    const firstIndex = setShrincsDaoWitnessPlaceholders(transactionToSign, ownerLock);
+    if (firstIndex < 0) throw new Error("No input belongs to the active SHRINCS lock.");
+    await Promise.all(transactionToSign.inputs.map(async (input) => {
+      if (!input.cellOutput || input.outputData === undefined) await input.completeExtraInfos(expectedClient);
+    }));
+    const signature = await signShrincsMessage(shrincsSigningMessage(transactionToSign, transactionToSign.inputs, firstIndex));
+    const witness = transactionToSign.getWitnessArgs(firstIndex) ?? ccc.WitnessArgs.from({});
+    transactionToSign.setWitnessArgs(firstIndex, {
+      lock: signature,
+      inputType: witness.inputType,
+      outputType: witness.outputType,
+    });
+    return transactionToSign;
+  }
+  const signer = new ccc.SignerCkbPrivateKey(expectedClient, expectedKey);
+  if (action === "withdraw") {
+    const daoProfit = BigInt(await transaction.inputs[0].getExtraCapacity(expectedClient));
+    const profitFundedTransaction = transaction.clone();
+    try {
+      await profitFundedTransaction.completeFeeChangeToOutput(
+        signer, 0, FEE_RATE, DAO_FEE_CELL_FILTER, { shouldAddInputs: false },
+      );
+      assertWalletContext(expectedAccount, expectedClient, expectedKey);
+      return signer.signTransaction(profitFundedTransaction);
+    } catch (error) {
+      if (!(error instanceof ccc.ErrorTransactionInsufficientCapacity)) throw error;
+      transaction.outputs[0].capacity = BigInt(transaction.outputs[0].capacity) + daoProfit;
+    }
+  }
+  await transaction.completeFeeBy(signer, FEE_RATE, DAO_FEE_CELL_FILTER, { shouldAddInputs: true });
+  assertWalletContext(expectedAccount, expectedClient, expectedKey);
+  return signer.signTransaction(transaction);
+}
+
+function showDaoTransactionLink(action, transactionHash) {
+  const hash = document.createElement("code");
+  hash.className = "transaction-hash";
+  hash.textContent = transactionHash;
+  elements.daoStatus.replaceChildren(t({
+    deposit: "daoDepositSuccess",
+    prepare: "daoPrepareSuccess",
+    withdraw: "daoWithdrawSuccess",
+  }[action]), hash);
+  elements.daoStatus.className = "status success";
+}
+
+async function performDaoAction(action, { amount, cell } = {}) {
+  if (walletOperationInProgress) return;
+  const signingAccount = account;
+  const signingClient = client;
+  const signingKey = privateKeyInMemory;
+  const signingAddress = signingAccount?.address;
+  if (!signingAccount || !signingClient || !signingKey) {
+    setStatus(elements.daoStatus, t("walletLocked"), "error");
+    return;
+  }
+  walletOperationInProgress = true;
+  elements.daoDepositButton.disabled = true;
+  elements.daoRefreshButton.disabled = true;
+  elements.daoCells.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+  setStatus(elements.daoStatus, t("buildingTransaction"));
+  try {
+    const { script: ownerLock } = await ccc.Address.fromString(signingAddress, signingClient);
+    let transaction;
+    if (action === "deposit") {
+      transaction = await buildDaoDepositTransaction(amount, ownerLock);
+    } else {
+      const freshCell = await signingClient.getCellLive(cell.outPoint, true);
+      if (!freshCell) throw new Error(t("daoCellSpent"));
+      const daoScript = currentDaoScript();
+      if (!freshCell.cellOutput.type || !sameScript(freshCell.cellOutput.type, daoScript) ||
+          !sameScript(freshCell.cellOutput.lock, ownerLock) || typeof freshCell.outputData !== "string" || freshCell.outputData.length !== 18) {
+        throw new Error(t("daoInvalidCell"));
+      }
+      transaction = action === "prepare"
+        ? await buildDaoPrepareTransaction(freshCell, ownerLock)
+        : await buildDaoWithdrawTransaction(freshCell, ownerLock);
+    }
+    assertWalletContext(signingAccount, signingClient, signingKey);
+    const sealed = await signDaoTransaction(transaction, ownerLock, action, signingAccount, signingClient, signingKey);
+    assertWalletContext(signingAccount, signingClient, signingKey);
+    setStatus(elements.daoStatus, t("daoBroadcasting"));
+    const transactionHash = await signingClient.sendTransaction(serializableCkbValue(sealed));
+    assertWalletContext(signingAccount, signingClient, signingKey);
+    await refreshBalance();
+    await loadDaoCells();
+    showDaoTransactionLink(action, transactionHash);
+  } catch (error) {
+    setStatus(elements.daoStatus, t("daoActionError", { error: error.message }), "error");
+  } finally {
+    walletOperationInProgress = false;
+    elements.daoDepositButton.disabled = false;
+    elements.daoRefreshButton.disabled = false;
+    renderDaoCells();
+  }
 }
 
 // 进入钱包视图(生成/导入后直接进入, 或解锁后进入). privateKey 为内存中用于签名的密钥.
@@ -1639,13 +2213,29 @@ async function recordTransaction(transactionHash, amount, address = account.addr
 
 function showWalletPanel(panel) {
   const history = panel === "history";
-  elements.transferForm.hidden = history;
+  const dao = panel === "dao";
+  elements.transferForm.hidden = history || dao;
+  elements.daoPanel.hidden = !dao;
   elements.historyPanel.hidden = !history;
-  elements.sendTab.classList.toggle("active", !history);
+  elements.sendTab.classList.toggle("active", !history && !dao);
+  elements.daoTab.classList.toggle("active", dao);
   elements.historyTab.classList.toggle("active", history);
-  elements.sendTab.setAttribute("aria-selected", String(!history));
+  elements.sendTab.setAttribute("aria-selected", String(!history && !dao));
+  elements.daoTab.setAttribute("aria-selected", String(dao));
   elements.historyTab.setAttribute("aria-selected", String(history));
   if (history) loadTransactionHistory();
+  if (dao) {
+    loadDaoCells();
+    if (daoCountdownTimer === null) {
+      daoCountdownTimer = setInterval(() => {
+        updateDaoCountdowns();
+        if (daoTipHeader && Date.now() - daoTipFetchedAt >= 5 * 60_000) refreshDaoTipHeader();
+      }, 60_000);
+    }
+  } else if (daoCountdownTimer !== null) {
+    clearInterval(daoCountdownTimer);
+    daoCountdownTimer = null;
+  }
 }
 
 async function persistShrincsSignMode(mode) {
@@ -1783,11 +2373,29 @@ elements.settingsSignMode.addEventListener("change", () => {
 });
 elements.changePasswordButton.addEventListener("click", changeWalletPassword);
 elements.sendTab.addEventListener("click", () => showWalletPanel("send"));
+elements.daoTab.addEventListener("click", () => showWalletPanel("dao"));
 elements.historyTab.addEventListener("click", () => showWalletPanel("history"));
+elements.daoRefreshButton.addEventListener("click", () => loadDaoCells());
+elements.daoDepositForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  try {
+    const amount = parseCkbAmount(elements.daoAmount.value, 0n);
+    performDaoAction("deposit", { amount });
+  } catch (error) {
+    setStatus(elements.daoStatus, t("daoActionError", { error: error.message }), "error");
+  }
+});
+elements.daoCells.addEventListener("click", (event) => {
+  const button = event.target.closest("button[data-dao-action]");
+  if (!button) return;
+  const cell = daoCells[Number(button.dataset.daoIndex)];
+  if (cell) performDaoAction(button.dataset.daoAction, { cell });
+});
 elements.languageSelect.addEventListener("change", async () => {
   language = elements.languageSelect.value;
   await chrome.storage.local.set({ language });
   applyTranslations();
+  renderDaoCells();
 });
 elements.resetConfirmButton.addEventListener("click", async () => {
   if (walletOperationInProgress) return;

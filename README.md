@@ -6,6 +6,13 @@ A testnet web wallet extension for the CKB blockchain.
 
 ![img](./res/show.png)
 
+# Nervos DAO
+
+The wallet supports DAO deposits, withdrawal preparation, and withdrawals after the
+claim epoch. DAO cells are queried by the wallet's exact lock and DAO type scripts;
+their deposit and withdrawal headers are fetched only when an individual cell is
+used, avoiding per-cell transaction-history scans while listing holdings.
+
 # Install (Source Code)
 
 ```bash

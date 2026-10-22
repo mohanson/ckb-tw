@@ -51,6 +51,13 @@
     .history-item .row { align-items:flex-start; }
     .history-meta, .empty-state { color:var(--muted); font-size:11px; }
     .empty-state { margin:10px 0 0; text-align:center; }
+    .dao-list { display:grid; gap:8px; }
+    .dao-cell { padding:10px; border:1px solid var(--line); border-radius:11px; background:rgba(4,18,39,.45); }
+    .dao-cell-meta { overflow-wrap:anywhere; margin:5px 0 0; color:var(--muted); font:10px/1.4 ui-monospace,"Cascadia Code",monospace; }
+    .dao-cell-countdown { margin:6px 0 0; color:var(--cyan); font-size:11px; }
+    .dao-cell .actions { justify-content:flex-end; margin-top:9px; }
+    .dao-cell .actions .dao-cell-countdown { flex:1; margin:0; }
+    .dao-cell .actions button { flex:0 1 auto; padding:7px 9px; font-size:11px; }
     .setting-row { padding:12px 0; border-bottom:1px solid var(--line); }
     .setting-row:first-of-type { padding-top:0; }
     .setting-row:last-of-type { border-bottom:0; }
@@ -201,7 +208,7 @@
         <p id="address" class="address"></p>
       </div>
       <div class="card"><div class="row"><strong data-i18n="availableBalance">Available balance</strong><button id="refresh-button" class="secondary" type="button" data-i18n="refreshButton">Refresh</button></div><p id="balance" class="balance">-- <small>CKB</small></p></div>
-      <div class="tabs" role="tablist"><button id="send-tab" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="transfer-form" data-i18n="sendTitle">Send CKB</button><button id="history-tab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="history-panel" data-i18n="historyTitle">Transaction history</button></div>
+      <div class="tabs" role="tablist"><button id="send-tab" class="tab active" type="button" role="tab" aria-selected="true" aria-controls="transfer-form" data-i18n="sendTitle">Send CKB</button><button id="dao-tab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="dao-panel" data-i18n="daoTab">Nervos DAO</button><button id="history-tab" class="tab" type="button" role="tab" aria-selected="false" aria-controls="history-panel" data-i18n="historyTitle">Transaction history</button></div>
       <form id="transfer-form" class="card wallet-panel">
         <h2 data-i18n="sendTitle">Send CKB</h2><label for="recipient" data-i18n="recipientLabel">Testnet recipient address</label>
         <input id="recipient" autocomplete="off" spellcheck="false" data-i18n-placeholder="recipientPlaceholder" placeholder="ckt1..." required>
@@ -210,6 +217,21 @@
         <p id="wallet-status" class="status" role="status" aria-live="polite"></p>
         <div id="signing-progress" class="signing-progress transaction-progress" data-i18n-aria="signingProgress" role="progressbar" aria-label="Signing progress" hidden></div>
       </form>
+      <section id="dao-panel" class="card wallet-panel" hidden>
+        <div class="row"><h2 data-i18n="daoTitle">Nervos DAO</h2><button id="dao-refresh-button" class="secondary" type="button" data-i18n="daoRefreshButton">Refresh</button></div>
+        <p class="hint" data-i18n="daoHint">Deposits earn secondary issuance. Withdrawal requires a preparation transaction and a 180-epoch lock period.</p>
+        <div class="setting-row"><strong data-i18n="daoBalanceLabel">DAO capacity</strong><p id="dao-balance" class="balance">-- <small>CKB</small></p></div>
+        <form id="dao-deposit-form">
+          <h3 data-i18n="daoDepositTitle">Deposit into DAO</h3>
+          <label for="dao-amount" data-i18n="daoAmountLabel">Amount (CKB)</label>
+          <input id="dao-amount" inputmode="decimal" autocomplete="off" data-i18n-placeholder="daoAmountPlaceholder" placeholder="At least the occupied capacity" required>
+          <div class="actions"><button id="dao-deposit-button" type="submit" data-i18n="daoDepositButton">Deposit</button></div>
+        </form>
+        <h3 data-i18n="daoCellsTitle">DAO cells</h3>
+        <div id="dao-cells" class="dao-list"></div>
+        <p id="dao-list-status" class="status" role="status" aria-live="polite"></p>
+        <p id="dao-status" class="status" role="status" aria-live="polite"></p>
+      </section>
       <section id="history-panel" class="card wallet-panel" hidden><h2 data-i18n="historyTitle">Transaction history</h2><ul id="transaction-history" class="history-list"></ul><p id="history-empty" class="empty-state" data-i18n="historyEmpty">No transactions yet</p></section>
     </section>
   </main>
