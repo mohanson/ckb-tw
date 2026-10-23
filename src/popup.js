@@ -459,6 +459,14 @@ translations["zh-CN"].historySuccess = "已完成";
 translations["en-US"].historySuccess = "Completed";
 translations["zh-CN"].historyAmount = "金额";
 translations["en-US"].historyAmount = "Amount";
+translations["zh-CN"].historyTransfer = "转账";
+translations["en-US"].historyTransfer = "Transfer";
+translations["zh-CN"].historyDaoDeposit = "DAO 存款";
+translations["en-US"].historyDaoDeposit = "DAO deposit";
+translations["zh-CN"].historyDaoPrepare = "DAO 预取款";
+translations["en-US"].historyDaoPrepare = "DAO withdrawal preparation";
+translations["zh-CN"].historyDaoWithdraw = "DAO 取款";
+translations["en-US"].historyDaoWithdraw = "DAO withdrawal";
 translations["zh-CN"].defaultOption = "默认";
 translations["en-US"].defaultOption = "Default";
 translations["zh-CN"].deleteAccountTitle = "删除账户";
@@ -1823,6 +1831,7 @@ async function performDaoAction(action, { amount, cell } = {}) {
     assertWalletContext(signingAccount, signingClient, signingKey);
     setStatus(elements.daoStatus, t("daoBroadcasting"));
     const transactionHash = await signingClient.sendTransaction(serializableCkbValue(sealed));
+    await recordTransaction(transactionHash, BigInt(sealed.outputs[0].capacity), signingAddress, `dao-${action}`);
     assertWalletContext(signingAccount, signingClient, signingKey);
     await refreshBalance();
     await loadDaoCells();
@@ -2012,7 +2021,7 @@ async function sendTransfer(event) {
     transactionSigned = true;
     setStatus(elements.walletStatus, t("broadcasting"));
     const transactionHash = await signingClient.sendTransaction(sealed);
-    await recordTransaction(transactionHash, amount, signingAddress);
+    await recordTransaction(transactionHash, amount, signingAddress, "transfer");
     assertWalletContext(signingAccount, signingClient, signingKey);
     elements.amount.value = "";
     await refreshBalance();
@@ -2156,7 +2165,13 @@ function renderTransactionHistory(records) {
     const item = document.createElement("li");
     item.className = "history-item";
     const statusLabel = record.status === "completed" ? t("historySuccess") : t("historyPending");
-    item.innerHTML = `<div class="row"><strong>${statusLabel}</strong><span class="history-meta">${new Date(record.time).toLocaleString(language)}</span></div><div class="row history-meta"><span>${t("historyAmount")}: ${record.amount} CKB</span></div>`;
+    const actionTranslation = {
+      transfer: "historyTransfer",
+      "dao-deposit": "historyDaoDeposit",
+      "dao-prepare": "historyDaoPrepare",
+      "dao-withdraw": "historyDaoWithdraw",
+    }[record.action] || "historyTransfer";
+    item.innerHTML = `<div class="row"><strong>${t(actionTranslation)}</strong><span class="history-meta">${new Date(record.time).toLocaleString(language)}</span></div><div class="row history-meta"><span>${statusLabel}</span><span>${t("historyAmount")}: ${record.amount} CKB</span></div>`;
     const hash = document.createElement("code");
     hash.className = "transaction-hash";
     hash.textContent = record.hash;
@@ -2203,10 +2218,10 @@ async function loadTransactionHistory() {
   renderTransactionHistory(records);
 }
 
-async function recordTransaction(transactionHash, amount, address = account.address) {
+async function recordTransaction(transactionHash, amount, address = account.address, action = "transfer") {
   const { transactionHistory = {} } = await chrome.storage.local.get("transactionHistory");
   const records = transactionHistory[address] || [];
-  transactionHistory[address] = [{ hash: transactionHash, amount: formatCkb(amount), time: Date.now(), status: "pending" }, ...records].slice(0, 30);
+  transactionHistory[address] = [{ hash: transactionHash, amount: formatCkb(amount), time: Date.now(), status: "pending", action }, ...records].slice(0, 30);
   await chrome.storage.local.set({ transactionHistory });
   if (account?.address === address) renderTransactionHistory(transactionHistory[address]);
 }

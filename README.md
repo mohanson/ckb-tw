@@ -12,6 +12,7 @@ The wallet supports DAO deposits, withdrawal preparation, and withdrawals after 
 claim epoch. DAO cells are queried by the wallet's exact lock and DAO type scripts;
 their deposit and withdrawal headers are fetched only when an individual cell is
 used, avoiding per-cell transaction-history scans while listing holdings.
+Successful DAO transactions are recorded alongside transfers in transaction history.
 
 # Install (Source Code)
 
