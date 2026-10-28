@@ -36,6 +36,9 @@
       "matches": [
         "<all_urls>"
       ],
+      "exclude_matches": [
+        "https://docs.google.com/*"
+      ],
       "js": [
         "content.js"
       ],

@@ -6,6 +6,9 @@ A testnet web wallet extension for the CKB blockchain.
 
 ![img](./res/show.png)
 
+The wallet provider is not injected into Google Docs pages to avoid interfering
+with the editor.
+
 # Nervos DAO
 
 The wallet supports DAO deposits, withdrawal preparation, and withdrawals after the
